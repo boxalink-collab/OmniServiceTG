@@ -1,7 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// Votre configuration Firestore
+// Importations des pages (Vérifiez bien que les fichiers existent dans /pages/)
+import { renderAccueil } from './pages/Accueil.js';
+import { renderServices } from './pages/Services.js';
+
 const firebaseConfig = {
   apiKey: "AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",
   authDomain: "omniservicetg-59df3.firebaseapp.com",
@@ -14,49 +17,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
-// Fonction simple pour charger les pages
-window.loadPage = function(page) {
+// Gestionnaire de navigation
+window.loadPage = function(pageId) {
     const content = document.getElementById('app-content');
     
-    // Mise à jour de l'état actif de la navigation
+    // Mise à jour visuelle des boutons de navigation
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    // On cherche l'élément qui a été cliqué ou celui qui correspond au pageId
+    const activeNav = document.querySelector(`.nav-item[onclick*="${pageId}"]`);
+    if(activeNav) activeNav.classList.add('active');
 
-    // Simulation de chargement (en attendant les fichiers séparés)
-    content.innerHTML = `<div style="padding:20px;">Chargement de la page ${page}...</div>`;
-    
-    console.log(`Navigation vers : ${page}`);
-};
-
-// Charger l'accueil par défaut
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("OmniService TG prêt !");
-});
-
-import { renderAccueil } from './pages/Accueil.js';
-
-window.loadPage = function(page) {
-    const content = document.getElementById('app-content');
-    
-    if(page === 'accueil') {
+    if (pageId === 'accueil') {
         content.innerHTML = renderAccueil();
-    } else {
-        content.innerHTML = `<div style="padding:20px;">Page ${page} en cours de construction...</div>`;
-    }
-};
-
-// Charger l'accueil au démarrage
-window.onload = () => loadPage('accueil');
-
-import { renderServices } from './pages/Services.js';
-
-window.loadPage = function(page) {
-    const content = document.getElementById('app-content');
-    
-    if(page === 'accueil') {
-        content.innerHTML = renderAccueil();
-    } else if(page === 'services') {
+    } else if (pageId === 'services') {
         content.innerHTML = renderServices();
-    } 
-    // ... reste du code
+    } else {
+        content.innerHTML = `<div style="padding:20px;">La page <b>${pageId}</b> est en cours de développement.</div>`;
+    }
+    
+    // Remonter en haut de page
+    window.scrollTo(0, 0);
 };
+
+// Chargement initial
+document.addEventListener('DOMContentLoaded', () => {
+    loadPage('accueil');
+});
