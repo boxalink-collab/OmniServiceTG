@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OmniService TG — Administration</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1E6FBE;--blue-d:#155A9C;
+  --ora:#F5820A; --ora-d:#D96E00;
+  --dark:#1A1A2E;--mid:#4A4A6A;--light:#9999BB;
+  --border:#E8EAF0;--bg:#F4F6FA;
+  --green:#2E7D32;--red:#C62828;--purple:#7B1FA2;
+}
+html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--dark)}
+
+/* ════ ÉCRAN LOGIN ════ */
+#login-screen{
+  position:fixed;inset:0;
+  background:linear-gradient(135deg,#0e1420 0%,#1a2540 100%);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;padding:16px;
+}
+.login-box{
+  background:#fff;border-radius:22px;padding:36px 32px;
+  width:100%;max-width:380px;text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.4);
+}
+.login-logo-wrap{
+  width:70px;height:70px;background:linear-gradient(135deg,var(--blue),var(--blue-d));
+  border-radius:18px;margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  box-shadow:0 8px 24px rgba(30,111,190,.35);
+}
+.login-logo-wrap img{width:56px;height:56px;object-fit:contain}
+.login-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--dark);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--light);margin-bottom:26px}
+.login-label{display:block;font-size:11px;font-weight:700;color:var(--mid);text-align:left;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.login-inp{
+  width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:11px;
+  font-size:13px;font-family:'Poppins',sans-serif;margin-bottom:13px;outline:none;
+  background:var(--bg);transition:border-color .2s;
+}
+.login-inp:focus{border-color:var(--blue);background:#fff}
+.login-btn{
+  width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-d));
+  color:#fff;border:none;border-radius:999px;padding:14px;font-size:14px;
+  font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;
+  box-shadow:0 4px 16px rgba(30,111,190,.35);transition:all .2s;
+}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(30,111,190,.45)}
+.login-err{color:var(--red);font-size:12px;margin-top:10px;min-height:18px}
+.login-hint{
+  margin-top:16px;font-size:11px;color:var(--light);line-height:1.6;
+  background:var(--bg);border-radius:9px;padding:10px 12px;text-align:left;
+}
+.login-hint b{color:var(--dark)}
+
+/* ════ LAYOUT ADMIN ════ */
+.layout{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{
+  width:240px;background:#1A1A2E;flex-shrink:0;
+  display:flex;flex-direction:column;
+  transition:transform .3s;
+}
+.sb-brand{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo{font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;color:#fff}
+.sb-logo span{color:var(--ora)}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:2px}
+.sb-nav{padding:16px 12px;flex:1;overflow-y:auto}
+.sb-section{font-size:9px;font-weight:800;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:1px;padding:0 10px;margin:14px 0 6px}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;
+  border-radius:10px;cursor:pointer;margin-bottom:3px;transition:background .15s;
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.5);
+  border:none;background:transparent;width:100%;text-align:left;
+}
+.sb-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.sb-item.on{background:rgba(30,111,190,.25);color:#fff}
+.sb-item-ico{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--ora);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px}
+.sb-footer{padding:14px 14px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-admin-info{font-size:11px;color:rgba(255,255,255,.3);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout-btn{width:100%;background:rgba(198,40,40,.2);color:#ff8a80;border:none;border-radius:9px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:background .2s}
+.logout-btn:hover{background:rgba(198,40,40,.35)}
+
+/* Hamburger (mobile) */
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--blue);color:#fff;border:none;border-radius:10px;width:40px;height:40px;font-size:18px;cursor:pointer;align-items:center;justify-content:center}
+
+/* Main content */
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.main-inner{max-width:1100px;margin:0 auto;padding:28px 24px 48px}
+
+/* ── Page titles ── */
+.pg-title{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--dark);margin-bottom:4px}
+.pg-sub{font-size:12px;color:var(--light);margin-bottom:24px}
+
+/* ── Stats cards ── */
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:26px}
+.stat-card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.stat-ico{font-size:22px}
+.stat-val{font-family:'Nunito',sans-serif;font-size:30px;font-weight:900;color:var(--dark)}
+.stat-lbl{font-size:11px;color:var(--light);font-weight:600}
+
+/* ── Filters bar ── */
+.filters-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.fbtn{background:#fff;border:1.5px solid var(--border);border-radius:999px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;color:var(--mid);transition:all .15s;white-space:nowrap}
+.fbtn.on,.fbtn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.f-search{flex:1;min-width:180px}
+.f-search input{width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:999px;font-size:12px;outline:none;font-family:'Poppins',sans-serif;background:#fff}
+.f-search input:focus{border-color:var(--blue)}
+.refresh-btn{background:var(--blue);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;transition:background .2s}
+.refresh-btn:hover{background:var(--blue-d)}
+
+/* ── Orders table ── */
+.orders-wrap{background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden}
+.orders-head{
+  display:grid;grid-template-columns:100px 1fr 130px 110px 120px 170px;gap:10px;
+  padding:11px 16px;background:var(--bg);font-size:10px;font-weight:700;
+  color:var(--light);text-transform:uppercase;letter-spacing:.5px;
+  border-bottom:1px solid var(--border);
+}
+.order-row{
+  display:grid;grid-template-columns:100px 1fr 130px 110px 120px 170px;gap:10px;
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  align-items:center;transition:background .1s;
+}
+.order-row:last-child{border-bottom:none}
+.order-row:hover{background:#FAFBFC}
+.or-ref{font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.or-name{font-size:12px;font-weight:600;color:var(--dark)}
+.or-sub{font-size:10px;color:var(--light);margin-top:2px}
+.pill{font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;display:inline-block}
+.or-actions{display:flex;gap:6px;align-items:center}
+.act-select{padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-family:'Poppins',sans-serif;cursor:pointer;outline:none;background:#fff;color:var(--dark);max-width:110px}
+.act-save{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;transition:background .2s}
+.act-save:hover{background:var(--blue-d)}
+.act-del{background:#FFEBEE;color:var(--red);border:none;border-radius:8px;padding:7px 9px;font-size:13px;cursor:pointer;transition:background .2s}
+.act-del:hover{background:#FFCDD2}
+
+/* mobile card view for orders */
+.order-card-mobile{display:none;background:#fff;border-radius:14px;padding:15px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:10px}
+.ocm-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.ocm-actions{display:flex;gap:6px;margin-top:12px;align-items:center}
+.ocm-select{flex:1;padding:9px 10px;border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-family:'Poppins',sans-serif;cursor:pointer;outline:none;background:var(--bg)}
+
+/* ── Empty / Loading ── */
+.empty-msg{text-align:center;padding:54px;color:var(--light);font-size:13px}
+.loading-wrap{text-align:center;padding:54px;color:var(--light)}
+.spinner{display:inline-block;width:30px;height:30px;border:3px solid rgba(30,111,190,.2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;right:24px;background:#1A1A2E;color:#fff;border-radius:12px;padding:13px 20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.toast.show{opacity:1}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:18px;padding:28px;max-width:520px;width:100%;max-height:85vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:14px;right:14px;background:var(--bg);border:none;border-radius:9px;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--mid)}
+.modal-title{font-family:'Nunito',sans-serif;font-size:19px;font-weight:900;color:var(--dark);margin-bottom:18px}
+.modal-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bg);font-size:12px}
+.modal-key{color:var(--light);font-weight:600;min-width:110px}
+.modal-val{color:var(--dark);font-weight:600;text-align:right;word-break:break-word;max-width:65%}
+
+/* ── Settings ── */
+.settings-card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,.07);max-width:500px;margin-bottom:20px}
+.settings-title{font-size:14px;font-weight:700;color:var(--dark);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.s-label{display:block;font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.s-inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:13px;font-family:'Poppins',sans-serif;background:var(--bg);outline:none;margin-bottom:16px;transition:border-color .2s}
+.s-inp:focus{border-color:var(--blue);background:#fff}
+.s-btn{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;border-radius:999px;padding:12px 28px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif}
+
+/* ── Stats page ── */
+.bar-row{margin-bottom:13px}
+.bar-top{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:5px}
+.bar-bg{height:8px;background:var(--bg);border-radius:999px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(135deg,var(--blue),var(--ora));border-radius:999px;transition:width .6s ease}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:768px){
+  .sidebar{position:fixed;top:0;bottom:0;left:0;z-index:200;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:flex}
+  .main{margin-left:0}
+  .main-inner{padding:60px 16px 40px}
+  .orders-head,.order-row{display:none}
+  .order-card-mobile{display:block}
+  .stats-row{grid-template-columns:1fr 1fr}
+}
+@media(min-width:769px){
+  .order-card-mobile{display:none}
+}
+@media(min-width:1000px){
+  .stats-row{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ LOGIN ════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo-wrap">
+      <img src="../assets/logo.png" alt="OmniService TG" onerror="this.parentElement.textContent='🛡️'"/>
+    </div>
+    <div class="login-title">OmniService <span style="color:#F5820A">TG</span></div>
+    <div class="login-sub">Interface d'administration</div>
+
+    <label class="login-label">Email</label>
+    <input type="email"    class="login-inp" id="l-email" placeholder="admin@omniservicetg.com" autocomplete="username"/>
+    <label class="login-label">Mot de passe</label>
+    <input type="password" class="login-inp" id="l-pass"  placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()" id="login-btn">Se connecter →</button>
+    <div class="login-err" id="l-err"></div>
+
+    <div class="login-hint">
+      <b>🔑 Identifiants par défaut :</b><br/>
+      Email : <b>admin@omniservicetg.com</b><br/>
+      Mot de passe : <b>OmniAdmin2026!</b><br/>
+      <span style="color:#F5820A">→ À changer dans Paramètres après connexion</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ INTERFACE ADMIN ════════════════ -->
+<div class="layout" id="admin-ui" style="display:none">
+
+  <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">OmniService <span>TG</span></div>
+      <div class="sb-sub">Administration</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <button class="sb-item on" data-section="orders" onclick="showSection('orders',this)">
+        <span class="sb-item-ico">📦</span>Commandes
+        <span class="sb-badge" id="badge-pending">0</span>
+      </button>
+      <button class="sb-item" data-section="stats" onclick="showSection('stats',this)">
+        <span class="sb-item-ico">📊</span>Statistiques
+      </button>
+      <div class="sb-section">Réglages</div>
+      <button class="sb-item" data-section="settings" onclick="showSection('settings',this)">
+        <span class="sb-item-ico">⚙️</span>Paramètres
+      </button>
+      <button class="sb-item" data-section="password" onclick="showSection('password',this)">
+        <span class="sb-item-ico">🔑</span>Changer le mot de passe
+      </button>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-admin-info" id="admin-email-disp">—</div>
+      <button class="logout-btn" onclick="doLogout()">🚪 Se déconnecter</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="main-inner">
+
+      <!-- ══ COMMANDES ══ -->
+      <div id="section-orders">
+        <div class="pg-title">Gestion des Commandes</div>
+        <div class="pg-sub" id="last-refresh">Chargement...</div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-top"><span class="stat-ico">⏳</span></div>
+            <div class="stat-val" id="s-att">0</div>
+            <div class="stat-lbl">En attente</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><span class="stat-ico">🟣</span></div>
+            <div class="stat-val" id="s-enc">0</div>
+            <div class="stat-lbl">En cours</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><span class="stat-ico">✅</span></div>
+            <div class="stat-val" id="s-ter">0</div>
+            <div class="stat-lbl">Terminées</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><span class="stat-ico">📦</span></div>
+            <div class="stat-val" id="s-tot">0</div>
+            <div class="stat-lbl">Total</div>
+          </div>
+        </div>
+
+        <div class="filters-bar">
+          <button class="fbtn on" onclick="setFilter('all',this)">Toutes</button>
+          <button class="fbtn" onclick="setFilter('En attente',this)">⏳ En attente</button>
+          <button class="fbtn" onclick="setFilter('Confirmée',this)">🔵 Confirmées</button>
+          <button class="fbtn" onclick="setFilter('En cours',this)">🟣 En cours</button>
+          <button class="fbtn" onclick="setFilter('Terminée',this)">✅ Terminées</button>
+          <button class="fbtn" onclick="setFilter('Annulée',this)">❌ Annulées</button>
+          <div class="f-search"><input type="text" placeholder="🔍 Téléphone, service, réf..." oninput="doSearch(this.value)"/></div>
+          <button class="refresh-btn" onclick="loadOrders()">🔄 Actualiser</button>
+        </div>
+
+        <!-- Desktop table -->
+        <div class="orders-wrap" id="orders-table-wrap">
+          <div class="orders-head">
+            <div>Référence</div><div>Service</div><div>Client</div>
+            <div>Date</div><div>Statut</div><div>Actions</div>
+          </div>
+          <div id="orders-body-desktop">
+            <div class="loading-wrap"><div class="spinner"></div></div>
+          </div>
+        </div>
+        <!-- Mobile cards -->
+        <div id="orders-body-mobile"></div>
+      </div>
+
+      <!-- ══ STATISTIQUES ══ -->
+      <div id="section-stats" style="display:none">
+        <div class="pg-title">Statistiques</div>
+        <div class="pg-sub">Vue d'ensemble des performances</div>
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr);max-width:700px">
+          <div class="stat-card"><div class="stat-ico">📅</div><div class="stat-val" id="st-today">0</div><div class="stat-lbl">Aujourd'hui</div></div>
+          <div class="stat-card"><div class="stat-ico">📆</div><div class="stat-val" id="st-week">0</div><div class="stat-lbl">Cette semaine</div></div>
+          <div class="stat-card"><div class="stat-ico">🏆</div><div class="stat-val" id="st-top" style="font-size:16px;margin-top:4px">—</div><div class="stat-lbl">Service le + demandé</div></div>
+        </div>
+        <div class="settings-card" style="max-width:600px">
+          <div class="settings-title">Répartition par service</div>
+          <div id="st-breakdown"></div>
+        </div>
+      </div>
+
+      <!-- ══ PARAMÈTRES ══ -->
+      <div id="section-settings" style="display:none">
+        <div class="pg-title">Paramètres</div>
+        <div class="pg-sub">Informations de contact affichées sur l'application</div>
+        <div class="settings-card">
+          <div class="settings-title">📞 Coordonnées</div>
+          <label class="s-label">Téléphone</label>
+          <input type="tel"   class="s-inp" id="cfg-phone" placeholder="+228 XX XX XX XX"/>
+          <label class="s-label">Email de contact</label>
+          <input type="email" class="s-inp" id="cfg-email" placeholder="contact@omniservicetg.com"/>
+          <label class="s-label">Site web</label>
+          <input type="text"  class="s-inp" id="cfg-web"   placeholder="www.omniservicetg.com"/>
+          <button class="s-btn" onclick="saveSettings()">💾 Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- ══ CHANGER MOT DE PASSE ══ -->
+      <div id="section-password" style="display:none">
+        <div class="pg-title">Changer le mot de passe</div>
+        <div class="pg-sub">Sécurisez votre accès administrateur</div>
+        <div class="settings-card">
+          <div class="settings-title">🔑 Nouveau mot de passe</div>
+          <label class="s-label">Mot de passe actuel</label>
+          <input type="password" class="s-inp" id="pw-current" placeholder="Mot de passe actuel"/>
+          <label class="s-label">Nouveau mot de passe</label>
+          <input type="password" class="s-inp" id="pw-new" placeholder="Min. 8 caractères"/>
+          <label class="s-label">Confirmer le nouveau mot de passe</label>
+          <input type="password" class="s-inp" id="pw-confirm" placeholder="Répétez le nouveau mot de passe"/>
+          <button class="s-btn" onclick="changePassword()">🔒 Changer le mot de passe</button>
+          <div id="pw-msg" style="margin-top:12px;font-size:12px"></div>
+        </div>
+        <div class="settings-card" style="border:1px solid var(--border);box-shadow:none;background:#FFFBF0">
+          <div class="settings-title" style="color:#856404">⚠️ Identifiant par défaut</div>
+          <p style="font-size:12px;color:var(--mid);line-height:1.7">
+            Email : <strong>admin@omniservicetg.com</strong><br/>
+            Mot de passe initial : <strong>OmniAdmin2026!</strong><br/>
+            Ces identifiants sont créés automatiquement dans Firebase Authentication.
+            Pensez à les changer dès votre première connexion.
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /main-inner -->
+  </main>
+</div><!-- /layout -->
+
+<!-- Modal détail commande -->
+<div class="modal-overlay" id="modal-overlay" onclick="maybeCloseModal(event)">
+  <div class="modal" id="modal-content">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title">Détail de la commande</div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ════════════════ FIREBASE ════════════════ -->
+<script type="module">
+import { initializeApp }                              from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc,
+         updateDoc, deleteDoc, orderBy, query,
+         serverTimestamp }                            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword,
+         signOut, onAuthStateChanged,
+         updatePassword, EmailAuthProvider,
+         reauthenticateWithCredential }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+// ── ⚠️  Votre config Firebase (identique à app.js) ──
+const firebaseConfig = {
+  apiKey: "VOTRE_API_KEY",
+  authDomain: "VOTRE_PROJECT.firebaseapp.com",
+  projectId: "VOTRE_PROJECT_ID",
+  storageBucket: "VOTRE_PROJECT.appspot.com",
+  messagingSenderId: "VOTRE_SENDER_ID",
+  appId: "VOTRE_APP_ID"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db    = getFirestore(fbApp);
+const auth  = getAuth(fbApp);
+
+// ── Helpers ──────────────────────────────────
+function toast(msg, color="#1A1A2E") {
+  const t = document.getElementById("toast");
+  t.style.background = color;
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+// ── Authentification ─────────────────────────
+window.doLogin = async function() {
+  const email = document.getElementById("l-email").value.trim();
+  const pass  = document.getElementById("l-pass").value;
+  const err   = document.getElementById("l-err");
+  const btn   = document.getElementById("login-btn");
+  err.textContent = "";
+  btn.textContent = "Connexion...";
+  btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    const msgs = {
+      "auth/invalid-credential": "Email ou mot de passe incorrect.",
+      "auth/user-not-found":     "Compte introuvable. Créez-le dans Firebase Auth.",
+      "auth/wrong-password":     "Mot de passe incorrect.",
+      "auth/invalid-email":      "Format d'email invalide.",
+      "auth/too-many-requests":  "Trop de tentatives. Attendez quelques minutes.",
+    };
+    err.textContent = msgs[e.code] || "Erreur : " + e.message;
+    btn.textContent = "Se connecter →";
+    btn.disabled = false;
+  }
+};
+
+window.doLogout = async function() {
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("admin-ui").style.display     = "flex";
+    document.getElementById("admin-email-disp").textContent = user.email;
+    loadOrders();
+    loadSettings();
+  } else {
+    document.getElementById("login-screen").style.display = "flex";
+    document.getElementById("admin-ui").style.display     = "none";
+  }
+});
+
+// ── Changer mot de passe ─────────────────────
+window.changePassword = async function() {
+  const current  = document.getElementById("pw-current").value;
+  const newPw    = document.getElementById("pw-new").value;
+  const confirm  = document.getElementById("pw-confirm").value;
+  const msg      = document.getElementById("pw-msg");
+
+  if (newPw.length < 8) { msg.style.color="var(--red)"; msg.textContent="❌ Le mot de passe doit faire au moins 8 caractères."; return; }
+  if (newPw !== confirm)  { msg.style.color="var(--red)"; msg.textContent="❌ Les mots de passe ne correspondent pas."; return; }
+
+  try {
+    const user = auth.currentUser;
+    const cred = EmailAuthProvider.credential(user.email, current);
+    await reauthenticateWithCredential(user, cred);
+    await updatePassword(user, newPw);
+    msg.style.color = "var(--green)";
+    msg.textContent = "✅ Mot de passe modifié avec succès !";
+    document.getElementById("pw-current").value = "";
+    document.getElementById("pw-new").value     = "";
+    document.getElementById("pw-confirm").value = "";
+    toast("✅ Mot de passe mis à jour !", "var(--green)");
+  } catch(e) {
+    msg.style.color = "var(--red)";
+    if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential")
+      msg.textContent = "❌ Mot de passe actuel incorrect.";
+    else
+      msg.textContent = "❌ Erreur : " + e.message;
+  }
+};
+
+// ── Données & rendu ──────────────────────────
+let allOrders    = [];
+let activeFilter = "all";
+let searchTerm   = "";
+
+const SC = {
+  "En attente": { c:"#F5820A", bg:"#FFF3E0" },
+  "Confirmée":  { c:"#1E6FBE", bg:"#E3F2FD" },
+  "En cours":   { c:"#7B1FA2", bg:"#F3E5F5" },
+  "Terminée":   { c:"#2E7D32", bg:"#E8F5E9" },
+  "Annulée":    { c:"#C62828", bg:"#FFEBEE" },
+};
+
+window.loadOrders = async function() {
+  document.getElementById("orders-body-desktop").innerHTML = `<div class="loading-wrap"><div class="spinner"></div></div>`;
+  document.getElementById("orders-body-mobile").innerHTML  = "";
+  try {
+    const q    = query(collection(db,"commandes"), orderBy("createdAt","desc"));
+    const snap = await getDocs(q);
+    allOrders  = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    render();
+    updateStats();
+    document.getElementById("last-refresh").textContent =
+      "Dernière mise à jour : " + new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  } catch(e) {
+    document.getElementById("orders-body-desktop").innerHTML = `<div class="empty-msg">❌ Erreur de chargement Firebase.</div>`;
+    console.error(e);
+  }
+};
+
+function filteredOrders() {
+  return allOrders.filter(o => {
+    const matchFilter = activeFilter === "all" || o.statut === activeFilter;
+    const matchSearch = !searchTerm || [o.phone,o.serviceName,o.service,o.id]
+      .some(v => v && v.toLowerCase().includes(searchTerm));
+    return matchFilter && matchSearch;
+  });
+}
+
+function render() {
+  const list = filteredOrders();
+  // badge
+  document.getElementById("badge-pending").textContent = allOrders.filter(o=>o.statut==="En attente").length;
+
+  if (!list.length) {
+    document.getElementById("orders-body-desktop").innerHTML = `<div class="empty-msg">Aucune commande trouvée.</div>`;
+    document.getElementById("orders-body-mobile").innerHTML  = `<div class="empty-msg">Aucune commande trouvée.</div>`;
+    return;
+  }
+
+  const statusOpts = (cur) => Object.keys(SC).map(s=>`<option value="${s}"${s===cur?" selected":""}>${s}</option>`).join("");
+
+  // Desktop
+  document.getElementById("orders-body-desktop").innerHTML = list.map(o => {
+    const s = SC[o.statut]||SC["En attente"];
+    const dateStr = o.createdAt
+      ? new Date(o.createdAt.seconds*1000).toLocaleDateString("fr-FR",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})
+      : "—";
+    return `<div class="order-row">
+      <div><span class="or-ref" onclick="showDetail('${o.id}')">#${o.id.slice(0,8).toUpperCase()}</span></div>
+      <div><div class="or-name">${o.serviceName||o.service||"—"}</div><div class="or-sub">${o.type||""}</div></div>
+      <div><div class="or-name">${o.phone||"—"}</div><div class="or-sub">${o.adresse||""}</div></div>
+      <div style="font-size:11px;color:var(--mid)">${dateStr}</div>
+      <div><span class="pill" style="background:${s.bg};color:${s.c}">${o.statut}</span></div>
+      <div class="or-actions">
+        <select class="act-select" id="sel-${o.id}">${statusOpts(o.statut)}</select>
+        <button class="act-save" onclick="updateStatus('${o.id}')">✔ Sauver</button>
+        <button class="act-del"  onclick="deleteOrder('${o.id}')" title="Supprimer">🗑</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  // Mobile cards
+  document.getElementById("orders-body-mobile").innerHTML = list.map(o => {
+    const s = SC[o.statut]||SC["En attente"];
+    const dateStr = o.createdAt
+      ? new Date(o.createdAt.seconds*1000).toLocaleDateString("fr-FR",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})
+      : "—";
+    return `<div class="order-card-mobile">
+      <div class="ocm-head">
+        <div>
+          <span class="or-ref" onclick="showDetail('${o.id}')">#${o.id.slice(0,8).toUpperCase()}</span>
+          <div style="font-size:12px;font-weight:700;color:var(--dark);margin-top:3px">${o.serviceName||o.service||"—"}</div>
+          <div style="font-size:11px;color:var(--light)">${o.phone||"—"} · ${dateStr}</div>
+        </div>
+        <span class="pill" style="background:${s.bg};color:${s.c}">${o.statut}</span>
+      </div>
+      <div class="ocm-actions">
+        <select class="ocm-select" id="selm-${o.id}">${statusOpts(o.statut)}</select>
+        <button class="act-save" onclick="updateStatusMobile('${o.id}')">✔</button>
+        <button class="act-del"  onclick="deleteOrder('${o.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+window.setFilter = function(val, btn) {
+  activeFilter = val;
+  document.querySelectorAll(".fbtn").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  render();
+};
+window.doSearch = function(val) {
+  searchTerm = val.toLowerCase();
+  render();
+};
+
+// ── Mettre à jour statut ─────────────────────
+window.updateStatus = async function(id) {
+  const val = document.getElementById(`sel-${id}`).value;
+  await _updateStatus(id, val);
+};
+window.updateStatusMobile = async function(id) {
+  const val = document.getElementById(`selm-${id}`).value;
+  await _updateStatus(id, val);
+};
+async function _updateStatus(id, val) {
+  try {
+    await updateDoc(doc(db,"commandes",id), { statut: val, updatedAt: serverTimestamp() });
+    const o = allOrders.find(x=>x.id===id);
+    if (o) o.statut = val;
+    render(); updateStats();
+    toast("✅ Statut mis à jour !", "#2E7D32");
+  } catch(e) { toast("❌ Erreur de mise à jour","#C62828"); }
+}
+
+// ── Supprimer ────────────────────────────────
+window.deleteOrder = async function(id) {
+  if (!confirm("Supprimer cette commande définitivement ?")) return;
+  try {
+    await deleteDoc(doc(db,"commandes",id));
+    allOrders = allOrders.filter(o=>o.id!==id);
+    render(); updateStats();
+    toast("🗑 Commande supprimée");
+  } catch(e) { toast("❌ Erreur de suppression","#C62828"); }
+};
+
+// ── Stats ────────────────────────────────────
+function updateStats() {
+  const today  = new Date().toDateString();
+  const weekAgo= Date.now() - 7*86400000;
+  document.getElementById("s-att").textContent = allOrders.filter(o=>o.statut==="En attente").length;
+  document.getElementById("s-enc").textContent = allOrders.filter(o=>o.statut==="En cours"||o.statut==="Confirmée").length;
+  document.getElementById("s-ter").textContent = allOrders.filter(o=>o.statut==="Terminée").length;
+  document.getElementById("s-tot").textContent = allOrders.length;
+
+  // stats page
+  document.getElementById("st-today").textContent = allOrders.filter(o=>o.createdAt&&new Date(o.createdAt.seconds*1000).toDateString()===today).length;
+  document.getElementById("st-week").textContent  = allOrders.filter(o=>o.createdAt&&o.createdAt.seconds*1000>=weekAgo).length;
+
+  const counts = {};
+  allOrders.forEach(o=>{ const k=o.serviceName||o.service||"Autre"; counts[k]=(counts[k]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const maxV   = sorted[0]?.[1]||1;
+  document.getElementById("st-top").textContent = sorted[0]?.[0]?.split(" ")[0]||"—";
+  document.getElementById("st-breakdown").innerHTML = sorted.map(([name,count])=>`
+    <div class="bar-row">
+      <div class="bar-top"><span>${name}</span><span>${count}</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${Math.round(count/maxV*100)}%"></div></div>
+    </div>`).join("");
+}
+
+// ── Modal détail ─────────────────────────────
+window.showDetail = function(id) {
+  const o = allOrders.find(x=>x.id===id);
+  if (!o) return;
+  const s = SC[o.statut]||SC["En attente"];
+  const keys = { service:"Service", serviceName:"Nom service", statut:"Statut", phone:"Téléphone",
+    adresse:"Adresse", type:"Type", produits:"Produits", commande:"Commande", personnes:"Personnes",
+    detail:"Détail", urgence:"Urgence", categorie:"Catégorie", article:"Article",
+    budget:"Budget (FCFA)", superficie:"Superficie (m²)", date:"Date", problem:"Problème", notes:"Notes" };
+  const exclude = ["id","createdAt","updatedAt"];
+  const dateStr = o.createdAt ? new Date(o.createdAt.seconds*1000).toLocaleString("fr-FR") : "—";
+
+  const rows = Object.entries(o)
+    .filter(([k,v])=>!exclude.includes(k)&&v)
+    .map(([k,v])=>`<div class="modal-row">
+      <span class="modal-key">${keys[k]||k}</span>
+      <span class="modal-val">${k==="statut"?`<span class="pill" style="background:${s.bg};color:${s.c}">${v}</span>`:v}</span>
+    </div>`).join("");
+
+  document.getElementById("modal-title").textContent = `#${id.slice(0,8).toUpperCase()} — ${o.serviceName||o.service}`;
+  document.getElementById("modal-body").innerHTML = `
+    <div class="modal-row"><span class="modal-key">Date</span><span class="modal-val">${dateStr}</span></div>
+    ${rows}`;
+  document.getElementById("modal-overlay").classList.add("show");
+};
+window.closeModal = function() { document.getElementById("modal-overlay").classList.remove("show"); };
+window.maybeCloseModal = function(e) { if (e.target===document.getElementById("modal-overlay")) closeModal(); };
+
+// ── Sections ────────────────────────────────
+window.showSection = function(id, btn) {
+  ["orders","stats","settings","password"].forEach(s=>document.getElementById("section-"+s).style.display=s===id?"block":"none");
+  document.querySelectorAll(".sb-item").forEach(b=>b.classList.remove("on"));
+  if(btn) btn.classList.add("on");
+  if(id==="stats") updateStats();
+  if(window.innerWidth<769) document.getElementById("sidebar").classList.remove("open");
+};
+
+// ── Hamburger ────────────────────────────────
+window.toggleSidebar = function() {
+  document.getElementById("sidebar").classList.toggle("open");
+};
+
+// ── Paramètres ───────────────────────────────
+function loadSettings() {
+  ["phone","email","web"].forEach(k=>{
+    const v = localStorage.getItem("cfg_"+k);
+    if(v) document.getElementById("cfg-"+k).value = v;
+  });
+}
+window.saveSettings = function() {
+  ["phone","email","web"].forEach(k=>localStorage.setItem("cfg_"+k, document.getElementById("cfg-"+k).value));
+  toast("✅ Paramètres enregistrés !","#2E7D32");
+};
+
+</script>
+</body>
+</html>
