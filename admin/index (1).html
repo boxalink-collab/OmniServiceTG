@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OmniService TG — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1E6FBE; --blue-d:#155A9C;
+  --ora:#F5820A;  --ora-d:#D96E00;
+  --dark:#1A1A2E; --mid:#4A4A6A; --light:#9999BB;
+  --border:#E8EAF0; --bg:#F4F6FA; --white:#fff;
+  --green:#2E7D32; --red:#C62828; --purple:#7B1FA2;
+}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--dark);min-height:100vh}
+
+/* ── Login ── */
+#login-screen{
+  position:fixed;inset:0;background:#0e1420;
+  display:flex;align-items:center;justify-content:center;z-index:1000;
+}
+.login-box{background:#fff;border-radius:20px;padding:36px 32px;width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-logo{font-size:42px;margin-bottom:10px}
+.login-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--dark);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--light);margin-bottom:24px}
+.login-inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:'Poppins',sans-serif;margin-bottom:12px;outline:none}
+.login-inp:focus{border-color:var(--blue)}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;border-radius:999px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif}
+.login-err{color:var(--red);font-size:11px;margin-top:8px}
+
+/* ── Sidebar ── */
+.layout{display:flex;min-height:100vh}
+.sidebar{
+  width:230px;background:#1A1A2E;flex-shrink:0;
+  display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;
+  z-index:10;
+}
+.sb-brand{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo{font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;color:#fff}
+.sb-logo span{color:var(--ora)}
+.sb-sub{font-size:9px;color:rgba(255,255,255,.35);margin-top:2px}
+.sb-nav{padding:16px 10px;flex:1}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;
+  cursor:pointer;margin-bottom:4px;transition:background .15s;
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.55);border:none;background:transparent;width:100%;text-align:left;
+}
+.sb-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.sb-item.on{background:rgba(30,111,190,.25);color:#fff}
+.sb-item-ico{font-size:16px;width:22px;text-align:center}
+.sb-badge{margin-left:auto;background:var(--ora);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px}
+.sb-footer{padding:14px 12px;border-top:1px solid rgba(255,255,255,.08)}
+.logout-btn{width:100%;background:rgba(198,40,40,.2);color:#ff8a80;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif}
+
+/* ── Main ── */
+.main{margin-left:230px;flex:1;padding:28px;background:var(--bg);min-height:100vh}
+.page-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--dark);margin-bottom:6px}
+.page-sub{font-size:12px;color:var(--light);margin-bottom:24px}
+
+/* ── Stats ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.stat-val{font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:var(--dark)}
+.stat-lbl{font-size:11px;color:var(--light);margin-top:4px;font-weight:600}
+.stat-ico{font-size:22px;margin-bottom:8px}
+
+/* ── Filters ── */
+.filters{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.filter-btn{background:#fff;border:1.5px solid var(--border);border-radius:999px;padding:7px 15px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;color:var(--mid);transition:all .15s}
+.filter-btn.on,.filter-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.search-bar{flex:1;min-width:180px}
+.search-bar input{width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:999px;font-size:12px;outline:none;font-family:'Poppins',sans-serif}
+.search-bar input:focus{border-color:var(--blue)}
+.refresh-btn{background:var(--blue);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif}
+
+/* ── Orders table ── */
+.orders-wrap{background:#fff;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden}
+.orders-head{display:grid;grid-template-columns:1fr 1.2fr 1fr 0.8fr 0.8fr 1.2fr;gap:12px;padding:12px 18px;background:#F4F6FA;font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.order-row{display:grid;grid-template-columns:1fr 1.2fr 1fr 0.8fr 0.8fr 1.2fr;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s}
+.order-row:last-child{border-bottom:none}
+.order-row:hover{background:#FAFBFC}
+.or-ref{font-size:11px;font-weight:700;color:var(--blue)}
+.or-name{font-size:12px;font-weight:600;color:var(--dark)}
+.or-sub{font-size:10px;color:var(--light)}
+.pill{font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;display:inline-block}
+.or-actions{display:flex;gap:6px;align-items:center}
+.act-select{padding:5px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-family:'Poppins',sans-serif;cursor:pointer;outline:none;background:#fff;color:var(--dark)}
+.act-save{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif}
+.act-del{background:#FFEBEE;color:var(--red);border:none;border-radius:8px;padding:6px;font-size:12px;cursor:pointer}
+
+/* ── Empty / Loading ── */
+.empty-msg{text-align:center;padding:50px;color:var(--light);font-size:13px}
+.loading{text-align:center;padding:50px;color:var(--light)}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid rgba(30,111,190,.2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;right:24px;background:#1A1A2E;color:#fff;border-radius:12px;padding:13px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.toast.show{opacity:1}
+
+/* ── Detail modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;display:none}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:18px;padding:26px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--light)}
+.modal-title{font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:var(--dark);margin-bottom:16px}
+.modal-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bg);font-size:12px}
+.modal-key{color:var(--light);font-weight:600}
+.modal-val{color:var(--dark);font-weight:600;text-align:right;max-width:60%}
+</style>
+</head>
+<body>
+
+<!-- ── Écran de connexion ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🛡️</div>
+    <div class="login-title">OmniService <span style="color:#F5820A">TG</span></div>
+    <div class="login-sub">Interface d'administration</div>
+    <input type="email" class="login-inp" id="l-email" placeholder="Email administrateur" autocomplete="username"/>
+    <input type="password" class="login-inp" id="l-pass" placeholder="Mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">Se connecter</button>
+    <div class="login-err" id="l-err"></div>
+  </div>
+</div>
+
+<!-- ── Interface principale ── -->
+<div class="layout" id="admin-ui" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">OmniService <span>TG</span></div>
+      <div class="sb-sub">Panneau d'administration</div>
+    </div>
+    <nav class="sb-nav">
+      <button class="sb-item on" onclick="showSection('orders')"><span class="sb-item-ico">📦</span>Commandes<span class="sb-badge" id="badge-orders">0</span></button>
+      <button class="sb-item" onclick="showSection('stats')"><span class="sb-item-ico">📊</span>Statistiques</button>
+      <button class="sb-item" onclick="showSection('settings')"><span class="sb-item-ico">⚙️</span>Paramètres</button>
+    </nav>
+    <div class="sb-footer">
+      <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:8px" id="admin-email-disp">—</div>
+      <button class="logout-btn" onclick="doLogout()">🚪 Se déconnecter</button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- ══ Section Commandes ══ -->
+    <div id="section-orders">
+      <div class="page-title">Gestion des Commandes</div>
+      <div class="page-sub" id="last-refresh">Chargement...</div>
+
+      <!-- Stats rapides -->
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-ico">⏳</div><div class="stat-val" id="s-attente">0</div><div class="stat-lbl">En attente</div></div>
+        <div class="stat-card"><div class="stat-ico">🔵</div><div class="stat-val" id="s-encours">0</div><div class="stat-lbl">En cours</div></div>
+        <div class="stat-card"><div class="stat-ico">✅</div><div class="stat-val" id="s-termines">0</div><div class="stat-lbl">Terminées</div></div>
+        <div class="stat-card"><div class="stat-ico">📦</div><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Total commandes</div></div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="filters">
+        <button class="filter-btn on" onclick="setFilter('all',this)">Toutes</button>
+        <button class="filter-btn" onclick="setFilter('En attente',this)">⏳ En attente</button>
+        <button class="filter-btn" onclick="setFilter('Confirmée',this)">🔵 Confirmées</button>
+        <button class="filter-btn" onclick="setFilter('En cours',this)">🟣 En cours</button>
+        <button class="filter-btn" onclick="setFilter('Terminée',this)">✅ Terminées</button>
+        <button class="filter-btn" onclick="setFilter('Annulée',this)">❌ Annulées</button>
+        <div class="search-bar"><input type="text" placeholder="🔍 Rechercher par téléphone, service..." oninput="filterSearch(this.value)"/></div>
+        <button class="refresh-btn" onclick="loadOrders()">🔄 Actualiser</button>
+      </div>
+
+      <!-- Tableau -->
+      <div class="orders-wrap">
+        <div class="orders-head">
+          <div>Référence</div>
+          <div>Service</div>
+          <div>Client</div>
+          <div>Date</div>
+          <div>Statut</div>
+          <div>Actions</div>
+        </div>
+        <div id="orders-body">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Section Stats ══ -->
+    <div id="section-stats" style="display:none">
+      <div class="page-title">Statistiques</div>
+      <div class="page-sub">Vue d'ensemble des performances</div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card"><div class="stat-ico">📅</div><div class="stat-val" id="st-today">0</div><div class="stat-lbl">Aujourd'hui</div></div>
+        <div class="stat-card"><div class="stat-ico">📆</div><div class="stat-val" id="st-week">0</div><div class="stat-lbl">Cette semaine</div></div>
+        <div class="stat-card"><div class="stat-ico">🏆</div><div class="stat-val" id="st-top">—</div><div class="stat-lbl">Service le plus demandé</div></div>
+      </div>
+      <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07)">
+        <div style="font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--dark);margin-bottom:14px">Répartition par service</div>
+        <div id="st-breakdown"></div>
+      </div>
+    </div>
+
+    <!-- ══ Section Paramètres ══ -->
+    <div id="section-settings" style="display:none">
+      <div class="page-title">Paramètres</div>
+      <div class="page-sub">Configuration de l'application</div>
+      <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07);max-width:500px">
+        <div style="font-weight:700;margin-bottom:16px;font-size:14px">Informations de contact</div>
+        <label style="font-size:11px;font-weight:700;color:var(--light);display:block;margin-bottom:5px;text-transform:uppercase">Téléphone</label>
+        <input type="tel" id="cfg-phone" placeholder="+228 XX XX XX XX" style="width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;margin-bottom:14px;font-family:'Poppins',sans-serif;outline:none"/>
+        <label style="font-size:11px;font-weight:700;color:var(--light);display:block;margin-bottom:5px;text-transform:uppercase">Email</label>
+        <input type="email" id="cfg-email" placeholder="contact@omniservicetg.com" style="width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;margin-bottom:20px;font-family:'Poppins',sans-serif;outline:none"/>
+        <button onclick="saveSettings()" style="background:linear-gradient(135deg,#1E6FBE,#155A9C);color:#fff;border:none;border-radius:999px;padding:13px 28px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif">💾 Enregistrer</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal détail commande -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-title">Détail de la commande</div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ Firebase ══ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, doc,
+  updateDoc, deleteDoc, orderBy, query, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+// ── Config Firebase ── (même que app.js)
+const firebaseConfig = {
+  apiKey: "VOTRE_API_KEY",
+  authDomain: "VOTRE_PROJECT.firebaseapp.com",
+  projectId: "VOTRE_PROJECT_ID",
+  storageBucket: "VOTRE_PROJECT.appspot.com",
+  messagingSenderId: "VOTRE_SENDER_ID",
+  appId: "VOTRE_APP_ID"
+};
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+// ── Toast ──────────────────────────────────────
+function showToast(msg, color = "#1A1A2E") {
+  const t = document.getElementById("toast");
+  t.style.background = color;
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+// ── Auth ───────────────────────────────────────
+window.doLogin = async function() {
+  const email = document.getElementById("l-email").value;
+  const pass  = document.getElementById("l-pass").value;
+  const err   = document.getElementById("l-err");
+  err.textContent = "";
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    err.textContent = "Email ou mot de passe incorrect.";
+  }
+};
+
+window.doLogout = async function() {
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("admin-ui").style.display = "flex";
+    document.getElementById("admin-email-disp").textContent = user.email;
+    loadOrders();
+  } else {
+    document.getElementById("login-screen").style.display = "flex";
+    document.getElementById("admin-ui").style.display = "none";
+  }
+});
+
+// ── Données ───────────────────────────────────
+let allOrders = [];
+let currentFilter = "all";
+let currentSearch = "";
+
+const SC = {
+  "En attente": { c: "#F5820A", bg: "#FFF3E0" },
+  "Confirmée":  { c: "#1E6FBE", bg: "#E3F2FD" },
+  "En cours":   { c: "#7B1FA2", bg: "#F3E5F5" },
+  "Terminée":   { c: "#2E7D32", bg: "#E8F5E9" },
+  "Annulée":    { c: "#C62828", bg: "#FFEBEE" }
+};
+
+// ── Charger commandes ──────────────────────────
+window.loadOrders = async function() {
+  document.getElementById("orders-body").innerHTML = `<div class="loading"><div class="spinner"></div></div>`;
+  try {
+    const q = query(collection(db, "commandes"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderOrders();
+    updateStats();
+    const now = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    document.getElementById("last-refresh").textContent = `Dernière mise à jour : ${now}`;
+  } catch (e) {
+    document.getElementById("orders-body").innerHTML = `<div class="empty-msg">❌ Erreur de chargement. Vérifiez votre connexion Firebase.</div>`;
+  }
+};
+
+function renderOrders() {
+  let filtered = allOrders;
+  if (currentFilter !== "all") filtered = filtered.filter(o => o.statut === currentFilter);
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    filtered = filtered.filter(o =>
+      (o.phone || "").includes(q) ||
+      (o.serviceName || o.service || "").toLowerCase().includes(q) ||
+      o.id.toLowerCase().includes(q)
+    );
+  }
+
+  document.getElementById("badge-orders").textContent = allOrders.filter(o => o.statut === "En attente").length;
+
+  if (!filtered.length) {
+    document.getElementById("orders-body").innerHTML = `<div class="empty-msg">Aucune commande trouvée.</div>`;
+    return;
+  }
+
+  document.getElementById("orders-body").innerHTML = filtered.map(o => {
+    const s = SC[o.statut] || SC["En attente"];
+    const dateStr = o.createdAt
+      ? new Date(o.createdAt.seconds * 1000).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
+      : "—";
+
+    const statusOptions = Object.keys(SC).map(st =>
+      `<option value="${st}" ${o.statut === st ? "selected" : ""}>${st}</option>`
+    ).join("");
+
+    return `<div class="order-row" id="row-${o.id}">
+      <div>
+        <div class="or-ref" style="cursor:pointer" onclick="showDetail('${o.id}')">#${o.id.slice(0, 8).toUpperCase()}</div>
+      </div>
+      <div>
+        <div class="or-name">${o.serviceName || o.service || "—"}</div>
+        <div class="or-sub">${o.type || ""}</div>
+      </div>
+      <div>
+        <div class="or-name">${o.phone || "—"}</div>
+        <div class="or-sub">${o.adresse || ""}</div>
+      </div>
+      <div style="font-size:11px;color:var(--mid)">${dateStr}</div>
+      <div>
+        <span class="pill" style="background:${s.bg};color:${s.c}">${o.statut}</span>
+      </div>
+      <div class="or-actions">
+        <select class="act-select" id="sel-${o.id}">${statusOptions}</select>
+        <button class="act-save" onclick="updateStatus('${o.id}')">✔</button>
+        <button class="act-del" onclick="deleteOrder('${o.id}')" title="Supprimer">🗑</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── Mettre à jour le statut ────────────────────
+window.updateStatus = async function(id) {
+  const sel = document.getElementById(`sel-${id}`);
+  const newStatus = sel.value;
+  try {
+    await updateDoc(doc(db, "commandes", id), { statut: newStatus, updatedAt: serverTimestamp() });
+    const o = allOrders.find(x => x.id === id);
+    if (o) o.statut = newStatus;
+    renderOrders();
+    updateStats();
+    showToast("✅ Statut mis à jour !", "#2E7D32");
+  } catch(e) {
+    showToast("❌ Erreur de mise à jour", "#C62828");
+  }
+};
+
+// ── Supprimer une commande ─────────────────────
+window.deleteOrder = async function(id) {
+  if (!confirm("Supprimer cette commande définitivement ?")) return;
+  try {
+    await deleteDoc(doc(db, "commandes", id));
+    allOrders = allOrders.filter(o => o.id !== id);
+    renderOrders();
+    updateStats();
+    showToast("🗑 Commande supprimée");
+  } catch(e) {
+    showToast("❌ Erreur de suppression", "#C62828");
+  }
+};
+
+// ── Statistiques ──────────────────────────────
+function updateStats() {
+  const today = new Date().toDateString();
+  const weekAgo = Date.now() - 7 * 86400000;
+
+  document.getElementById("s-attente").textContent = allOrders.filter(o => o.statut === "En attente").length;
+  document.getElementById("s-encours").textContent = allOrders.filter(o => o.statut === "En cours" || o.statut === "Confirmée").length;
+  document.getElementById("s-termines").textContent = allOrders.filter(o => o.statut === "Terminée").length;
+  document.getElementById("s-total").textContent = allOrders.length;
+
+  // Stats section
+  document.getElementById("st-today").textContent = allOrders.filter(o =>
+    o.createdAt && new Date(o.createdAt.seconds * 1000).toDateString() === today
+  ).length;
+  document.getElementById("st-week").textContent = allOrders.filter(o =>
+    o.createdAt && o.createdAt.seconds * 1000 >= weekAgo
+  ).length;
+
+  // Service le plus demandé
+  const counts = {};
+  allOrders.forEach(o => {
+    const k = o.serviceName || o.service || "Autre";
+    counts[k] = (counts[k] || 0) + 1;
+  });
+  const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+  document.getElementById("st-top").textContent = top ? top[0].split(" ")[0] : "—";
+
+  // Breakdown
+  const breakdown = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const maxVal = breakdown[0]?.[1] || 1;
+  document.getElementById("st-breakdown").innerHTML = breakdown.map(([name, count]) =>
+    `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px">
+        <span>${name}</span><span>${count}</span>
+      </div>
+      <div style="height:7px;background:#F4F6FA;border-radius:999px;overflow:hidden">
+        <div style="height:100%;width:${Math.round(count / maxVal * 100)}%;background:linear-gradient(135deg,#1E6FBE,#F5820A);border-radius:999px;transition:width .5s"></div>
+      </div>
+    </div>`
+  ).join("");
+}
+
+// ── Filtres ───────────────────────────────────
+window.setFilter = function(val, btn) {
+  currentFilter = val;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  renderOrders();
+};
+window.filterSearch = function(val) {
+  currentSearch = val;
+  renderOrders();
+};
+
+// ── Navigation sections ──────────────────────
+window.showSection = function(id) {
+  ["orders", "stats", "settings"].forEach(s => {
+    document.getElementById(`section-${s}`).style.display = s === id ? "block" : "none";
+  });
+  document.querySelectorAll(".sb-item").forEach(b => b.classList.remove("on"));
+  event.currentTarget.classList.add("on");
+  if (id === "stats") updateStats();
+};
+
+// ── Modal détail ──────────────────────────────
+window.showDetail = function(id) {
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+  const s = SC[o.statut] || SC["En attente"];
+  const dateStr = o.createdAt
+    ? new Date(o.createdAt.seconds * 1000).toLocaleString("fr-FR")
+    : "—";
+
+  const rows = Object.entries(o)
+    .filter(([k]) => !["id", "createdAt", "updatedAt", "service"].includes(k))
+    .map(([k, v]) => `<div class="modal-row"><span class="modal-key">${k}</span><span class="modal-val">${v}</span></div>`)
+    .join("");
+
+  document.getElementById("modal-title").textContent = `#${id.slice(0, 8).toUpperCase()} — ${o.serviceName || o.service}`;
+  document.getElementById("modal-body").innerHTML = `
+    <div class="modal-row"><span class="modal-key">Date</span><span class="modal-val">${dateStr}</span></div>
+    <div class="modal-row"><span class="modal-key">Statut</span><span class="modal-val"><span class="pill" style="background:${s.bg};color:${s.c}">${o.statut}</span></span></div>
+    ${rows}
+  `;
+  document.getElementById("modal-overlay").classList.add("show");
+};
+window.closeModal = function(e) {
+  if (!e || e.target === document.getElementById("modal-overlay") || e.currentTarget.classList.contains("modal-close")) {
+    document.getElementById("modal-overlay").classList.remove("show");
+  }
+};
+
+// ── Paramètres ────────────────────────────────
+window.saveSettings = function() {
+  const phone = document.getElementById("cfg-phone").value;
+  const email = document.getElementById("cfg-email").value;
+  localStorage.setItem("admin_phone", phone);
+  localStorage.setItem("admin_email", email);
+  showToast("✅ Paramètres enregistrés !", "#2E7D32");
+};
+
+// Restaurer settings
+const sp = localStorage.getItem("admin_phone");
+const se = localStorage.getItem("admin_email");
+if (sp) document.getElementById("cfg-phone").value = sp;
+if (se) document.getElementById("cfg-email").value = se;
+
+</script>
+</body>
+</html>
