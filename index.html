@@ -2,29 +2,42 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniService TG - Appelez, on s’en charge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OmniService TG | Appelez, on s’en charge</title>
+    
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <header class="app-header">
         <div class="header-top">
-            <img src="logo.jpg" alt="OmniService TG" class="logo">
+            <div class="brand">
+                <img src="logo.jpg" alt="Logo OmniService TG" class="logo">
+                <span class="brand-name">OmniServiceTG</span>
+            </div>
             <div class="header-icons">
-                <i class="fas fa-shopping-basket" id="btn-panier"></i>
-                <i class="fas fa-user-circle" id="btn-profile"></i>
+                <div class="icon-badge-container">
+                    <i class="fas fa-shopping-basket" id="cart-icon"></i>
+                    <span class="badge-count">0</span>
+                </div>
+                <i class="fas fa-user-circle" id="profile-icon" onclick="loadPage('profile')"></i>
             </div>
         </div>
+        
         <div class="search-bar-container">
-            <input type="text" placeholder="Rechercher un service (Restauration, Plomberie...)" id="main-search">
-            <i class="fas fa-search"></i>
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="De quel service avez-vous besoin ?" id="global-search">
         </div>
     </header>
 
     <main id="app-content">
-        </main>
+        <div class="loader-init">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Chargement de OmniService TG...</p>
+        </div>
+    </main>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="loadPage('accueil')">
@@ -32,11 +45,12 @@
             <span>Accueil</span>
         </div>
         <div class="nav-item" onclick="loadPage('services')">
+            <i class="fas fa-grid-2"></i>
             <i class="fas fa-th-large"></i>
             <span>Services</span>
         </div>
         <div class="nav-item" onclick="loadPage('commandes')">
-            <i class="fas fa-clipboard-list"></i>
+            <i class="fas fa-receipt"></i>
             <span>Commandes</span>
         </div>
         <div class="nav-item" onclick="loadPage('apropos')">
@@ -46,5 +60,6 @@
     </nav>
 
     <script type="module" src="app.js"></script>
+
 </body>
 </html>
