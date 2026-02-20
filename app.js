@@ -15,20 +15,8 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
 // Fonction simple pour charger les pages
-import { renderAccueil } from './pages/Accueil.js';
-
 window.loadPage = function(page) {
     const content = document.getElementById('app-content');
-    
-    if(page === 'accueil') {
-        content.innerHTML = renderAccueil();
-    } else {
-        content.innerHTML = `<div style="padding:20px;">Page ${page} en cours de construction...</div>`;
-    }
-};
-
-// Charger l'accueil au démarrage
-window.onload = () => loadPage('accueil');
     
     // Mise à jour de l'état actif de la navigation
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -44,3 +32,31 @@ window.onload = () => loadPage('accueil');
 document.addEventListener('DOMContentLoaded', () => {
     console.log("OmniService TG prêt !");
 });
+
+import { renderAccueil } from './pages/Accueil.js';
+
+window.loadPage = function(page) {
+    const content = document.getElementById('app-content');
+    
+    if(page === 'accueil') {
+        content.innerHTML = renderAccueil();
+    } else {
+        content.innerHTML = `<div style="padding:20px;">Page ${page} en cours de construction...</div>`;
+    }
+};
+
+// Charger l'accueil au démarrage
+window.onload = () => loadPage('accueil');
+
+import { renderServices } from './pages/Services.js';
+
+window.loadPage = function(page) {
+    const content = document.getElementById('app-content');
+    
+    if(page === 'accueil') {
+        content.innerHTML = renderAccueil();
+    } else if(page === 'services') {
+        content.innerHTML = renderServices();
+    } 
+    // ... reste du code
+};
