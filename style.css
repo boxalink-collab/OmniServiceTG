@@ -1,0 +1,84 @@
+:root {
+    --primary-blue: #0056b3; /* Bleu du logo */
+    --secondary-orange: #ff8c00; /* Orange du logo */
+    --bg-light: #f4f4f7;
+    --text-dark: #333;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    padding-bottom: 70px; /* Espace pour la navigation basse */
+}
+
+/* HEADER STYLE GOZEM */
+.app-header {
+    background-color: white;
+    padding: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.logo { height: 40px; }
+
+.header-icons i {
+    font-size: 22px;
+    color: var(--primary-blue);
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.search-bar-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-bar-container input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+.search-bar-container i {
+    position: absolute;
+    right: 15px;
+    color: #888;
+}
+
+/* NAVIGATION BASSE */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 65px;
+    background-color: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #eee;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #888;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.nav-item.active { color: var(--secondary-orange); }
+.nav-item i { font-size: 20px; margin-bottom: 4px; }
