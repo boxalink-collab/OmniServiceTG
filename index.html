@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OmniService TG</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div class="hint">📱 OmniService TG — Cliquez pour naviguer</div>
+
+<!-- ════════════ PHONE SHELL ════════════ -->
+<div class="shell">
+<div class="screen">
+
+  <!-- TOP NAV -->
+  <div class="topnav">
+    <div class="topnav-brand">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="logo-box">
+          <img src="assets/logo.png" alt="OmniService TG" onerror="this.parentElement.textContent='🛡️'"/>
+        </div>
+        <div>
+          <div class="brand-name">OmniService <span>TG</span></div>
+          <div class="brand-sub">Appelez, on s'en charge</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:7px">
+        <button class="nav-btn" onclick="goTab('orders')">
+          🛒<span class="cart-badge" id="cart-count" style="display:none">0</span>
+        </button>
+        <button class="nav-btn" onclick="goTab('profile')">👤</button>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-ico">🔍</span>
+      <input type="text" placeholder="Rechercher un service..." id="search-input" oninput="filterServices(this.value)"/>
+    </div>
+  </div>
+
+  <!-- SCROLLER -->
+  <div class="scroller" id="scrl">
+
+    <!-- ══ ACCUEIL ══ -->
+    <div class="page on pcontent" id="p-home">
+
+      <!-- Slider -->
+      <div class="slide-wrap">
+        <div class="slider">
+          <div class="slide on" style="background:linear-gradient(135deg,#1E6FBE,#155A9C)">
+            <div><div class="slide-emoji">🚀</div><div class="slide-title">Livraison Express</div><div class="slide-sub">Vos courses livrées rapidement à Lomé</div></div>
+            <button class="slide-cta" onclick="openForm('delivery')">Commander →</button>
+          </div>
+          <div class="slide" style="background:linear-gradient(135deg,#F5820A,#D96E00)">
+            <div><div class="slide-emoji">✨</div><div class="slide-title">Nettoyage Professionnel</div><div class="slide-sub">Votre maison mérite le meilleur traitement</div></div>
+            <button class="slide-cta" onclick="openForm('cleaning')">Réserver →</button>
+          </div>
+          <div class="slide" style="background:linear-gradient(135deg,#1E6FBE,#F5820A)">
+            <div><div class="slide-emoji">🥘</div><div class="slide-title">Alimentation Fraîche</div><div class="slide-sub">Tilapia, volailles, légumes livrés chez vous</div></div>
+            <button class="slide-cta" onclick="openForm('food')">Commander →</button>
+          </div>
+          <div class="slide" style="background:linear-gradient(135deg,#155A9C,#1E6FBE)">
+            <div><div class="slide-emoji">🍽️</div><div class="slide-title">Service Traiteur</div><div class="slide-sub">Plats restaurants & traiteur événementiel</div></div>
+            <button class="slide-cta" onclick="openForm('restaurant')">Découvrir →</button>
+          </div>
+          <div class="dots">
+            <button class="dot on" style="width:18px" onclick="goSlide(0)"></button>
+            <button class="dot" style="width:6px" onclick="goSlide(1)"></button>
+            <button class="dot" style="width:6px" onclick="goSlide(2)"></button>
+            <button class="dot" style="width:6px" onclick="goSlide(3)"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marquee -->
+      <div class="marquee-wrap">
+        <div class="mtrack">
+          <span class="mtext">✔ Professionnalisme &nbsp;✔ Fiabilité &nbsp;✔ Excellence &nbsp;✔ Respect &nbsp;— &nbsp;<b>OmniService TG</b> &nbsp;— Simplifiez votre quotidien. Appelez, on s'en charge ! &nbsp;&nbsp;&nbsp;</span>
+          <span class="mtext">✔ Professionnalisme &nbsp;✔ Fiabilité &nbsp;✔ Excellence &nbsp;✔ Respect &nbsp;— &nbsp;<b>OmniService TG</b> &nbsp;— Simplifiez votre quotidien. Appelez, on s'en charge ! &nbsp;&nbsp;&nbsp;</span>
+          <span class="mtext">✔ Professionnalisme &nbsp;✔ Fiabilité &nbsp;✔ Excellence &nbsp;✔ Respect &nbsp;— &nbsp;<b>OmniService TG</b> &nbsp;— Simplifiez votre quotidien. Appelez, on s'en charge ! &nbsp;&nbsp;&nbsp;</span>
+        </div>
+      </div>
+
+      <!-- Services rapides -->
+      <div class="sec">
+        <div class="sec-head">
+          <div><div class="sec-title">Services disponibles</div><div class="sec-sub">Choisissez ce dont vous avez besoin</div></div>
+          <button class="see-all" onclick="goTab('services')">Tous ›</button>
+        </div>
+        <div class="svc-grid">
+          <button class="svc-btn" onclick="openForm('food')"><div class="svc-ico" style="background:#FFF3E0">🥘</div><span class="svc-lbl">Alimentation</span></button>
+          <button class="svc-btn" onclick="openForm('restaurant')"><div class="svc-ico" style="background:#E3F2FD">🍽️</div><span class="svc-lbl">Restauration</span></button>
+          <button class="svc-btn" onclick="openForm('delivery')"><div class="svc-ico" style="background:#FFF3E0">🚚</div><span class="svc-lbl">Livraison</span></button>
+          <button class="svc-btn" onclick="openForm('cleaning')"><div class="svc-ico" style="background:#E3F2FD">🧹</div><span class="svc-lbl">Nettoyage</span></button>
+          <button class="svc-btn" onclick="openForm('clothes')"><div class="svc-ico" style="background:#FFF3E0">👗</div><span class="svc-lbl">Prêt-à-porter</span></button>
+          <button class="svc-btn" onclick="openForm('maintenance')"><span class="svc-soon">16 Mars</span><div class="svc-ico" style="background:#E3F2FD">🔧</div><span class="svc-lbl">Maintenance</span></button>
+          <button class="svc-btn" onclick="openForm('security')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#E3F2FD">🛡️</div><span class="svc-lbl">Gardiennage</span></button>
+        </div>
+      </div>
+
+      <!-- Pourquoi nous choisir -->
+      <div class="sec">
+        <div class="sec-title" style="margin-bottom:12px">Pourquoi nous choisir ?</div>
+        <div class="why-card"><div class="why-ico" style="background:#E3F2FD">🛡️</div><div><div class="why-title">Organisation structurée</div><div class="why-desc">Chaque intervention planifiée et encadrée.</div></div></div>
+        <div class="why-card"><div class="why-ico" style="background:#FFF3E0">⭐</div><div><div class="why-title">Équipe identifiable</div><div class="why-desc">Personnel formé, professionnel et fiable.</div></div></div>
+        <div class="why-card"><div class="why-ico" style="background:#E3F2FD">⚡</div><div><div class="why-title">Service moderne</div><div class="why-desc">Communication claire et suivi efficace.</div></div></div>
+        <div class="why-card"><div class="why-ico" style="background:#FFF3E0">🕐</div><div><div class="why-title">Engagement qualité</div><div class="why-desc">Délais et standards toujours respectés.</div></div></div>
+      </div>
+
+      <!-- CTA -->
+      <div class="sec" style="margin-bottom:8px">
+        <div class="cta-banner">
+          <div class="cta-title">Prêt à travailler avec des professionnels ?</div>
+          <div class="cta-sub">Contactez OmniService TG et découvrez une nouvelle manière de gérer vos services.</div>
+          <a href="tel:+22800000000" class="cta-btn">📞 Nous contacter</a>
+        </div>
+      </div>
+    </div><!-- /home -->
+
+    <!-- ══ SERVICES ══ -->
+    <div class="page pcontent" id="p-services">
+      <!-- Liste -->
+      <div id="svc-list-v">
+        <div style="padding:14px 13px 8px">
+          <div class="sec-title">Nos Services</div>
+          <div class="sec-sub">Une solution intégrée pour tous vos besoins</div>
+        </div>
+        <div class="svc-list">
+          <button class="svc-row" onclick="openForm('food')"><div class="svc-row-ico" style="background:#FFF3E0">🥘</div><div><div class="svc-row-name">Alimentation &amp; Produits locaux</div><div class="svc-row-desc">Kits alimentaires, produits frais (Tilapia, Volailles, Légumes), Néré, Vin de palme embouteillé.</div></div><span style="font-size:18px;color:#E8EAF0;flex-shrink:0">›</span></button>
+          <button class="svc-row" onclick="openForm('restaurant')"><div class="svc-row-ico" style="background:#E3F2FD">🍽️</div><div><div class="svc-row-name">Restauration</div><div class="svc-row-desc">Plats de restaurants partenaires, service traiteur pour vos événements.</div></div><span style="font-size:18px;color:#E8EAF0;flex-shrink:0">›</span></button>
+          <button class="svc-row" onclick="openForm('delivery')"><div class="svc-row-ico" style="background:#FFF3E0">🚚</div><div><div class="svc-row-name">Livraison &amp; Courses</div><div class="svc-row-desc">Livraison express, courses personnalisées, livraison entreprise et de plats.</div></div><span style="font-size:18px;color:#E8EAF0;flex-shrink:0">›</span></button>
+          <button class="svc-row" onclick="openForm('maintenance')"><div class="svc-row-ico" style="background:#E3F2FD">🔧</div><div><div class="svc-row-name">Maintenance Technique <span class="tag-soon">16 Mars</span></div><div class="svc-row-desc">Électricité, plomberie, voiture, électroménager, informatique, pose TV/antenne.</div></div><span style="font-size:18px;color:#E8EAF0;flex-shrink:0">›</span></button>
+          <button class="svc-row" onclick="openForm('clothes')"><div class="svc-row-ico" style="background:#FFF3E0">👗</div><div><div class="svc-row-name">Prêt-à-porter</div><div class="svc-row-desc">Vêtements homme/femme/enfant, sacs, chaussures, cosmétiques et accessoires.</div></div><span style="font-size:18px;color:#E8EAF0;flex-shrink:0">›</span></button>
+          <button class="svc-row" onclick="openForm('cleaning')"><div class="svc-row-ico" style="background:#E3F2FD">🧹</div><div><div class="svc-row-name">Entretien &amp; Nettoyage</div><div class="svc-row-desc">Nettoyage résidentiel, bureaux, entretien régulier et industriel.</div></div><span style="font-size:18px;color:#E8EAF0;flex-shrink:0">›</span></button>
+          <button class="svc-row" onclick="openForm('security')"><div class="svc-row-ico" style="background:#E3F2FD">🛡️</div><div><div class="svc-row-name">Gardiennage &amp; Sécurité <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Gardiennage résidentiel/boutique/bureau, sécurité événementielle.</div></div><span style="font-size:18px;color:#E8EAF0;flex-shrink:0">›</span></button>
+        </div>
+      </div>
+      <!-- Formulaire (généré par JS) -->
+      <div id="svc-form-v" style="display:none"></div>
+      <!-- Succès -->
+      <div id="svc-success-v" style="display:none">
+        <div class="success">
+          <div class="succ-emoji">✅</div>
+          <div class="succ-title">Demande envoyée !</div>
+          <div class="succ-desc" id="succ-msg">Votre demande a bien été reçue.<br/>Notre équipe vous contactera très bientôt.</div>
+          <button class="succ-btn" onclick="closeForm()">Retour aux services</button>
+        </div>
+      </div>
+    </div><!-- /services -->
+
+    <!-- ══ COMMANDES ══ -->
+    <div class="page" id="p-orders">
+      <div class="orders-wrap pcontent">
+        <div style="margin-bottom:15px"><div class="sec-title">Mes Commandes</div><div class="sec-sub">Suivez l'état de vos demandes</div></div>
+        <div class="search-box">
+          <div style="font-size:10px;font-weight:700;color:#4A4A6A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Votre numéro de téléphone</div>
+          <div class="s-row">
+            <input type="tel" class="s-input" placeholder="+228 XX XX XX XX" id="ph-inp" onkeydown="if(event.key==='Enter')searchOrders()"/>
+            <button class="s-btn" onclick="searchOrders()">🔍</button>
+          </div>
+          <div style="font-size:10px;color:#9999BB;margin-top:7px">Numéro utilisé lors de votre commande</div>
+        </div>
+        <div id="orders-out">
+          <div class="empty-st"><div class="empty-ico">📦</div><div class="empty-txt">Entrez votre numéro pour<br/>voir vos commandes</div></div>
+        </div>
+      </div>
+    </div><!-- /orders -->
+
+    <!-- ══ À PROPOS ══ -->
+    <div class="page" id="p-about">
+      <div class="pcontent">
+        <div class="about-hero">
+          <div style="font-size:46px;margin-bottom:10px">🌐</div>
+          <div class="about-name">OmniService <span style="color:var(--ora)">TG</span></div>
+          <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px">Appelez, on s'en charge</div>
+          <div style="display:inline-block;margin-top:11px;background:rgba(245,130,10,.25);border:1px solid rgba(245,130,10,.5);border-radius:999px;padding:5px 13px;color:#FFB84D;font-size:10.5px;font-weight:700">🇹🇬 Entreprise togolaise</div>
+        </div>
+        <div class="about-wrap">
+          <div class="a-card">
+            <div class="a-card-title">🎯 Notre Mission</div>
+            <p>Offrir aux ménages et entreprises togolais des services multisectoriels professionnels, accessibles et structurés, qui simplifient leur quotidien et valorisent leur cadre de vie.</p>
+          </div>
+          <div class="a-card" style="background:linear-gradient(135deg,rgba(30,111,190,.05),rgba(245,130,10,.05));border:1px solid rgba(30,111,190,.1)">
+            <div class="a-card-title">🚀 Notre Vision</div>
+            <p>Construire un Togo où chaque foyer accède à des services fiables, modernes et dignes des standards internationaux. OmniService TG vise à devenir une <strong style="color:var(--blue)">référence nationale</strong> dans le secteur des services professionnels.</p>
+          </div>
+          <div style="margin-bottom:13px">
+            <div class="sec-title" style="margin-bottom:11px">Nos Valeurs</div>
+            <div class="val-row"><div class="val-ico">🎯</div><div><div class="val-name">Professionnalisme</div><div class="val-desc">Standards élevés à chaque intervention.</div></div></div>
+            <div class="val-row"><div class="val-ico">🔒</div><div><div class="val-name">Fiabilité</div><div class="val-desc">Vous pouvez compter sur nous.</div></div></div>
+            <div class="val-row"><div class="val-ico">🤝</div><div><div class="val-name">Respect</div><div class="val-desc">De nos clients, équipes et partenaires.</div></div></div>
+            <div class="val-row"><div class="val-ico">🔍</div><div><div class="val-name">Transparence</div><div class="val-desc">Tarifs clairs, pas de surprises.</div></div></div>
+            <div class="val-row"><div class="val-ico">⭐</div><div><div class="val-name">Excellence</div><div class="val-desc">Toujours le meilleur résultat.</div></div></div>
+          </div>
+          <div class="who-grid">
+            <div class="who-card"><div style="font-size:27px;margin-bottom:7px">👨‍👩‍👧‍👦</div><div style="font-size:12px;font-weight:700;color:var(--dark);margin-bottom:4px">Particuliers</div><div style="font-size:10px;color:var(--light);line-height:1.5">Familles, propriétaires, locataires cherchant un service organisé.</div></div>
+            <div class="who-card"><div style="font-size:27px;margin-bottom:7px">🏢</div><div style="font-size:12px;font-weight:700;color:var(--dark);margin-bottom:4px">Entreprises</div><div style="font-size:10px;color:var(--light);line-height:1.5">Bureaux, commerces, sociétés en croissance.</div></div>
+          </div>
+          <div class="a-card">
+            <div class="a-card-title">📞 Contact</div>
+            <div class="ct-row"><div class="ct-ico">📍</div><span style="font-size:13px;color:var(--mid)">Basé à Lomé, Togo</span></div>
+            <div class="ct-row"><div class="ct-ico">📞</div><span style="font-size:13px;color:var(--mid)">+228 XX XX XX XX</span></div>
+            <div class="ct-row"><div class="ct-ico">📧</div><span style="font-size:13px;color:var(--mid)">contact@omniservicetg.com</span></div>
+            <div class="ct-row" style="border:none"><div class="ct-ico">🌐</div><span style="font-size:13px;color:var(--mid)">www.omniservicetg.com</span></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /about -->
+
+    <!-- ══ PROFIL ══ -->
+    <div class="page" id="p-profile">
+      <div class="pcontent">
+        <div class="prof-hero">
+          <div class="avatar">👤</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:19px;font-weight:900;color:#fff" id="prof-name-disp">Mon Profil</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:4px" id="prof-phone-disp">Ajoutez vos informations</div>
+        </div>
+        <div class="prof-wrap">
+          <div class="prof-card">
+            <div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:13px">Mes informations</div>
+            <div class="p-inw"><span class="p-pfx">👤</span><input type="text" class="p-inp" placeholder="Votre nom complet" id="p-name-inp"/></div>
+            <div class="p-inw" style="margin-bottom:15px"><span class="p-pfx">📞</span><input type="tel" class="p-inp" placeholder="+228 XX XX XX XX" id="p-phone-inp"/></div>
+            <button class="p-save" id="p-save-btn" onclick="saveProfile()">Enregistrer</button>
+          </div>
+          <div class="menu-list">
+            <div class="menu-row"><div class="menu-ico" style="background:#FFF3E0">🔔</div><span style="flex:1;font-size:13px;font-weight:600;color:var(--dark)">Notifications</span><span style="color:var(--border);font-size:16px">›</span></div>
+            <div class="menu-row"><div class="menu-ico" style="background:#E3F2FD">🔒</div><span style="flex:1;font-size:13px;font-weight:600;color:var(--dark)">Confidentialité</span><span style="color:var(--border);font-size:16px">›</span></div>
+            <div class="menu-row"><div class="menu-ico" style="background:#FFF3E0">❓</div><span style="flex:1;font-size:13px;font-weight:600;color:var(--dark)">Aide &amp; Support</span><span style="color:var(--border);font-size:16px">›</span></div>
+          </div>
+          <div style="text-align:center;margin-top:20px;padding-bottom:8px">
+            <div style="font-size:10px;color:#C5C5D8">OmniService TG v1.0.0</div>
+            <div style="font-size:9px;color:#C5C5D8;margin-top:3px">Le service professionnel à la hauteur de vos ambitions</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /profile -->
+
+  </div><!-- /scroller -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="botnav">
+    <button class="btab on" id="t-home"     onclick="goTab('home')">    <div class="btab-ico">🏠</div><span class="btab-lbl">Accueil</span></button>
+    <button class="btab"    id="t-services" onclick="goTab('services')"><div class="btab-ico">🛠️</div><span class="btab-lbl">Services</span></button>
+    <button class="btab"    id="t-orders"   onclick="goTab('orders')">  <div class="btab-ico">📦</div><span class="btab-lbl">Commandes</span></button>
+    <button class="btab"    id="t-about"    onclick="goTab('about')">   <div class="btab-ico">ℹ️</div><span class="btab-lbl">À propos</span></button>
+  </nav>
+
+</div><!-- /screen -->
+</div><!-- /shell -->
+
+<!-- ══ Firebase + App ══ -->
+<!-- ⚠️  Remplacez type="module" si vous n'utilisez pas de bundler -->
+<script type="module" src="app.js"></script>
+
+<!-- Fonction de recherche de services (pas liée à Firebase) -->
+<script>
+function filterServices(q) {
+  if (!q) return;
+  // Rediriger vers l'onglet Services si texte tapé
+  const tab = document.getElementById('t-services');
+  if (!tab.classList.contains('on')) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+    document.querySelectorAll('.btab').forEach(b => b.classList.remove('on'));
+    document.getElementById('p-services').classList.add('on');
+    tab.classList.add('on');
+  }
+  // Filtre simple sur les boutons de la liste
+  const rows = document.querySelectorAll('#svc-list-v .svc-row');
+  rows.forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+</script>
+
+</body>
+</html>
