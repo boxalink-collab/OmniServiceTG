@@ -1,51 +1,59 @@
-/**
- * Composant Services - OmniService TG
- * Liste complète des prestations organisées par catégories
- */
-
 export const renderServices = () => {
     return `
-        <div class="services-container">
-            <h2 class="page-title">Nos Solutions Intégrées</h2>
-            <p class="subtitle">Une solution pour tous vos besoins [cite: 21]</p>
+        <div class="services-page">
+            <h2 class="main-title">Une solution intégrée pour tous vos besoins [cite: 21]</h2>
 
-            <div class="category-section">
-                <h3 class="category-title"><i class="fas fa-utensils"></i> Alimentation & Produits locaux [cite: 22]</h3>
-                <div class="service-list">
-                    <div class="service-item" onclick="openForm('kit-alim')">Kit de denrées alimentaire </div>
-                    <div class="service-item" onclick="openForm('frais')">Produits frais (Tilapia, Volailles, Légumes) [cite: 24]</div>
-                    <div class="service-item" onclick="openForm('néré')">Néré (Soumbala) [cite: 25]</div>
-                    <div class="service-item" onclick="openForm('vin-palme')">Vin de palme embouteillé [cite: 26]</div>
+            <div class="service-category">
+                <div class="cat-header orange-bg">
+                    <i class="fas fa-tools"></i>
+                    <h3>Maintenance Technique [cite: 35]</h3>
                 </div>
+                <div class="cat-info">Opérationnel le 16 Mars [cite: 44]</div>
+                <ul class="service-ul">
+                    <li>Électricité & Plomberie [cite: 36, 37]</li>
+                    <li>Dépannage voiture [cite: 38]</li>
+                    <li>Réparation Électroménager & Informatique [cite: 39, 41]</li>
+                    <li>Pose TV et Antenne [cite: 42]</li>
+                </ul>
             </div>
 
-            <div class="category-section priority-border">
-                <h3 class="category-title"><i class="fas fa-tools"></i> Maintenance technique [cite: 35]</h3>
-                <p class="status-note">Opérationnel le 16 Mars [cite: 44]</p>
-                <div class="service-list">
-                    <div class="service-item" onclick="openForm('elec')">Dépannage en Électricité </div>
-                    <div class="service-item" onclick="openForm('plomb')">Dépannage en Plomberie et sanitaires [cite: 37]</div>
-                    <div class="service-item" onclick="openForm('auto')">Dépannage voiture [cite: 38]</div>
-                    <div class="service-item" onclick="openForm('repar-electro')">Réparation Électroménager & Informatique [cite: 39, 41]</div>
+            <div class="service-category">
+                <div class="cat-header blue-bg">
+                    <i class="fas fa-utensils"></i>
+                    <h3>Alimentation & Restauration [cite: 22, 27]</h3>
                 </div>
+                <ul class="service-ul">
+                    <li>Kit de denrées alimentaires [cite: 23]</li>
+                    <li>Produits frais & Vin de palme [cite: 24, 26]</li>
+                    <li>Service Traiteur [cite: 29]</li>
+                </ul>
             </div>
 
-            <div class="category-section">
-                <h3 class="category-title"><i class="fas fa-broom"></i> Entretien & Nettoyage [cite: 50]</h3>
-                <div class="service-list">
-                    <div class="service-item" onclick="openForm('nettoyage-res')">Nettoyage résidentiel & bureaux [cite: 51, 52]</div>
-                    <div class="service-item" onclick="privateForm('nettoyage-indus')">Entretien industriel [cite: 54]</div>
+            <div class="service-category">
+                <div class="cat-header blue-bg">
+                    <i class="fas fa-clean-hands"></i>
+                    <h3>Entretien & Sécurité [cite: 50, 55]</h3>
                 </div>
+                <div class="cat-info">Sécurité : Opérationnel le 7 Avril [cite: 59]</div>
+                <ul class="service-ul">
+                    <li>Nettoyage Résidentiel & Industriel [cite: 51, 54]</li>
+                    <li>Gardiennage Boutique & Bureau [cite: 56]</li>
+                    <li>Surveillance Temporaire [cite: 58]</li>
+                </ul>
             </div>
 
-            <div class="category-section">
-                <h3 class="category-title"><i class="fas fa-user-shield"></i> Gardiennage & Sécurité [cite: 55]</h3>
-                <p class="status-note">Opérationnel le 7 Avril [cite: 59]</p>
-                <div class="service-list">
-                    <div class="service-item" onclick="openForm('gardiennage')">Résidentiel, Boutique & Bureau [cite: 56]</div>
-                    <div class="service-item" onclick="openForm('event-sec')">Sécurité événementielle [cite: 57]</div>
+            <div class="service-category">
+                <div class="cat-header orange-bg">
+                    <i class="fas fa-plus-circle"></i>
+                    <h3>Autres Services</h3>
                 </div>
+                <ul class="service-ul">
+                    <li>Prêt à porter & Cosmétique [cite: 45, 49]</li>
+                    <li>Livraison & Courses personnalisées [cite: 30, 32]</li>
+                </ul>
             </div>
+            
+            <p class="footer-note">Un seul contact. Plusieurs solutions. [cite: 60]</p>
         </div>
     `;
 };
