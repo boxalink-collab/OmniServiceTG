@@ -3,8 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Importation des composants de pages
-import { renderAccueil } from './pages/Accueil.js';
-import { renderServices } from './pages/Services.js';
+import { renderAccueil } from './pages/accueil.js';
+import { renderServices } from './pages/services.js';
 
 // Configuration Firestore fournie
 const firebaseConfig = {
