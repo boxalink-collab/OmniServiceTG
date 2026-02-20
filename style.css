@@ -82,3 +82,70 @@ body {
 
 .nav-item.active { color: var(--secondary-orange); }
 .nav-item i { font-size: 20px; margin-bottom: 4px; }
+
+/* SLIDER */
+.promo-slider {
+    position: relative;
+    height: 180px;
+    margin: 15px;
+    border-radius: 15px;
+    overflow: hidden;
+    color: white;
+}
+.slide {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    background-color: var(--primary-blue);
+}
+
+/* GRILLE DE SERVICES */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 15px;
+}
+.service-card {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.service-card.priority {
+    border: 2px solid var(--secondary-orange); /* Mise en évidence */
+}
+.icon-box {
+    width: 50px;
+    height: 50px;
+    background-color: #fff4e6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.icon-box i {
+    color: var(--secondary-orange);
+    font-size: 20px;
+}
+.service-card span { font-weight: bold; font-size: 14px; color: var(--primary-blue); }
+.service-card small { font-size: 10px; color: #777; margin-top: 5px; }
+
+/* BOUTON ACTION */
+.btn-action {
+    background-color: var(--secondary-orange);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    margin-top: 10px;
+    width: 90%;
+}
