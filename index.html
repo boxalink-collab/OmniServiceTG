@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>OmniService TG — Services professionnels à Lomé</title>
+<meta name="description" content="OmniService TG — Alimentation, livraison, nettoyage, restauration et plus à Lomé, Togo."/>
+<meta name="theme-color" content="#1E6FBE"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="OmniService TG"/>
+<meta name="msapplication-TileColor" content="#1E6FBE"/>
+<meta property="og:title" content="OmniService TG"/>
+<meta property="og:description" content="Alimentation, livraison, nettoyage, restauration et plus à Lomé, Togo."/>
+<meta property="og:type" content="website"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="assets/icon-any-192.png" type="image/png"/>
+<link rel="apple-touch-icon" href="assets/icon-any-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<style>
+/* ══ AUTH MODAL ══ */
+#auth-modal{
+  display:none;position:fixed;inset:0;z-index:2000;
+  background:rgba(10,18,32,.75);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:16px;
+}
+.auth-box{
+  background:#fff;border-radius:24px;width:100%;max-width:420px;
+  box-shadow:0 30px 80px rgba(0,0,0,.35);overflow:hidden;
+  max-height:92vh;overflow-y:auto;
+}
+.auth-header{
+  background:linear-gradient(135deg,#1E6FBE,#155A9C);
+  padding:24px 24px 20px;text-align:center;position:relative;
+}
+.auth-header-logo{
+  display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;
+}
+.auth-header-logo img{width:36px;height:36px;object-fit:contain;border-radius:9px}
+.auth-header-brand{
+  font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:#fff;
+}
+.auth-header-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+.auth-close{
+  position:absolute;top:14px;right:14px;
+  background:rgba(255,255,255,.15);border:none;color:#fff;
+  width:30px;height:30px;border-radius:50%;cursor:pointer;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+}
+.auth-tabs{
+  display:flex;border-bottom:1.5px solid #E8EAF0;
+}
+.auth-tab{
+  flex:1;padding:14px;text-align:center;font-size:13px;font-weight:700;
+  cursor:pointer;color:#9999BB;border:none;background:transparent;
+  font-family:'Poppins',sans-serif;transition:all .2s;
+  border-bottom:2.5px solid transparent;margin-bottom:-1.5px;
+}
+.auth-tab.on{color:#1E6FBE;border-bottom-color:#1E6FBE}
+.auth-panel{padding:22px 24px 28px}
+.auth-field{margin-bottom:14px}
+.auth-label{
+  display:block;font-size:11px;font-weight:700;color:#4A4A6A;
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;
+}
+.auth-inp{
+  width:100%;padding:11px 13px;border:1.5px solid #E8EAF0;border-radius:11px;
+  font-size:13px;font-family:'Poppins',sans-serif;background:#F4F6FA;outline:none;
+  color:#1A1A2E;transition:border-color .2s,background .2s;
+}
+.auth-inp:focus{border-color:#1E6FBE;background:#fff}
+.auth-inp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.auth-btn{
+  width:100%;background:linear-gradient(135deg,#1E6FBE,#155A9C);color:#fff;
+  border:none;border-radius:999px;padding:14px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Poppins',sans-serif;margin-top:6px;
+  box-shadow:0 4px 18px rgba(30,111,190,.35);transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(30,111,190,.45)}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.auth-err{
+  min-height:18px;font-size:12px;font-weight:600;color:#C62828;
+  text-align:center;margin-top:10px;
+}
+.auth-sep{
+  text-align:center;font-size:11px;color:#9999BB;
+  margin:14px 0 10px;display:flex;align-items:center;gap:10px;
+}
+.auth-sep::before,.auth-sep::after{content:'';flex:1;height:1px;background:#E8EAF0}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══ PROFIL REFACTO ══ */
+#prof-auth-card{
+  background:#fff;border-radius:16px;padding:22px;text-align:center;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:16px;
+}
+#prof-auth-card .auth-card-title{
+  font-size:15px;font-weight:700;color:#1A1A2E;margin-bottom:6px;
+}
+#prof-auth-card .auth-card-sub{
+  font-size:12px;color:#9999BB;margin-bottom:16px;line-height:1.6;
+}
+#prof-auth-card .btn-row{display:flex;gap:10px}
+#prof-auth-card .btn-login{
+  flex:1;background:linear-gradient(135deg,#1E6FBE,#155A9C);color:#fff;
+  border:none;border-radius:999px;padding:12px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:'Poppins',sans-serif;
+}
+#prof-auth-card .btn-signup{
+  flex:1;background:#fff;color:#1E6FBE;border:1.5px solid #1E6FBE;
+  border-radius:999px;padding:12px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:'Poppins',sans-serif;
+}
+
+/* ══ SECTION COMMANDES PAGE ══ */
+.orders-user-info{
+  background:#fff;border-radius:16px;padding:14px 18px;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:18px;
+  display:flex;align-items:center;gap:12px;
+}
+.orders-user-avatar{
+  font-size:32px;width:48px;height:48px;display:flex;
+  align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1E6FBE,#155A9C);
+  border-radius:50%;
+}
+.orders-user-name{font-size:13px;font-weight:700;color:#1A1A2E}
+.orders-user-phone{font-size:11px;color:#9999BB;margin-top:2px}
+.orders-refresh-btn{
+  margin-left:auto;background:#F4F6FA;border:1.5px solid #E8EAF0;
+  border-radius:999px;padding:8px 14px;font-size:11px;font-weight:700;
+  cursor:pointer;color:#4A4A6A;font-family:'Poppins',sans-serif;white-space:nowrap;
+}
+.orders-refresh-btn:hover{background:#E3F2FD;border-color:#1E6FBE;color:#1E6FBE}
+</style>
+</head>
+<body>
+
+<!-- ══ SPLASH SCREEN ══ -->
+<div id="splash-screen">
+  <div class="splash-bg"></div>
+  <div class="splash-content">
+    <div class="splash-logo-wrap">
+      <div class="splash-logo-ring"></div>
+      <div class="splash-logo-box">
+        <img src="assets/logo.png" alt="OmniService TG" id="splash-img"
+             onerror="this.outerHTML='<div class=splash-fallback>🛡️</div>'"/>
+      </div>
+    </div>
+    <div class="splash-brand">
+      <span class="splash-blue">Omni</span><span class="splash-ora">Service</span> <span class="splash-blue">TG</span>
+    </div>
+    <div class="splash-tagline">Appelez, on s'en charge</div>
+    <div class="splash-loader">
+      <div class="splash-loader-bar"></div>
+    </div>
+    <div class="splash-footer">🇹🇬 Basé à Lomé, Togo</div>
+  </div>
+</div>
+
+<!-- ══ MODAL AUTH (Connexion / Inscription) ══ -->
+<div id="auth-modal" onclick="if(event.target===this)closeAuthModal()">
+  <div class="auth-box">
+    <!-- Header avec logo + nom -->
+    <div class="auth-header">
+      <div class="auth-header-logo">
+        <img src="assets/logo.png" alt="OmniService TG" onerror="this.outerHTML='🛡️'"/>
+        <div class="auth-header-brand">
+          <span style="color:#fff">Omni</span><span style="color:#F5820A">Service</span> <span style="color:#fff">TG</span>
+        </div>
+      </div>
+      <div class="auth-header-sub">Votre espace personnel OmniService</div>
+      <button class="auth-close" onclick="closeAuthModal()">✕</button>
+    </div>
+    <!-- Onglets -->
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="auth-tab-login"  onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab"    id="auth-tab-signup" onclick="switchAuthTab('signup')">Inscription</button>
+    </div>
+    <!-- Panneau Connexion -->
+    <div id="auth-login-panel" class="auth-panel">
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input type="email" class="auth-inp" id="login-email" placeholder="votre@email.com" autocomplete="email"
+               onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Mot de passe</label>
+        <input type="password" class="auth-inp" id="login-pass" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="auth-btn" id="login-btn" onclick="doLogin()">Se connecter →</button>
+      <div class="auth-err" id="auth-err"></div>
+      <div class="auth-sep">Pas encore de compte ?</div>
+      <button style="width:100%;background:transparent;border:1.5px solid #1E6FBE;color:#1E6FBE;border-radius:999px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="switchAuthTab('signup')">Créer mon compte →</button>
+    </div>
+    <!-- Panneau Inscription -->
+    <div id="auth-signup-panel" class="auth-panel" style="display:none">
+      <div class="auth-inp-row">
+        <div class="auth-field">
+          <label class="auth-label">Prénom *</label>
+          <input type="text" class="auth-inp" id="signup-prenom" placeholder="Ex : Kofi" autocomplete="given-name"/>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Nom *</label>
+          <input type="text" class="auth-inp" id="signup-nom" placeholder="Ex : Mensah" autocomplete="family-name"/>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Genre *</label>
+        <select class="auth-inp" id="signup-genre">
+          <option value="">— Sélectionner —</option>
+          <option value="homme">👨 Homme</option>
+          <option value="femme">👩 Femme</option>
+        </select>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Téléphone *</label>
+        <input type="tel" class="auth-inp" id="signup-phone" placeholder="+228 XX XX XX XX" autocomplete="tel"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Ville de résidence *</label>
+        <input type="text" class="auth-inp" id="signup-ville" placeholder="Ex : Lomé, Kpalimé, Kara..." autocomplete="address-level2"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Email *</label>
+        <input type="email" class="auth-inp" id="signup-email" placeholder="votre@email.com" autocomplete="email"/>
+      </div>
+      <div class="auth-inp-row">
+        <div class="auth-field">
+          <label class="auth-label">Mot de passe *</label>
+          <input type="password" class="auth-inp" id="signup-pass" placeholder="Min. 6 caractères" autocomplete="new-password"/>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Confirmer *</label>
+          <input type="password" class="auth-inp" id="signup-pass2" placeholder="Répéter"
+                 onkeydown="if(event.key==='Enter')doSignup()"/>
+        </div>
+      </div>
+      <button class="auth-btn" id="signup-btn" onclick="doSignup()">S'inscrire →</button>
+      <div class="auth-err" id="auth-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BANNIÈRE PWA ══ -->
+<div id="pwa-banner" style="display:none">
+  <div class="pwa-inner">
+    <div class="pwa-logo">
+      <img src="assets/logo.png" alt="" onerror="this.outerHTML='🛡️'"/>
+    </div>
+    <div class="pwa-text">
+      <div class="pwa-title">Installer l'application</div>
+      <div class="pwa-sub">Accédez rapidement à OmniService TG</div>
+    </div>
+    <button class="pwa-btn" id="pwa-install-btn">Installer</button>
+    <button class="pwa-close" onclick="dismissPWA()">✕</button>
+  </div>
+</div>
+
+<!-- ══ TOP NAV ══ -->
+<header class="topnav">
+  <div class="topnav-inner">
+    <div class="topnav-row1">
+      <div class="logo-area">
+        <!-- Logo + Nom -->
+        <div class="logo-box">
+          <img src="assets/logo.png" alt="OmniService TG" onerror="this.parentElement.innerHTML='🛡️'"/>
+        </div>
+        <div>
+          <div class="brand-name">
+            <span class="brand-blue">Omni</span><span class="brand-ora">Service</span> <span class="brand-blue">TG</span>
+          </div>
+          <div class="brand-sub">Appelez, on s'en charge</div>
+        </div>
+        <nav class="nav-links">
+          <button class="nav-link on"  id="nl-home"     onclick="goTab('home')">🏠 Accueil</button>
+          <button class="nav-link"     id="nl-services" onclick="goTab('services')">🛠️ Services</button>
+          <button class="nav-link"     id="nl-orders"   onclick="goTab('orders')">📦 Commandes</button>
+          <button class="nav-link"     id="nl-about"    onclick="goTab('about')">ℹ️ À propos</button>
+        </nav>
+      </div>
+      <div class="nav-right">
+        <button class="nav-btn" onclick="goTab('orders')" title="Mes commandes">
+          🛒<span class="cart-badge" id="cart-count" style="display:none">0</span>
+        </button>
+        <!-- Bouton profil — devient avatar homme/femme après connexion -->
+        <button class="nav-btn" id="nav-btn-profile" onclick="goTab('profile')" title="Mon profil">👤</button>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-ico">🔍</span>
+      <input type="text" placeholder="Rechercher un service..." id="search-input" oninput="filterServices(this.value)"/>
+    </div>
+  </div>
+</header>
+
+<div class="app-body">
+
+  <!-- ══════════════════════════════════
+       PAGE : ACCUEIL
+  ══════════════════════════════════ -->
+  <div class="page on" id="p-home">
+    <div class="marquee-wrap">
+      <div class="mtrack">
+        <span class="mtext">✔ Professionnalisme &nbsp;✔ Fiabilité &nbsp;✔ Excellence &nbsp;✔ Respect &nbsp;— &nbsp;<b>OmniService TG</b> &nbsp;— Simplifiez votre quotidien ! &nbsp;&nbsp;&nbsp;</span>
+        <span class="mtext">✔ Professionnalisme &nbsp;✔ Fiabilité &nbsp;✔ Excellence &nbsp;✔ Respect &nbsp;— &nbsp;<b>OmniService TG</b> &nbsp;— Simplifiez votre quotidien ! &nbsp;&nbsp;&nbsp;</span>
+      </div>
+    </div>
+    <div class="slide-wrap">
+      <div class="slider" id="hero-slider">
+        <div class="slide on" style="background:linear-gradient(135deg,#1E6FBE,#155A9C)">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="slide-emoji">🚀</div>
+            <div class="slide-title">Livraison Express</div>
+            <div class="slide-sub">Vos courses livrées rapidement à Lomé</div>
+          </div>
+          <button class="slide-cta" onclick="openService('delivery')">Commander →</button>
+        </div>
+        <div class="slide" style="background:linear-gradient(135deg,#F5820A,#D96E00)">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="slide-emoji">✨</div>
+            <div class="slide-title">Nettoyage Professionnel</div>
+            <div class="slide-sub">Votre maison mérite le meilleur</div>
+          </div>
+          <button class="slide-cta" onclick="openService('cleaning')">Réserver →</button>
+        </div>
+        <div class="slide" style="background:linear-gradient(135deg,#1E6FBE,#F5820A)">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="slide-emoji">🥘</div>
+            <div class="slide-title">Alimentation Fraîche</div>
+            <div class="slide-sub">Tilapia, volailles, légumes livrés chez vous</div>
+          </div>
+          <button class="slide-cta" onclick="openService('food')">Commander →</button>
+        </div>
+        <div class="slide" style="background:linear-gradient(135deg,#155A9C,#1E6FBE)">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="slide-emoji">🍽️</div>
+            <div class="slide-title">Service Traiteur</div>
+            <div class="slide-sub">Plats restaurants et traiteur événementiel</div>
+          </div>
+          <button class="slide-cta" onclick="openService('restaurant')">Découvrir →</button>
+        </div>
+        <div class="dots" id="slider-dots">
+          <button class="dot on" onclick="goSlide(0)"></button>
+          <button class="dot"    onclick="goSlide(1)"></button>
+          <button class="dot"    onclick="goSlide(2)"></button>
+          <button class="dot"    onclick="goSlide(3)"></button>
+        </div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-head">
+        <div><div class="sec-title">Services disponibles</div><div class="sec-sub">Choisissez ce dont vous avez besoin</div></div>
+        <button class="see-all" onclick="goTab('services')">Tous ›</button>
+      </div>
+      <div class="svc-grid">
+        <button class="svc-btn" onclick="openService('food')"><div class="svc-ico" style="background:#FFF3E0">🥘</div><span class="svc-lbl">Alimentation</span></button>
+        <button class="svc-btn" onclick="openService('restaurant')"><div class="svc-ico" style="background:#E3F2FD">🍽️</div><span class="svc-lbl">Restauration</span></button>
+        <button class="svc-btn" onclick="openService('delivery')"><div class="svc-ico" style="background:#FFF3E0">🚚</div><span class="svc-lbl">Livraison</span></button>
+        <button class="svc-btn" onclick="openService('cleaning')"><div class="svc-ico" style="background:#E3F2FD">🧹</div><span class="svc-lbl">Nettoyage</span></button>
+        <button class="svc-btn" onclick="openService('clothes')"><div class="svc-ico" style="background:#FFF3E0">👗</div><span class="svc-lbl">Prêt-à-porter</span></button>
+        <button class="svc-btn" onclick="openService('maintenance')"><span class="svc-soon">16 Mars</span><div class="svc-ico" style="background:#E3F2FD">🔧</div><span class="svc-lbl">Maintenance</span></button>
+        <button class="svc-btn" onclick="openService('security')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#E3F2FD">🛡️</div><span class="svc-lbl">Gardiennage</span></button>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title" style="margin-bottom:14px">Pourquoi nous choisir ?</div>
+      <div class="why-grid">
+        <div class="why-card"><div class="why-ico" style="background:#E3F2FD">🛡️</div><div><div class="why-title">Organisation structurée</div><div class="why-desc">Chaque intervention planifiée et encadrée.</div></div></div>
+        <div class="why-card"><div class="why-ico" style="background:#FFF3E0">⭐</div><div><div class="why-title">Équipe identifiable</div><div class="why-desc">Personnel formé, professionnel et fiable.</div></div></div>
+        <div class="why-card"><div class="why-ico" style="background:#E3F2FD">⚡</div><div><div class="why-title">Service moderne</div><div class="why-desc">Communication claire et suivi efficace.</div></div></div>
+        <div class="why-card"><div class="why-ico" style="background:#FFF3E0">🕐</div><div><div class="why-title">Engagement qualité</div><div class="why-desc">Délais et standards toujours respectés.</div></div></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="cta-banner">
+        <div class="cta-title">Prêt à travailler avec des professionnels ?</div>
+        <div class="cta-sub">Contactez OmniService TG et découvrez une nouvelle manière de gérer vos services au quotidien.</div>
+        <div class="cta-btns">
+          <a href="tel:+22872652222" class="cta-btn">📞 Nous appeler</a>
+          <a href="https://wa.me/22872652222" class="cta-btn cta-wa">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div><!-- /home -->
+
+  <!-- ══════════════════════════════════
+       PAGE : SERVICES
+  ══════════════════════════════════ -->
+  <div class="page" id="p-services">
+    <!-- VUE 1 : Liste -->
+    <div id="view-list">
+      <div class="sec" style="padding-top:20px">
+        <div class="sec-title">Nos Services</div>
+        <div class="sec-sub" style="margin-bottom:16px">Une solution intégrée pour tous vos besoins</div>
+        <div class="svc-list">
+          <button class="svc-row" onclick="openService('food')"><div class="svc-row-ico" style="background:#FFF3E0">🥘</div><div style="flex:1"><div class="svc-row-name">Alimentation &amp; Produits locaux</div><div class="svc-row-desc">Kits alimentaires, produits frais (Tilapia, Volailles, Légumes), Néré, Vin de palme.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('restaurant')"><div class="svc-row-ico" style="background:#E3F2FD">🍽️</div><div style="flex:1"><div class="svc-row-name">Restauration</div><div class="svc-row-desc">Plats de restaurants partenaires, service traiteur pour vos événements.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('delivery')"><div class="svc-row-ico" style="background:#FFF3E0">🚚</div><div style="flex:1"><div class="svc-row-name">Livraison &amp; Courses</div><div class="svc-row-desc">Livraison express, courses personnalisées, livraison entreprise et de plats.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('maintenance')"><div class="svc-row-ico" style="background:#E3F2FD">🔧</div><div style="flex:1"><div class="svc-row-name">Maintenance Technique <span class="tag-soon">16 Mars</span></div><div class="svc-row-desc">Électricité, plomberie, voiture, électroménager, informatique, pose TV/antenne.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('clothes')"><div class="svc-row-ico" style="background:#FFF3E0">👗</div><div style="flex:1"><div class="svc-row-name">Prêt-à-porter</div><div class="svc-row-desc">Vêtements homme/femme/enfant, sacs, chaussures, cosmétiques et accessoires.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('cleaning')"><div class="svc-row-ico" style="background:#E3F2FD">🧹</div><div style="flex:1"><div class="svc-row-name">Entretien &amp; Nettoyage</div><div class="svc-row-desc">Nettoyage résidentiel, bureaux, entretien régulier et industriel.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('security')"><div class="svc-row-ico" style="background:#E3F2FD">🛡️</div><div style="flex:1"><div class="svc-row-name">Gardiennage &amp; Sécurité <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Gardiennage résidentiel/boutique/bureau, sécurité événementielle.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VUE 2 : Catalogue -->
+    <div id="view-catalogue" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" onclick="showView('list')">←</button>
+        <div id="cat-ico" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0"></div>
+        <div>
+          <div id="cat-title" style="font-size:14px;font-weight:700;color:#1A1A2E"></div>
+          <div style="font-size:11px;color:#9999BB">Sélectionnez vos articles</div>
+        </div>
+      </div>
+      <div id="catalogue-items" class="catalogue-grid"></div>
+      <div class="cart-bar" id="cart-bar" style="display:none" onclick="showView('delivery')">
+        <div class="cart-bar-left">
+          <span class="cart-bar-count" id="cb-count">0 article</span>
+          <span class="cart-bar-text">Voir ma commande</span>
+        </div>
+        <span class="cart-bar-total" id="cb-total">0 FCFA</span>
+      </div>
+    </div>
+
+    <!-- VUE 3 : Formulaire standard -->
+    <div id="view-form" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" onclick="showView('list')">←</button>
+        <div id="form-ico" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0"></div>
+        <div>
+          <div id="form-title" style="font-size:14px;font-weight:700;color:#1A1A2E"></div>
+          <div style="font-size:11px;color:#9999BB">Formulaire de demande</div>
+        </div>
+      </div>
+      <div id="form-soon" style="display:none" class="warn-box">
+        <div style="font-weight:700;font-size:13px;margin-bottom:3px">⏳ Bientôt disponible</div>
+        <div style="font-size:12px;opacity:.92" id="form-soon-date"></div>
+      </div>
+      <div class="order-card">
+        <div id="form-fields"></div>
+        <button class="btn-primary" id="form-submit-btn" onclick="submitStandardForm()">📨 Envoyer ma demande</button>
+      </div>
+    </div>
+
+    <!-- VUE 4 : Livraison (sans champ téléphone) -->
+    <div id="view-delivery" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" id="delivery-back-btn" onclick="showView('catalogue')">←</button>
+        <div style="font-size:22px">📍</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#1A1A2E">Informations de livraison</div>
+          <div style="font-size:11px;color:#9999BB">Étape 1 sur 2</div>
+        </div>
+      </div>
+      <div class="step-bar">
+        <div class="step active"><div class="step-num">1</div><span>Livraison</span></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">2</div><span>Paiement</span></div>
+      </div>
+      <div class="order-card">
+        <div class="order-card-title">📍 Votre position</div>
+        <div class="loc-toggle">
+          <button class="loc-btn on" id="loc-btn-gps"  onclick="setLocMode('gps')">📡 Par localisation GPS</button>
+          <button class="loc-btn"    id="loc-btn-desc" onclick="setLocMode('desc')">✍️ Par description</button>
+        </div>
+        <div id="loc-gps-panel">
+          <button class="btn-secondary" id="gps-btn" onclick="getGPS()">📡 Obtenir ma position</button>
+          <div id="gps-result" style="margin-top:10px;font-size:12px;color:#4A4A6A;display:none"></div>
+        </div>
+        <div id="loc-desc-panel" style="display:none">
+          <label class="f-label">Description de votre position</label>
+          <textarea class="f-textarea" id="del-desc" rows="3" placeholder="Ex : Quartier Adidogomé, derrière le marché, maison bleue avec portail noir..."></textarea>
+        </div>
+      </div>
+      <div class="order-card">
+        <div class="order-card-title">🏠 Adresse de livraison</div>
+        <label class="f-label">Rue / quartier / repère</label>
+        <input type="text" class="f-input" id="del-address" placeholder="Ex : Adidogomé, rue des Cocotiers"/>
+        <label class="f-label">Notes supplémentaires (optionnel)</label>
+        <textarea class="f-textarea" id="del-notes" rows="2" placeholder="Étage, couleur de la maison..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="goToPayment()">Continuer → Paiement</button>
+    </div>
+
+    <!-- VUE 5 : Paiement -->
+    <div id="view-payment" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" onclick="showView('delivery')">←</button>
+        <div style="font-size:22px">💳</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#1A1A2E">Confirmation &amp; Paiement</div>
+          <div style="font-size:11px;color:#9999BB">Étape 2 sur 2</div>
+        </div>
+      </div>
+      <div class="step-bar">
+        <div class="step done"><div class="step-num">✓</div><span>Livraison</span></div>
+        <div class="step-line done"></div>
+        <div class="step active"><div class="step-num">2</div><span>Paiement</span></div>
+      </div>
+      <div class="order-card">
+        <div class="order-card-title">🛒 Votre commande</div>
+        <div id="recap-items"></div>
+        <div class="recap-total">
+          <span class="recap-total-label">Total</span>
+          <span class="recap-total-val" id="recap-total-val">0 FCFA</span>
+        </div>
+      </div>
+      <div class="order-card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 18px 12px;font-size:15px;font-weight:700;color:#1A1A2E">💳 Mode de paiement</div>
+        <button class="pay-opt" id="pay-mixx" onclick="selectPay('mixx')">
+          <div class="pay-ico" style="background:#E8F5E9">💚</div>
+          <div><div class="pay-name">Mixx By Yas</div><div class="pay-sub">Paiement mobile sécurisé</div></div>
+          <span class="pay-soon">Bientôt</span>
+          <div class="pay-radio"></div>
+        </button>
+        <button class="pay-opt" id="pay-flooz" onclick="selectPay('flooz')">
+          <div class="pay-ico" style="background:#FFF3E0">🧡</div>
+          <div><div class="pay-name">Flooz</div><div class="pay-sub">Paiement mobile Moov</div></div>
+          <span class="pay-soon">Bientôt</span>
+          <div class="pay-radio"></div>
+        </button>
+        <button class="pay-opt selected" id="pay-livraison" onclick="selectPay('livraison')">
+          <div class="pay-ico" style="background:#F3E5F5">🏠</div>
+          <div><div class="pay-name">Payer à la livraison</div><div class="pay-sub">Espèces ou mobile à la réception</div></div>
+          <div class="pay-radio"></div>
+        </button>
+      </div>
+      <button class="btn-primary" id="confirm-btn" onclick="confirmOrder()">✅ Confirmer la commande</button>
+    </div>
+
+    <!-- VUE 6 : Succès -->
+    <div id="view-success" style="display:none">
+      <div class="success">
+        <div class="succ-emoji">✅</div>
+        <div class="succ-title">Commande confirmée !</div>
+        <div class="succ-desc" id="succ-msg">Votre commande a été reçue.<br/>Notre équipe vous contactera très bientôt.</div>
+        <button class="btn-primary" style="max-width:300px;margin:0 auto" onclick="showView('list')">← Retour aux services</button>
+      </div>
+    </div>
+  </div><!-- /services -->
+
+  <!-- ══════════════════════════════════
+       PAGE : COMMANDES (suivi)
+  ══════════════════════════════════ -->
+  <div class="page" id="p-orders">
+    <div class="orders-page">
+      <div class="orders-header">
+        <div class="sec-title">Mes Commandes</div>
+        <div class="sec-sub">Suivez l'état de vos demandes en temps réel</div>
+      </div>
+      <!-- Info utilisateur connecté + bouton actualiser -->
+      <div class="orders-user-info" id="orders-user-bar" style="display:none">
+        <div class="orders-user-avatar" id="orders-user-avatar">👤</div>
+        <div>
+          <div class="orders-user-name" id="orders-user-name">—</div>
+          <div class="orders-user-phone" id="orders-user-phone">—</div>
+        </div>
+        <button class="orders-refresh-btn" onclick="loadMyOrders()">🔄 Actualiser</button>
+      </div>
+      <div id="orders-out">
+        <div class="orders-empty">
+          <div class="orders-empty-ico">🔐</div>
+          <div class="orders-empty-title">Connexion requise</div>
+          <div class="orders-empty-sub">Connectez-vous pour voir vos commandes et leur historique.</div>
+          <button class="btn-primary" style="max-width:220px;margin:20px auto 0" onclick="openAuthModal('login')">Se connecter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       PAGE : À PROPOS
+  ══════════════════════════════════ -->
+  <div class="page" id="p-about">
+    <div style="padding-top:20px">
+      <div class="about-hero">
+        <div class="about-logo">
+          <img src="assets/logo.png" alt="OmniService TG" onerror="this.parentElement.innerHTML='<div style=font-size:50px>🛡️</div>'"/>
+        </div>
+        <div class="about-name"><span class="brand-blue">Omni</span><span class="brand-ora">Service</span> <span class="brand-blue">TG</span></div>
+        <div style="font-size:12px;color:var(--light);margin-top:4px">Appelez, on s'en charge</div>
+        <div style="font-size:12px;color:var(--mid);font-weight:600;margin-top:6px">Lancé par Assistance Global</div>
+        <div class="about-flag">🇹🇬 Entreprise togolaise</div>
+      </div>
+      <div class="a-card" style="background:linear-gradient(135deg,rgba(30,111,190,.03),rgba(245,130,10,.03));border:1px solid rgba(30,111,190,.1)">
+        <div class="a-card-title">🚀 Notre Vision</div>
+        <p>Construire un Togo où chaque foyer accède à des services fiables, modernes et dignes des standards internationaux. OmniService TG vise à devenir une <strong style="color:var(--blue)">référence nationale</strong> dans le secteur des services professionnels.</p>
+      </div>
+      <div class="a-card">
+        <div class="a-card-title">🎯 Notre Mission</div>
+        <p>Offrir aux ménages et entreprises togolais des services multisectoriels professionnels, accessibles et structurés, qui simplifient leur quotidien et valorisent leur cadre de vie.</p>
+      </div>
+      <div class="sec-title" style="margin-bottom:12px">Nos Valeurs</div>
+      <div class="val-row"><div class="val-ico">🎯</div><div><div class="val-name">Professionnalisme</div><div class="val-desc">Standards élevés à chaque intervention.</div></div></div>
+      <div class="val-row"><div class="val-ico">🔒</div><div><div class="val-name">Fiabilité</div><div class="val-desc">Vous pouvez compter sur nous.</div></div></div>
+      <div class="val-row"><div class="val-ico">🤝</div><div><div class="val-name">Respect</div><div class="val-desc">De nos clients, équipes et partenaires.</div></div></div>
+      <div class="val-row"><div class="val-ico">🔍</div><div><div class="val-name">Transparence</div><div class="val-desc">Tarifs clairs, pas de surprises.</div></div></div>
+      <div class="val-row" style="margin-bottom:18px"><div class="val-ico">⭐</div><div><div class="val-name">Excellence</div><div class="val-desc">Toujours le meilleur résultat.</div></div></div>
+      <div class="who-grid">
+        <div class="who-card"><div style="font-size:30px;margin-bottom:9px">👨‍👩‍👧‍👦</div><div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:5px">Particuliers</div><div style="font-size:11px;color:var(--light);line-height:1.5">Familles et propriétaires cherchant un service organisé.</div></div>
+        <div class="who-card"><div style="font-size:30px;margin-bottom:9px">🏢</div><div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:5px">Entreprises</div><div style="font-size:11px;color:var(--light);line-height:1.5">Bureaux, commerces, sociétés en croissance.</div></div>
+      </div>
+      <div class="a-card">
+        <div class="a-card-title">📞 Contact</div>
+        <div class="ct-row"><div class="ct-ico">📍</div><span style="font-size:13px;color:var(--mid)">Basé à Lomé, Togo</span></div>
+        <div class="ct-row"><div class="ct-ico">📞</div><a href="tel:+22872652222" style="font-size:13px;color:var(--blue);font-weight:600;text-decoration:none">+228 72 65 22 22</a></div>
+        <div class="ct-row"><div class="ct-ico">📧</div><a href="/cdn-cgi/l/email-protection#3c5f5352485d5f487c535152554f594e4a555f59485b125f5351" style="font-size:13px;color:var(--blue);font-weight:600;text-decoration:none"><span class="__cf_email__" data-cfemail="7f1c10110b1e1c0b3f101211160c1a0d09161c1a0b18511c1012">[email&#160;protected]</span></a></div>
+        <div class="ct-row"><div class="ct-ico">🌐</div><span style="font-size:13px;color:var(--mid)">www.omniservicetg.com</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       PAGE : PROFIL
+  ══════════════════════════════════ -->
+  <div class="page" id="p-profile">
+    <div style="padding-top:20px">
+      <div class="prof-hero">
+        <!-- Avatar dynamique homme/femme -->
+        <div class="avatar" id="prof-avatar">👤</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:#fff" id="prof-name-disp">Mon Profil</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:5px" id="prof-phone-disp">Connectez-vous pour accéder à votre compte</div>
+      </div>
+
+      <!-- Carte si NON connecté -->
+      <div id="prof-auth-card">
+        <div class="auth-card-title">Bienvenue sur OmniService TG !</div>
+        <div class="auth-card-sub">Connectez-vous ou créez un compte pour passer des commandes, suivre leur statut et gérer votre profil.</div>
+        <div class="btn-row">
+          <button class="btn-login" onclick="openAuthModal('login')">Se connecter</button>
+          <button class="btn-signup" onclick="openAuthModal('signup')">S'inscrire</button>
+        </div>
+      </div>
+
+      <!-- Carte si connecté -->
+      <div id="prof-logged-card" style="display:none">
+        <div class="prof-card">
+          <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:14px">✏️ Modifier mes informations</div>
+          <div class="p-inw"><span class="p-pfx">👤</span><input type="text" class="p-inp" placeholder="Prénom" id="pf-prenom"/></div>
+          <div class="p-inw"><span class="p-pfx">👤</span><input type="text" class="p-inp" placeholder="Nom" id="pf-nom"/></div>
+          <div class="p-inw"><span class="p-pfx">📞</span><input type="tel" class="p-inp" placeholder="+228 XX XX XX XX" id="pf-phone"/></div>
+          <div class="p-inw"><span class="p-pfx">📍</span><input type="text" class="p-inp" placeholder="Ville de résidence" id="pf-ville"/></div>
+          <div class="p-inw" style="margin-bottom:16px"><span class="p-pfx">📧</span><input type="email" class="p-inp" placeholder="Email" id="pf-email" readonly style="opacity:.6"/></div>
+          <button class="p-save" onclick="saveProfile()">💾 Enregistrer</button>
+        </div>
+        <div class="menu-list">
+          <div class="menu-row" onclick="goTab('orders')"><div class="menu-ico" style="background:#E3F2FD">📦</div><span style="flex:1;font-size:13px;font-weight:600;color:var(--dark)">Mes commandes</span><span style="color:var(--border);font-size:18px">›</span></div>
+          <div class="menu-row"><div class="menu-ico" style="background:#FFF3E0">🔔</div><span style="flex:1;font-size:13px;font-weight:600;color:var(--dark)">Notifications</span><span style="color:var(--border);font-size:18px">›</span></div>
+          <div class="menu-row"><div class="menu-ico" style="background:#E3F2FD">🔒</div><span style="flex:1;font-size:13px;font-weight:600;color:var(--dark)">Confidentialité</span><span style="color:var(--border);font-size:18px">›</span></div>
+          <div class="menu-row" onclick="doLogout()"><div class="menu-ico" style="background:#FFEBEE">🚪</div><span style="flex:1;font-size:13px;font-weight:600;color:#C62828">Se déconnecter</span><span style="color:var(--border);font-size:18px">›</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /app-body -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Bottom Nav -->
+<nav class="botnav">
+  <button class="btab on" id="t-home"     onclick="goTab('home')">    <div class="btab-ico">🏠</div><span class="btab-lbl">Accueil</span></button>
+  <button class="btab"    id="t-services" onclick="goTab('services')"><div class="btab-ico">🛠️</div><span class="btab-lbl">Services</span></button>
+  <button class="btab"    id="t-orders"   onclick="goTab('orders')">  <div class="btab-ico">📦</div><span class="btab-lbl">Commandes</span></button>
+  <button class="btab"    id="t-about"    onclick="goTab('about')">   <div class="btab-ico">ℹ️</div><span class="btab-lbl">À propos</span></button>
+  <button class="btab"    id="t-profile"  onclick="goTab('profile')"> <div class="btab-ico" id="btab-profile-ico">👤</div><span class="btab-lbl">Profil</span></button>
+</nav>
+
+<!-- Script principal -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module" src="app.js"></script>
+<script>
+// Mettre à jour aussi l'icône du bas nav après connexion
+const _origUpdateNav = window.updateNavForAuth;
+window.addEventListener('auth-changed', () => {});
+// Patch pour l'icône bottom nav
+function patchBottomNavAvatar(genre) {
+  const ico = document.getElementById('btab-profile-ico');
+  if (ico) ico.textContent = genre === 'femme' ? '👩' : genre === 'homme' ? '👨' : '👤';
+}
+// L'app.js exportera depuis onAuthStateChanged, mais pour le bottom nav on observe le bouton nav
+const profileNavObserver = new MutationObserver(() => {
+  const btn = document.getElementById('nav-btn-profile');
+  const ico = document.getElementById('btab-profile-ico');
+  if (btn && ico) ico.textContent = btn.textContent;
+});
+window.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('nav-btn-profile');
+  if (btn) profileNavObserver.observe(btn, {childList:true, characterData:true, subtree:true});
+
+  // Mise à jour barre commandes quand utilisateur connecté
+  // (Le Service Worker est enregistré dans app.js)
+});
+</script>
+</body>
+</html>
