@@ -686,3 +686,14 @@ window.addEventListener('DOMContentLoaded', () => {
     if (phEl) phEl.value = p;
   }
 });
+
+window.addEventListener('load', function() {
+    // On laisse le splash affiché au moins 2 secondes pour l'effet visuel
+    setTimeout(function() {
+        const splash = document.getElementById('splash-screen');
+        splash.classList.add('fade-out');
+        
+        // Optionnel : On peut aussi débloquer le scroll ici si tu l'avais bloqué
+        document.body.style.overflow = 'auto';
+    }, 2000);
+});
