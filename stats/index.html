@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OmniService TG — Statisticien</title>
+<link rel="icon" href="../assets/logo.png" type="image/png"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#1E6FBE;--blue-d:#155A9C;--blue-s:rgba(30,111,190,.1);--ora:#F5820A;--dark:#1A1A2E;--mid:#4A4A6A;--light:#9999BB;--border:#E8EAF0;--bg:#F4F6FA;--green:#2E7D32;--red:#C62828;--purple:#7B1FA2;--teal:#00695C}
+html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--dark)}
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:9999;background:#0a1220;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.sp-logo{font-size:52px;animation:popIn .6s cubic-bezier(.34,1.56,.64,1) .3s both}
+.sp-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:#fff;animation:fadeUp .5s ease .7s both}
+.sp-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;animation:fadeUp .5s ease .9s both}
+.sp-bar{width:160px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;animation:fadeUp .4s ease 1s both}
+.sp-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));animation:load 1.4s ease 1.1s both}
+@keyframes load{0%{width:0}100%{width:100%}}
+#splash.out{animation:splashOut .4s ease forwards}
+@keyframes splashOut{to{opacity:0;pointer-events:none}}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0e1420,#1a2540);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;display:none}
+.login-box{background:#fff;border-radius:24px;padding:36px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.login-logo{font-size:44px;margin-bottom:10px}
+.login-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--dark);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--light);margin-bottom:20px}
+.login-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(123,31,162,.08);color:var(--purple);border:1px solid rgba(123,31,162,.2);border-radius:999px;padding:4px 14px;font-size:11px;font-weight:700;margin-bottom:18px}
+.inp{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'Poppins',sans-serif;outline:none;transition:.2s;background:#fafbfd;margin-bottom:12px}
+.inp:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(123,31,162,.1)}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,var(--purple),#4A148C);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;min-height:18px}
+
+/* LAYOUT */
+#app{display:none;min-height:100vh}
+.top-header{background:linear-gradient(135deg,#1A1A2E,#2D1B4E);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.th-left{display:flex;align-items:center;gap:12px}
+.th-icon{font-size:28px}
+.th-name{font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:#fff}
+.th-role{font-size:11px;color:rgba(255,255,255,.4);margin-top:1px}
+.btn-logout-top{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Poppins',sans-serif}
+
+/* PERIOD */
+.period-bar{background:#fff;padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none}
+.period-bar::-webkit-scrollbar{display:none}
+.period-btn{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:12px;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;white-space:nowrap;transition:.2s;background:#fff;color:var(--mid)}
+.period-btn.on{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+/* MAIN */
+.main-content{padding:20px;max-width:1200px;margin:0 auto}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.kpi-card{background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,.06);position:relative;overflow:hidden;border-left:4px solid transparent}
+.kpi-k1{border-color:var(--blue)}
+.kpi-k2{border-color:var(--ora)}
+.kpi-k3{border-color:var(--green)}
+.kpi-k4{border-color:var(--purple)}
+.kpi-k5{border-color:var(--teal)}
+.kpi-k6{border-color:var(--red)}
+.kpi-label{font-size:10px;color:var(--light);font-weight:600;letter-spacing:.3px;margin-bottom:6px;text-transform:uppercase}
+.kpi-value{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--dark);margin-bottom:2px}
+.kpi-sub{font-size:11px;color:var(--mid)}
+.kpi-trend{font-size:10px;font-weight:700;margin-top:4px}
+.kpi-trend.up{color:var(--green)}
+.kpi-trend.down{color:var(--red)}
+
+/* 2-COL LAYOUT */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:768px){.two-col{grid-template-columns:1fr}}
+
+/* CARDS */
+.stat-card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden}
+.stat-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.stat-title{font-size:14px;font-weight:700}
+.stat-body{padding:16px}
+
+/* LINE CHART */
+.line-chart-wrap{position:relative;height:120px;margin-bottom:8px}
+svg.line-chart{width:100%;height:100%}
+
+/* BAR HORIZONTAL */
+.hbar-item{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.hbar-label{font-size:12px;color:var(--mid);width:100px;flex-shrink:0;text-align:right}
+.hbar-track{flex:1;height:10px;background:var(--bg);border-radius:5px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:5px;transition:.5s}
+.hbar-val{font-size:11px;font-weight:700;color:var(--dark);width:60px;text-align:right}
+
+/* RANKING */
+.rank-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.rank-item:last-child{border-bottom:none}
+.rank-num{font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:var(--light);width:24px;text-align:center}
+.rank-num.top{color:var(--ora)}
+.rank-info{flex:1}
+.rank-name{font-size:13px;font-weight:700}
+.rank-sub{font-size:11px;color:var(--light);margin-top:1px}
+.rank-val{font-size:13px;font-weight:700;color:var(--blue)}
+
+/* HOURLY HEAT */
+.heat-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.heat-cell{aspect-ratio:1;border-radius:3px;transition:.2s;cursor:default;position:relative}
+.heat-cell:hover .heat-tooltip{display:block}
+.heat-tooltip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;font-size:9px;padding:3px 6px;border-radius:4px;white-space:nowrap;z-index:10;pointer-events:none}
+.heat-lbl-row{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:4px}
+.heat-lbl{font-size:9px;color:var(--light);text-align:center}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1A1A2E;color:#fff;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:600;z-index:9998;transition:.35s;opacity:0;max-width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="sp-logo">📊</div>
+  <div class="sp-title">OmniService TG</div>
+  <div class="sp-sub">Interface Statisticien</div>
+  <div class="sp-bar"><div class="sp-bar-fill"></div></div>
+</div>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">📊</div>
+    <div class="login-title">Espace Statisticien</div>
+    <div class="login-sub">OmniService TG</div>
+    <div class="login-badge">🔐 Accès Analytique</div>
+    <input class="inp" type="email" id="login-email" placeholder="Email"/>
+    <input class="inp" type="password" id="login-password" placeholder="Mot de passe"/>
+    <button class="btn-login" onclick="doLogin()" id="btn-login">Se connecter</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="top-header">
+    <div class="th-left">
+      <div class="th-icon">📊</div>
+      <div>
+        <div class="th-name" id="top-name">Statisticien</div>
+        <div class="th-role">Tableau de bord analytique · OmniService TG</div>
+      </div>
+    </div>
+    <button class="btn-logout-top" onclick="doLogout()">↩ Déconnexion</button>
+  </div>
+
+  <div class="period-bar">
+    <button class="period-btn on" onclick="setPeriode(7,this)">7 jours</button>
+    <button class="period-btn" onclick="setPeriode(30,this)">30 jours</button>
+    <button class="period-btn" onclick="setPeriode(90,this)">3 mois</button>
+    <button class="period-btn" onclick="setPeriode(365,this)">1 an</button>
+    <button class="period-btn" onclick="setPeriode(0,this)">Tout</button>
+  </div>
+
+  <div class="main-content">
+    <!-- KPI GRID -->
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card kpi-k1"><div class="kpi-label">Commandes totales</div><div class="kpi-value" id="k-total">—</div><div class="kpi-sub" id="k-total-sub">chargement...</div></div>
+      <div class="kpi-card kpi-k2"><div class="kpi-label">Terminées</div><div class="kpi-value" id="k-term">—</div><div class="kpi-sub" id="k-term-pct">—% taux de succès</div></div>
+      <div class="kpi-card kpi-k3"><div class="kpi-label">CA Total</div><div class="kpi-value" id="k-ca">—</div><div class="kpi-sub">FCFA</div></div>
+      <div class="kpi-card kpi-k4"><div class="kpi-label">Panier moyen</div><div class="kpi-value" id="k-panier">—</div><div class="kpi-sub">FCFA / commande</div></div>
+      <div class="kpi-card kpi-k5"><div class="kpi-label">Annulées</div><div class="kpi-value" id="k-annulees">—</div><div class="kpi-sub" id="k-annulees-pct">—% taux d'annulation</div></div>
+      <div class="kpi-card kpi-k6"><div class="kpi-label">Clients uniques</div><div class="kpi-value" id="k-clients">—</div><div class="kpi-sub">comptes actifs</div></div>
+    </div>
+
+    <!-- EVOLUTION + PAR SERVICE -->
+    <div class="two-col">
+      <div class="stat-card">
+        <div class="stat-head"><div class="stat-title">📈 Évolution (30 derniers jours)</div></div>
+        <div class="stat-body">
+          <div class="line-chart-wrap"><svg class="line-chart" id="line-chart" viewBox="0 0 300 100" preserveAspectRatio="none"></svg></div>
+          <div style="font-size:11px;color:var(--light);text-align:center" id="line-legend">— CA par jour</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-head"><div class="stat-title">🍽 Par service</div></div>
+        <div class="stat-body" id="service-bars">Chargement...</div>
+      </div>
+    </div>
+
+    <!-- HEURE + ZONES -->
+    <div class="two-col">
+      <div class="stat-card">
+        <div class="stat-head"><div class="stat-title">⏰ Commandes par heure</div></div>
+        <div class="stat-body">
+          <div class="heat-grid" id="heat-grid"></div>
+          <div class="heat-lbl-row" id="heat-lbls"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-head"><div class="stat-title">📍 Top zones de livraison</div></div>
+        <div class="stat-body" id="zones-list">Chargement...</div>
+      </div>
+    </div>
+
+    <!-- ARTICLES + LIVREURS -->
+    <div class="two-col">
+      <div class="stat-card">
+        <div class="stat-head"><div class="stat-title">🏆 Articles les plus commandés</div></div>
+        <div class="stat-body" id="articles-rank">Chargement...</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-head"><div class="stat-title">🛵 Performance livreurs</div></div>
+        <div class="stat-body" id="livreurs-rank">Chargement...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",
+  authDomain: "omniservicetg-59df3.firebaseapp.com",
+  projectId: "omniservicetg-59df3",
+  storageBucket: "omniservicetg-59df3.firebasestorage.app",
+  messagingSenderId: "196278567761",
+  appId: "1:196278567761:web:4f6416acaab58b67bf4970"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+
+let allOrders = [];
+let periodeDays = 7;
+
+// SPLASH
+setTimeout(() => {
+  document.getElementById('splash').classList.add('out');
+  setTimeout(() => document.getElementById('splash').style.display = 'none', 400);
+}, 2500);
+
+// AUTH
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    const snap = await getDoc(doc(db,'agents',user.uid));
+    if (!snap.exists() || !['stats','admin'].includes(snap.data().role)) {
+      await signOut(auth); showLogin('❌ Accès non autorisé'); return;
+    }
+    document.getElementById('top-name').textContent = snap.data().nom || user.email;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadData();
+  } else { showLogin(); }
+});
+
+function showLogin(err='') {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  if (err) document.getElementById('login-err').textContent = err;
+}
+window.doLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const btn = document.getElementById('btn-login');
+  if (!email||!pass) { document.getElementById('login-err').textContent='⚠️ Champs requis'; return; }
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
+  try { await signInWithEmailAndPassword(auth,email,pass); }
+  catch(e) { document.getElementById('login-err').textContent='❌ Identifiants incorrects'; }
+  finally { btn.disabled=false; btn.textContent='Se connecter'; }
+};
+window.doLogout = async () => await signOut(auth);
+
+async function loadData() {
+  try {
+    const snap = await getDocs(query(collection(db,'commandes'), orderBy('createdAt','desc')));
+    allOrders = snap.docs.map(d => ({id:d.id,...d.data()}));
+    renderAll();
+  } catch(e) { showToast('❌ Erreur chargement données'); }
+}
+
+window.setPeriode = function(days, btn) {
+  periodeDays = days;
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderAll();
+};
+
+function getFiltered() {
+  if (periodeDays === 0) return allOrders;
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-periodeDays); cutoff.setHours(0,0,0,0);
+  return allOrders.filter(o => o.createdAt && new Date(o.createdAt.seconds*1000) >= cutoff);
+}
+
+function renderAll() {
+  const orders = getFiltered();
+  renderKPIs(orders);
+  renderLineChart(orders);
+  renderServiceBars(orders);
+  renderHeatmap(orders);
+  renderZones(orders);
+  renderArticles(orders);
+  renderLivreurs(orders);
+}
+
+function renderKPIs(orders) {
+  const terminées = orders.filter(o=>o.statut==='Terminée');
+  const annulées = orders.filter(o=>o.statut==='Annulée');
+  const ca = terminées.reduce((s,o)=>s+(Number(o.total)||0),0);
+  const panier = terminées.length > 0 ? Math.round(ca/terminées.length) : 0;
+  const uids = new Set(orders.map(o=>o.uid).filter(Boolean));
+  const fmt = v => v>=1000000 ? (v/1000000).toFixed(1)+'M' : v>=1000 ? (v/1000).toFixed(0)+'k' : v;
+  document.getElementById('k-total').textContent = orders.length;
+  document.getElementById('k-total-sub').textContent = periodeDays > 0 ? `${periodeDays} derniers jours` : 'total';
+  document.getElementById('k-term').textContent = terminées.length;
+  document.getElementById('k-term-pct').textContent = orders.length > 0 ? Math.round(terminées.length/orders.length*100)+'% taux de succès' : '—';
+  document.getElementById('k-ca').textContent = fmt(ca);
+  document.getElementById('k-panier').textContent = panier.toLocaleString('fr-FR');
+  document.getElementById('k-annulees').textContent = annulées.length;
+  document.getElementById('k-annulees-pct').textContent = orders.length > 0 ? Math.round(annulées.length/orders.length*100)+'% annulation' : '—';
+  document.getElementById('k-clients').textContent = uids.size;
+}
+
+function renderLineChart(orders) {
+  const days = 30;
+  const buckets = [];
+  for (let i=days-1; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
+    const d2 = new Date(d); d2.setHours(23,59,59,999);
+    const ca = orders.filter(o => {
+      if (!o.createdAt) return false;
+      const dt = new Date(o.createdAt.seconds*1000);
+      return dt>=d && dt<=d2 && o.statut==='Terminée';
+    }).reduce((s,o)=>s+(Number(o.total)||0),0);
+    buckets.push(ca);
+  }
+  const max = Math.max(...buckets,1);
+  const pts = buckets.map((v,i) => {
+    const x = i/(days-1)*280+10;
+    const y = 90 - (v/max*80);
+    return `${x},${y}`;
+  }).join(' ');
+  // Area fill
+  const areapts = `10,90 ` + buckets.map((v,i) => {
+    const x = i/(days-1)*280+10;
+    const y = 90 - (v/max*80);
+    return `${x},${y}`;
+  }).join(' ') + ` 290,90`;
+  const svg = document.getElementById('line-chart');
+  svg.innerHTML = `
+    <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(123,31,162,.25)"/><stop offset="100%" stop-color="rgba(123,31,162,0)"/></linearGradient></defs>
+    <polygon points="${areapts}" fill="url(#areaGrad)"/>
+    <polyline points="${pts}" fill="none" stroke="var(--purple)" stroke-width="1.5" stroke-linejoin="round"/>
+    ${buckets.map((v,i) => {
+      if (v === 0) return '';
+      const x = i/(days-1)*280+10;
+      const y = 90 - (v/max*80);
+      return `<circle cx="${x}" cy="${y}" r="2" fill="var(--purple)"/>`;
+    }).join('')}
+  `;
+}
+
+function renderServiceBars(orders) {
+  const counts = {};
+  orders.forEach(o => {
+    const s = o.serviceName || o.service || 'Autre';
+    counts[s] = (counts[s]||0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const max = sorted[0]?.[1]||1;
+  const colors = ['var(--blue)','var(--ora)','var(--green)','var(--purple)','var(--teal)','var(--red)'];
+  document.getElementById('service-bars').innerHTML = sorted.map(([name,count],i) => `
+    <div class="hbar-item">
+      <div class="hbar-label">${name}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${count/max*100}%;background:${colors[i%colors.length]}"></div></div>
+      <div class="hbar-val">${count}</div>
+    </div>`).join('') || '<div style="color:var(--light);font-size:12px">Aucune donnée</div>';
+}
+
+function renderHeatmap(orders) {
+  const hours = Array(24).fill(0);
+  orders.forEach(o => {
+    if (o.createdAt) hours[new Date(o.createdAt.seconds*1000).getHours()]++;
+  });
+  const max = Math.max(...hours,1);
+  const SHOW = [0,2,4,6,8,10,12,14,16,18,20,22]; // 12 labels
+  const fullHours = Array.from({length:24},(_,i)=>i);
+  // show first 24 as 12x2
+  const heat = document.getElementById('heat-grid');
+  heat.innerHTML = fullHours.slice(0,24).map(h => {
+    const v = hours[h];
+    const intensity = v/max;
+    const bg = `rgba(123,31,162,${0.05+intensity*0.85})`;
+    return `<div class="heat-cell" style="background:${bg}"><div class="heat-tooltip">${h}h: ${v} cmd</div></div>`;
+  }).join('');
+  document.getElementById('heat-lbls').innerHTML = SHOW.map(h=>`<div class="heat-lbl">${h}h</div>`).join('');
+}
+
+function renderZones(orders) {
+  const zones = {};
+  orders.forEach(o => {
+    if (o.zone || o.adresse) {
+      const z = o.zone || (o.adresse||'').split(',').pop().trim() || 'Inconnu';
+      zones[z] = (zones[z]||0)+1;
+    }
+  });
+  const sorted = Object.entries(zones).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if (!sorted.length) { document.getElementById('zones-list').innerHTML='<div style="color:var(--light);font-size:12px">Aucune donnée de zone</div>'; return; }
+  const max = sorted[0][1];
+  document.getElementById('zones-list').innerHTML = sorted.map(([zone,count],i) => `
+    <div class="rank-item">
+      <div class="rank-num ${i<3?'top':''}">${i+1}</div>
+      <div class="rank-info"><div class="rank-name">📍 ${zone}</div><div class="rank-sub">${count} commande${count>1?'s':''}</div></div>
+      <div class="rank-val">${Math.round(count/max*100)}%</div>
+    </div>`).join('');
+}
+
+function renderArticles(orders) {
+  const articles = {};
+  orders.forEach(o => {
+    if (o.items) {
+      try {
+        const items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items;
+        if (Array.isArray(items)) items.forEach(it => {
+          const name = it.name || it.nom || '?';
+          articles[name] = (articles[name]||0) + (it.qty||it.quantite||1);
+        });
+      } catch(e){}
+    }
+  });
+  const sorted = Object.entries(articles).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if (!sorted.length) { document.getElementById('articles-rank').innerHTML='<div style="color:var(--light);font-size:12px">Aucune donnée articles</div>'; return; }
+  document.getElementById('articles-rank').innerHTML = sorted.map(([name,qty],i) => `
+    <div class="rank-item">
+      <div class="rank-num ${i<3?'top':''}">${i+1}</div>
+      <div class="rank-info"><div class="rank-name">${name}</div><div class="rank-sub">commandé ${qty} fois</div></div>
+      <div class="rank-val">${qty}×</div>
+    </div>`).join('');
+}
+
+function renderLivreurs(orders) {
+  const livreurs = {};
+  orders.filter(o=>o.statut==='Terminée').forEach(o => {
+    if (o.livreurNom) {
+      if (!livreurs[o.livreurNom]) livreurs[o.livreurNom]={livraisons:0,ca:0};
+      livreurs[o.livreurNom].livraisons++;
+      livreurs[o.livreurNom].ca += Number(o.total)||0;
+    }
+  });
+  const sorted = Object.entries(livreurs).sort((a,b)=>b[1].livraisons-a[1].livraisons).slice(0,5);
+  if (!sorted.length) { document.getElementById('livreurs-rank').innerHTML='<div style="color:var(--light);font-size:12px">Aucune donnée livreur</div>'; return; }
+  document.getElementById('livreurs-rank').innerHTML = sorted.map(([nom,d],i) => `
+    <div class="rank-item">
+      <div class="rank-num ${i<3?'top':''}">${i+1}</div>
+      <div class="rank-info"><div class="rank-name">🛵 ${nom}</div><div class="rank-sub">${d.livraisons} livraison${d.livraisons>1?'s':''}</div></div>
+      <div class="rank-val">${d.livraisons}</div>
+    </div>`).join('');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
