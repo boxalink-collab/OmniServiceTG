@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OmniService TG — Comptable</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#1565C0;--blue2:#1E88E5;--blue-s:rgba(21,101,192,.1);--blue-d:#0D47A1;--ora:#F5820A;--ora-s:rgba(245,130,10,.1);--ora-d:#E65100;--dark:#0D2137;--mid:#3A5068;--light:#7A95B0;--border:#D6E4F0;--bg:#F0F4FF;--card:#fff;--green:#2E7D32;--red:#C62828;--purple:#6A1B9A;}
+html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--dark)}
+#splash{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#0D2137,#1565C0);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.sp-logo{font-size:56px;animation:popIn .6s cubic-bezier(.34,1.56,.64,1) .3s both}
+.sp-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:#fff;animation:fadeUp .5s ease .7s both}
+.sp-sub{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;animation:fadeUp .5s ease .9s both}
+.sp-bar{width:160px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;margin-top:8px;animation:fadeUp .4s ease 1s both}
+.sp-bar-fill{height:100%;background:linear-gradient(90deg,var(--ora),var(--blue2));animation:load 1.4s ease 1.1s both}
+@keyframes load{0%{width:0}100%{width:100%}}
+#splash.out{animation:splashOut .4s ease forwards}
+@keyframes splashOut{to{opacity:0;pointer-events:none}}
+@keyframes popIn{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0D2137,#1565C0 60%,#0D47A1);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.login-box{background:#fff;border-radius:24px;padding:36px 28px;width:100%;max-width:380px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.login-logo{font-size:52px;margin-bottom:8px}
+.login-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--dark);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--light);margin-bottom:16px}
+.login-badge{display:inline-flex;align-items:center;gap:6px;background:var(--ora-s);color:var(--ora-d);border:1px solid rgba(245,130,10,.3);border-radius:999px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:20px}
+.code-lbl{font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;text-align:left;display:block}
+.code-inp{width:100%;padding:16px;border:2px solid var(--border);border-radius:14px;font-size:24px;font-weight:900;font-family:'Nunito',sans-serif;text-align:center;letter-spacing:4px;text-transform:uppercase;outline:none;transition:.2s;background:#f8faff;color:var(--dark)}
+.code-inp:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px var(--blue-s)}
+.code-inp::placeholder{font-size:14px;letter-spacing:1px;font-weight:400;color:var(--light)}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;margin-top:6px}
+.login-err{color:var(--red);font-size:12px;margin-top:10px;min-height:18px;font-weight:600}
+.login-hint{font-size:11px;color:var(--light);margin-top:12px}
+.top-header{background:linear-gradient(135deg,#0D2137,#1565C0);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.th-left{display:flex;align-items:center;gap:12px}
+.th-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--ora),var(--ora-d));display:flex;align-items:center;justify-content:center;font-size:22px}
+.th-name{font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;color:#fff}
+.th-role{font-size:10px;color:rgba(255,255,255,.5)}
+.th-code{background:rgba(245,130,10,.2);border:1px solid rgba(245,130,10,.4);color:#FFB74D;border-radius:999px;padding:3px 12px;font-size:10px;font-weight:800;font-family:'Nunito',sans-serif;letter-spacing:1px}
+.btn-logout-top{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;font-family:'Poppins',sans-serif}
+.period-bar{background:#fff;padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none}
+.period-btn{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;color:var(--mid);white-space:nowrap;transition:.2s}
+.period-btn.on{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border-color:transparent}
+.date-range{display:flex;align-items:center;gap:6px;margin-left:auto}
+.date-inp{padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:'Poppins',sans-serif}
+.main-content{padding:20px;max-width:1000px;margin:0 auto}
+.solde-banner{background:linear-gradient(135deg,#0D2137,#1565C0);border-radius:16px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;color:#fff}
+.solde-label{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px}
+.solde-value{font-family:'Nunito',sans-serif;font-size:32px;font-weight:900}
+.solde-note{font-size:11px;color:rgba(255,255,255,.5);margin-top:4px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.kpi-card{border-radius:14px;padding:16px;position:relative;overflow:hidden}
+.kpi-ca{background:linear-gradient(135deg,#E3F2FD,#BBDEFB)}.kpi-momo{background:linear-gradient(135deg,#E8F5E9,#C8E6C9)}.kpi-cash{background:linear-gradient(135deg,#EDE7F6,#D1C4E9)}.kpi-cmds{background:linear-gradient(135deg,#FFF3E0,#FFE0B2)}
+.kpi-label{font-size:9px;font-weight:800;color:var(--mid);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.kpi-value{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:var(--dark)}
+.kpi-sub{font-size:10px;color:var(--mid);margin-top:4px}
+.kpi-icon{position:absolute;top:12px;right:12px;font-size:22px;opacity:.4}
+.section-card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(21,101,192,.08);margin-bottom:20px;overflow:hidden}
+.section-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.section-title{font-size:15px;font-weight:700;color:var(--dark)}
+.btn-export{background:linear-gradient(135deg,var(--green),#1B5E20);color:#fff;border:none;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif}
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:100px;border-bottom:1px solid var(--border);padding:0 4px}
+.bar-item{display:flex;flex-direction:column;align-items:center;flex:1;gap:3px}
+.bar-val{font-size:9px;font-weight:700;color:var(--blue);white-space:nowrap}
+.bar{background:linear-gradient(to top,var(--blue),var(--blue2));border-radius:4px 4px 0 0;width:100%;transition:.4s}
+.bar-lbl{font-size:9px;color:var(--light);margin-top:4px}
+.payment-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px}
+.pay-item{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:10px 12px}
+.pay-color{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.pay-name{font-size:11px;font-weight:600;color:var(--mid)}
+.pay-val{font-size:14px;font-weight:800;color:var(--dark);font-family:'Nunito',sans-serif}
+.pay-pct{font-size:10px;color:var(--light)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--bg);color:var(--mid);font-weight:700;padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border)}
+.montant{font-weight:700;color:var(--green);font-family:'Nunito',sans-serif}
+.pill{border-radius:999px;padding:3px 9px;font-size:10px;font-weight:700}
+.p-terminee{background:#E8F5E9;color:var(--green)}.p-attente{background:#FFF3E0;color:#E65100}.p-annulee{background:#FFEBEE;color:var(--red)}
+.p-momo{background:#E8F5E9;color:var(--green)}.p-cash{background:#EDE7F6;color:var(--purple)}.p-livraison{background:#E3F2FD;color:var(--blue)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:#fff;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:600;z-index:9998;transition:.35s;opacity:0;max-width:90vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<div id="splash">
+  <div class="sp-logo">🧾</div>
+  <div class="sp-title">OmniService TG</div>
+  <div class="sp-sub">Interface Comptable</div>
+  <div class="sp-bar"><div class="sp-bar-fill"></div></div>
+</div>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🧾</div>
+    <div class="login-title">Espace Comptable</div>
+    <div class="login-sub">OmniService TG</div>
+    <div class="login-badge">🔑 Connexion par code</div>
+    <span class="code-lbl">Votre code d'accès</span>
+    <input class="code-inp" type="text" id="login-code" placeholder="CPTXXXX"
+      maxlength="10" autocomplete="off" spellcheck="false"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter') doLogin()"/>
+    <button class="btn-login" onclick="doLogin()" id="btn-login">🚀 Se connecter</button>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-hint">Code fourni par votre responsable RH.</div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="top-header">
+    <div class="th-left">
+      <div class="th-icon">🧾</div>
+      <div><div class="th-name" id="top-name">Comptable</div><div class="th-role">Interface Comptable · OmniService TG</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="th-code" id="top-code">—</span>
+      <button class="btn-logout-top" onclick="doLogout()">↩ Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="period-bar">
+    <button class="period-btn on" onclick="setPeriode('today',this)">Aujourd'hui</button>
+    <button class="period-btn" onclick="setPeriode('week',this)">7 jours</button>
+    <button class="period-btn" onclick="setPeriode('month',this)">Ce mois</button>
+    <button class="period-btn" onclick="setPeriode('all',this)">Tout</button>
+    <div class="date-range">
+      <input type="date" id="date-from" class="date-inp"/>
+      <span style="color:var(--light);font-size:12px">→</span>
+      <input type="date" id="date-to" class="date-inp"/>
+      <button class="period-btn on" style="padding:7px 12px" onclick="setPeriodeCustom()">OK</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="solde-banner">
+      <div>
+        <div class="solde-label">Chiffre d'affaires — période sélectionnée</div>
+        <div class="solde-value" id="kpi-ca-big">— FCFA</div>
+        <div class="solde-note" id="kpi-period-label">Chargement...</div>
+      </div>
+      <div style="font-size:52px;opacity:.25">📊</div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-ca"><div class="kpi-label">Commandes terminées</div><div class="kpi-value" id="kpi-count">—</div><div class="kpi-sub" id="kpi-count-sub">chargement...</div><div class="kpi-icon">📦</div></div>
+      <div class="kpi-card kpi-momo"><div class="kpi-label">Mobile Money</div><div class="kpi-value" id="kpi-momo">—</div><div class="kpi-sub" id="kpi-momo-pct">—% du CA</div><div class="kpi-icon">📱</div></div>
+      <div class="kpi-card kpi-cash"><div class="kpi-label">Cash</div><div class="kpi-value" id="kpi-cash">—</div><div class="kpi-sub" id="kpi-cash-pct">—% du CA</div><div class="kpi-icon">💵</div></div>
+      <div class="kpi-card kpi-cmds"><div class="kpi-label">Annulées</div><div class="kpi-value" id="kpi-annulees">—</div><div class="kpi-sub">commandes annulées</div><div class="kpi-icon">❌</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+      <div class="section-card">
+        <div class="section-head"><div class="section-title">📊 CA 7 derniers jours</div></div>
+        <div style="padding:16px"><div class="bar-chart" id="bar-chart"></div></div>
+      </div>
+      <div class="section-card">
+        <div class="section-head"><div class="section-title">💳 Modes de paiement</div></div>
+        <div class="payment-grid" id="payment-grid"></div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-title">📋 Détail des commandes</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-export" onclick="exportCSV()">📥 Export CSV</button>
+          <button class="btn-export" style="background:linear-gradient(135deg,var(--mid),var(--dark))" onclick="window.print()">🖨 Imprimer</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Réf.</th><th>Date</th><th>Service</th><th>Client</th><th>Paiement</th><th>Montant</th><th>Statut</th></tr></thead>
+          <tbody id="orders-tbody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--light)">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, query, getDocs, doc, getDoc, setDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInAnonymously, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const fbApp = initializeApp({apiKey:"AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",authDomain:"omniservicetg-59df3.firebaseapp.com",projectId:"omniservicetg-59df3",storageBucket:"omniservicetg-59df3.firebasestorage.app",messagingSenderId:"196278567761",appId:"1:196278567761:web:4f6416acaab58b67bf4970"});
+const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+let allOrders=[], filteredOrders=[], periodeMode='today', dateFrom=null, dateTo=null;
+
+setTimeout(()=>{const s=document.getElementById('splash');s.classList.add('out');setTimeout(()=>s.style.display='none',400);},2500);
+
+onAuthStateChanged(auth, async user => {
+  if (user && user.isAnonymous) {
+    try {
+      const snap = await getDoc(doc(db,'agents',user.uid));
+      if (snap.exists() && ['comptable','admin'].includes(snap.data().role) && snap.data().actif!==false) {
+        document.getElementById('top-name').textContent = snap.data().prenom||snap.data().nom||'Comptable';
+        document.getElementById('top-code').textContent = snap.data().code||'—';
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        loadAllOrders();
+      } else { await signOut(auth); showLogin('❌ Accès réservé aux comptables'); }
+    } catch(e) { showLogin(); }
+  } else if (!user) { showLogin(); }
+});
+
+function showLogin(err='') {
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  if(err) document.getElementById('login-err').textContent=err;
+}
+
+window.doLogin = async function() {
+  const code=document.getElementById('login-code').value.trim().toUpperCase();
+  const errEl=document.getElementById('login-err');
+  const btn=document.getElementById('btn-login');
+  if(!code){errEl.textContent='⚠️ Saisissez votre code';return;}
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Vérification...';
+  errEl.textContent='';
+  try {
+    const ls=await getDoc(doc(db,'agents_login',code));
+    if(!ls.exists()){errEl.textContent='❌ Code inconnu. Contactez votre RH.';btn.disabled=false;btn.textContent='🚀 Se connecter';return;}
+    const ld=ls.data();
+    if(!['comptable','admin'].includes(ld.role)){errEl.textContent='❌ Ce code n\'est pas un code Comptable.';btn.disabled=false;btn.textContent='🚀 Se connecter';return;}
+    if(ld.actif===false){errEl.textContent='⛔ Compte désactivé.';btn.disabled=false;btn.textContent='🚀 Se connecter';return;}
+    if(!ld.agentUid){errEl.textContent='❌ Code mal configuré (agentUid manquant). Contactez votre RH.';btn.disabled=false;btn.textContent='🚀 Se connecter';return;}
+    btn.innerHTML='<span class="spinner"></span> Connexion...';
+    const cred=await signInAnonymously(auth);
+    const aUid=cred.user.uid;
+    const ps=await getDoc(doc(db,'agents',ld.agentUid));
+    const pd=ps.exists()?ps.data():{nom:'Comptable',role:'comptable',actif:true};
+    await setDoc(doc(db,'agents',aUid),{...pd,uid:aUid,code:code,role:ld.role,actif:true,codeRef:ld.agentUid,derniere_connexion:serverTimestamp()});
+    // onAuthStateChanged prend le relais
+  } catch(e){
+    console.error(e);
+    if(e.code==='permission-denied'){errEl.textContent='❌ Accès refusé par Firestore.';}
+    else{errEl.textContent='❌ Erreur : '+(e.message||'Problème réseau.');}
+    btn.disabled=false;btn.textContent='🚀 Se connecter';
+  }
+};
+window.doLogout = async()=>{await signOut(auth);};
+
+async function loadAllOrders(){
+  try{const snap=await getDocs(query(collection(db,'commandes'),orderBy('createdAt','desc')));allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));applyFilter();}catch(e){toast('❌ Erreur chargement');}
+}
+
+window.setPeriode=function(mode,btn){
+  periodeMode=mode;dateFrom=null;dateTo=null;
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');applyFilter();
+};
+window.setPeriodeCustom=function(){
+  const f=document.getElementById('date-from').value;const t=document.getElementById('date-to').value;
+  if(!f||!t){toast('⚠️ Sélectionnez les deux dates');return;}
+  periodeMode='custom';dateFrom=new Date(f);dateTo=new Date(t);dateTo.setHours(23,59,59,999);applyFilter();
+};
+
+function applyFilter(){
+  const now=new Date();let from,to;
+  if(periodeMode==='today'){from=new Date(now);from.setHours(0,0,0,0);to=new Date(now);to.setHours(23,59,59,999);document.getElementById('kpi-period-label').textContent="Aujourd'hui";}
+  else if(periodeMode==='week'){from=new Date(now);from.setDate(now.getDate()-7);from.setHours(0,0,0,0);to=new Date(now);to.setHours(23,59,59,999);document.getElementById('kpi-period-label').textContent="7 derniers jours";}
+  else if(periodeMode==='month'){from=new Date(now.getFullYear(),now.getMonth(),1);to=new Date(now);to.setHours(23,59,59,999);document.getElementById('kpi-period-label').textContent="Ce mois";}
+  else if(periodeMode==='custom'&&dateFrom&&dateTo){from=dateFrom;to=dateTo;document.getElementById('kpi-period-label').textContent=from.toLocaleDateString('fr-FR')+' → '+to.toLocaleDateString('fr-FR');}
+  else{filteredOrders=[...allOrders];document.getElementById('kpi-period-label').textContent="Toutes les commandes";renderDashboard();return;}
+  filteredOrders=allOrders.filter(o=>{if(!o.createdAt)return false;const d=new Date(o.createdAt.seconds*1000);return d>=from&&d<=to;});
+  renderDashboard();
+}
+
+function renderDashboard(){
+  const term=filteredOrders.filter(o=>o.statut==='Terminée');
+  const ann=filteredOrders.filter(o=>o.statut==='Annulée');
+  const ca=term.reduce((s,o)=>s+(Number(o.total)||0),0);
+  const momo=term.filter(o=>{const m=(o.modePaiement||'').toLowerCase();return m.includes('mobile')||m.includes('momo')||m.includes('flooz');});
+  const cash=term.filter(o=>{const m=(o.modePaiement||'').toLowerCase();return m.includes('cash');});
+  const momoCA=momo.reduce((s,o)=>s+(Number(o.total)||0),0);
+  const cashCA=cash.reduce((s,o)=>s+(Number(o.total)||0),0);
+  const p=v=>ca>0?Math.round(v/ca*100):0;
+  const fmt=v=>v>=1000000?(v/1000000).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'k':v;
+  document.getElementById('kpi-ca-big').textContent=Number(ca).toLocaleString('fr-FR')+' FCFA';
+  document.getElementById('kpi-count').textContent=term.length;
+  document.getElementById('kpi-count-sub').textContent=filteredOrders.length+' commandes totales';
+  document.getElementById('kpi-momo').textContent=fmt(momoCA)+' F';
+  document.getElementById('kpi-momo-pct').textContent=p(momoCA)+'% du CA';
+  document.getElementById('kpi-cash').textContent=fmt(cashCA)+' F';
+  document.getElementById('kpi-cash-pct').textContent=p(cashCA)+'% du CA';
+  document.getElementById('kpi-annulees').textContent=ann.length;
+  renderChart();renderPayments(momoCA,cashCA,ca);renderTable();
+}
+
+function renderChart(){
+  const days=7;const buckets=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+    const d2=new Date(d);d2.setHours(23,59,59,999);
+    const ca=allOrders.filter(o=>{if(!o.createdAt)return false;const dt=new Date(o.createdAt.seconds*1000);return dt>=d&&dt<=d2&&o.statut==='Terminée';}).reduce((s,o)=>s+(Number(o.total)||0),0);
+    buckets.push({lbl:d.toLocaleDateString('fr-FR',{weekday:'short'}).slice(0,3),ca});
+  }
+  const maxCa=Math.max(...buckets.map(b=>b.ca),1);
+  const fmt=v=>v>=1000000?(v/1000000).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'k':v;
+  document.getElementById('bar-chart').innerHTML=buckets.map(b=>{
+    const h=Math.max(4,Math.round(b.ca/maxCa*90));
+    return `<div class="bar-item"><div class="bar-val">${b.ca>0?fmt(b.ca):''}</div><div class="bar" style="height:${h}px" title="${Number(b.ca).toLocaleString('fr-FR')} FCFA"></div><div class="bar-lbl">${b.lbl}</div></div>`;
+  }).join('');
+}
+
+function renderPayments(momo,cash,total){
+  const autres=total-momo-cash;const p=v=>total>0?Math.round(v/total*100):0;const fmt=v=>Number(v).toLocaleString('fr-FR');
+  document.getElementById('payment-grid').innerHTML=`
+    <div class="pay-item"><div class="pay-color" style="background:var(--green)"></div><div><div class="pay-name">Mobile Money</div><div class="pay-val">${fmt(momo)} F</div><div class="pay-pct">${p(momo)}%</div></div></div>
+    <div class="pay-item"><div class="pay-color" style="background:var(--purple)"></div><div><div class="pay-name">Cash</div><div class="pay-val">${fmt(cash)} F</div><div class="pay-pct">${p(cash)}%</div></div></div>
+    <div class="pay-item"><div class="pay-color" style="background:var(--blue)"></div><div><div class="pay-name">Paiement livraison</div><div class="pay-val">${fmt(autres)} F</div><div class="pay-pct">${p(autres)}%</div></div></div>
+    <div class="pay-item"><div class="pay-color" style="background:var(--ora)"></div><div><div class="pay-name">Total CA</div><div class="pay-val">${fmt(total)} F</div><div class="pay-pct">100%</div></div></div>`;
+}
+
+function renderTable(){
+  const tbody=document.getElementById('orders-tbody');
+  if(!filteredOrders.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--light)">Aucune commande pour cette période</td></tr>';return;}
+  const sC={'Terminée':'p-terminee','En attente':'p-attente','Annulée':'p-annulee'};
+  const pC=m=>{const ml=(m||'').toLowerCase();if(ml.includes('mobile')||ml.includes('momo')||ml.includes('flooz'))return 'p-momo';if(ml.includes('cash'))return 'p-cash';return 'p-livraison';};
+  tbody.innerHTML=filteredOrders.map(o=>{
+    const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+    return `<tr><td style="font-weight:700;font-size:11px;color:var(--blue)">#${o.id.slice(0,8).toUpperCase()}</td><td style="white-space:nowrap">${date}</td><td>${o.serviceName||o.service||'—'}</td><td>${o.prenom||''} ${o.nom||''}</td><td><span class="pill ${pC(o.modePaiement)}">${o.modePaiement||'—'}</span></td><td class="montant">${o.total?Number(o.total).toLocaleString('fr-FR')+' F':'—'}</td><td><span class="pill ${sC[o.statut]||'p-attente'}">${o.statut||'—'}</span></td></tr>`;
+  }).join('');
+}
+
+window.exportCSV=function(){
+  const h=['Référence','Date','Service','Client','Téléphone','Paiement','Montant','Statut'];
+  const rows=filteredOrders.map(o=>{const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleString('fr-FR'):'';return['#'+o.id.slice(0,8).toUpperCase(),date,o.serviceName||o.service||'',(o.prenom||'')+' '+(o.nom||''),o.telephone||o.phone||'',o.modePaiement||'',o.total||'',o.statut||''].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',');});
+  const csv=[h.join(','),...rows].join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='omniservice-comptabilite-'+new Date().toISOString().slice(0,10)+'.csv';a.click();toast('✅ CSV exporté !');
+};
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+</script>
+</body>
+</html>
