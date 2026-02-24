@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OmniService TG — Livreur</title>
+<link rel="icon" href="../assets/logo.png" type="image/png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#1A1A2E"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Livreur TG"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1E6FBE;--blue-d:#155A9C;--blue-s:rgba(30,111,190,.1);
+  --ora:#F5820A;--dark:#1A1A2E;--mid:#4A4A6A;--light:#9999BB;
+  --border:#E8EAF0;--bg:#F4F6FA;--green:#2E7D32;--red:#C62828;
+  --card:#fff;--nav-h:64px;
+}
+html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--dark);overflow-x:hidden}
+
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;z-index:9999;background:#0a1220;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+#splash::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#0a1220,#1a2a50,#0a1220)}
+.sp-logo{font-size:56px;position:relative;z-index:1;animation:popIn .6s cubic-bezier(.34,1.56,.64,1) .3s both}
+.sp-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:#fff;position:relative;z-index:1;animation:fadeUp .5s ease .7s both}
+.sp-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;position:relative;z-index:1;animation:fadeUp .5s ease .9s both}
+.sp-bar{width:160px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;position:relative;z-index:1;margin-top:8px;animation:fadeUp .4s ease 1s both}
+.sp-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--ora));animation:load 1.4s ease 1.1s both}
+@keyframes load{0%{width:0}100%{width:100%}}
+#splash.out{animation:splashOut .4s ease forwards}
+@keyframes splashOut{to{opacity:0;pointer-events:none}}
+@keyframes popIn{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0e1420,#1a2540);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.login-box{background:#fff;border-radius:24px;padding:36px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.login-logo{font-size:44px;margin-bottom:12px}
+.login-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--dark);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--light);margin-bottom:24px}
+.login-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(30,111,190,.08);color:var(--blue);border:1px solid rgba(30,111,190,.2);border-radius:999px;padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:20px}
+.input-wrap{position:relative;margin-bottom:14px}
+.input-wrap input{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'Poppins',sans-serif;outline:none;transition:.2s;background:#fafbfd}
+.input-wrap input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px var(--blue-s)}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;transition:.2s;margin-top:4px}
+.btn-login:active{transform:scale(.98)}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;min-height:18px}
+
+/* ── LAYOUT ── */
+#app{display:none;flex-direction:column;height:100vh;overflow:hidden}
+.top-bar{background:linear-gradient(135deg,var(--dark),#2a2a4e);padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.top-bar-left{display:flex;align-items:center;gap:10px}
+.top-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-d));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.top-name{font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:#fff}
+.top-zone{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.top-right{display:flex;align-items:center;gap:10px}
+.badge-live{background:rgba(46,125,50,.25);border:1px solid rgba(46,125,50,.4);color:#81C784;border-radius:999px;padding:4px 10px;font-size:10px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:4px}
+.badge-live::before{content:'';width:6px;height:6px;border-radius:50%;background:#4CAF50;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.btn-logout{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+
+/* ── STATUS BAR ── */
+.status-bar{background:var(--dark);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+.status-label{font-size:11px;color:rgba(255,255,255,.5);font-weight:500}
+.status-toggle{display:flex;background:rgba(255,255,255,.08);border-radius:999px;padding:3px;gap:2px}
+.status-btn{padding:6px 14px;border-radius:999px;border:none;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;transition:.2s;color:rgba(255,255,255,.5);background:transparent}
+.status-btn.on.disponible{background:var(--green);color:#fff}
+.status-btn.on.indispo{background:var(--red);color:#fff}
+.stats-mini{display:flex;gap:16px}
+.stat-mini-item{text-align:center}
+.stat-mini-num{font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;color:#fff}
+.stat-mini-lbl{font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px}
+
+/* ── TABS ── */
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0}
+.tab-btn{flex:1;padding:12px 0;border:none;background:none;font-size:12px;font-weight:600;font-family:'Poppins',sans-serif;color:var(--light);cursor:pointer;position:relative;transition:.2s}
+.tab-btn.on{color:var(--blue)}
+.tab-btn.on::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:var(--blue);border-radius:2px}
+.tab-count{background:var(--red);color:#fff;border-radius:999px;padding:1px 6px;font-size:10px;margin-left:4px;display:inline-block}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:16px}
+
+/* ── COMMANDE CARD ── */
+.cmd-card{background:var(--card);border-radius:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;border:1.5px solid transparent;transition:.2s}
+.cmd-card.urgent{border-color:var(--ora);animation:urgentBorder 1.5s ease infinite alternate}
+@keyframes urgentBorder{from{border-color:rgba(245,130,10,.3)}to{border-color:var(--ora)}}
+.cmd-header{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cmd-service{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.cmd-emoji{font-size:24px;flex-shrink:0}
+.cmd-service-name{font-size:13px;font-weight:700;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmd-ref{font-size:10px;color:var(--light);margin-top:1px}
+.cmd-statut{border-radius:999px;padding:4px 10px;font-size:10px;font-weight:700;white-space:nowrap}
+.s-en-attente{background:#FFF3E0;color:#E65100}
+.s-en-route{background:#E3F2FD;color:#1565C0}
+.s-livree{background:#E8F5E9;color:var(--green)}
+.cmd-body{padding:0 16px 14px;border-top:1px solid var(--border)}
+.cmd-info-row{display:flex;align-items:flex-start;gap:8px;margin-top:10px;font-size:12px}
+.cmd-info-ico{font-size:14px;flex-shrink:0;margin-top:1px}
+.cmd-info-val{color:var(--mid);flex:1}
+.cmd-info-val strong{color:var(--dark);font-weight:700}
+.cmd-actions{display:flex;gap:8px;padding:10px 16px 14px;flex-wrap:wrap}
+.btn-action{flex:1;min-width:0;padding:10px 8px;border:none;border-radius:10px;font-size:12px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;transition:.2s;text-align:center}
+.btn-action:active{transform:scale(.97)}
+.btn-route{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff}
+.btn-livree{background:linear-gradient(135deg,var(--green),#1B5E20);color:#fff}
+.btn-maps{background:rgba(30,111,190,.1);color:var(--blue);border:1px solid rgba(30,111,190,.2)}
+.btn-call{background:rgba(46,125,50,.1);color:var(--green);border:1px solid rgba(46,125,50,.2)}
+.btn-probleme{background:rgba(198,40,40,.08);color:var(--red);border:1px solid rgba(198,40,40,.2)}
+
+/* ── HISTORIQUE ── */
+.hist-card{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;align-items:center;gap:12px}
+.hist-icon{width:38px;height:38px;border-radius:10px;background:var(--blue-s);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.hist-info{flex:1;min-width:0}
+.hist-name{font-size:13px;font-weight:700;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-date{font-size:11px;color:var(--light);margin-top:1px}
+.hist-right{text-align:right}
+.hist-statut{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px}
+.hist-montant{font-size:12px;font-weight:700;color:var(--blue);margin-top:3px}
+
+/* ── PROFIL ── */
+.profil-section{background:#fff;border-radius:16px;padding:20px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.profil-header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.profil-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-d));display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+.profil-name{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--dark)}
+.profil-role{font-size:12px;color:var(--blue);font-weight:600;margin-top:2px}
+.profil-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.profil-stat{background:var(--bg);border-radius:12px;padding:14px;text-align:center}
+.profil-stat-num{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--blue)}
+.profil-stat-lbl{font-size:11px;color:var(--light);margin-top:2px}
+.profil-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.profil-row:last-child{border-bottom:none}
+.profil-row-label{font-size:13px;color:var(--mid)}
+.profil-row-val{font-size:13px;font-weight:600;color:var(--dark)}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:48px 20px;color:var(--light)}
+.empty-ico{font-size:48px;margin-bottom:12px}
+.empty-title{font-size:15px;font-weight:700;color:var(--mid);margin-bottom:6px}
+.empty-sub{font-size:12px}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1A1A2E;color:#fff;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:600;z-index:9998;transition:.35s;opacity:0;max-width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.25s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-sheet{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;transform:translateY(100%);transition:.3s cubic-bezier(.4,0,.2,1)}
+.modal-overlay.show .modal-sheet{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px;text-align:center}
+textarea.modal-input{width:100%;padding:12px;border:1.5px solid var(--border);border-radius:12px;font-family:'Poppins',sans-serif;font-size:13px;resize:none;height:100px;outline:none}
+textarea.modal-input:focus{border-color:var(--blue)}
+.btn-submit-modal{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;margin-top:10px}
+
+/* ── LOADER ── */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-logo">🚴</div>
+  <div class="sp-title">OmniService TG</div>
+  <div class="sp-sub">Interface Livreur</div>
+  <div class="sp-bar"><div class="sp-bar-fill"></div></div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen" style="display:none">
+  <div class="login-box">
+    <div class="login-logo">🚴</div>
+    <div class="login-title">Espace Livreur</div>
+    <div class="login-sub">OmniService TG</div>
+    <div class="login-badge">🔐 Accès Livreur</div>
+    <div class="input-wrap">
+      <input type="email" id="login-email" placeholder="Email (ex: jean@omniservicetg.com)" autocomplete="email"/>
+    </div>
+    <div class="input-wrap">
+      <input type="password" id="login-password" placeholder="Mot de passe" autocomplete="current-password"/>
+    </div>
+    <button class="btn-login" onclick="doLogin()" id="btn-login">Se connecter</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="top-avatar" id="top-avatar">🚴</div>
+      <div>
+        <div class="top-name" id="top-name">Chargement...</div>
+        <div class="top-zone" id="top-zone">Zone: —</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="badge-live" id="badge-dispo">Disponible</div>
+      <button class="btn-logout" onclick="doLogout()" title="Déconnexion">↩</button>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div>
+      <div class="status-label">Mon statut</div>
+      <div class="status-toggle">
+        <button class="status-btn on disponible" id="btn-dispo" onclick="setStatus('disponible')">✅ Dispo</button>
+        <button class="status-btn indispo" id="btn-indispo" onclick="setStatus('indisponible')">⏸ Pause</button>
+      </div>
+    </div>
+    <div class="stats-mini">
+      <div class="stat-mini-item">
+        <div class="stat-mini-num" id="stat-today">0</div>
+        <div class="stat-mini-lbl">Aujourd'hui</div>
+      </div>
+      <div class="stat-mini-item">
+        <div class="stat-mini-num" id="stat-total">0</div>
+        <div class="stat-mini-lbl">Total</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn on" id="tab-actives" onclick="showTab('actives')">🛵 En cours <span class="tab-count" id="count-actives">0</span></button>
+    <button class="tab-btn" id="tab-attente" onclick="showTab('attente')">⏳ En attente <span class="tab-count" id="count-attente" style="background:var(--ora)">0</span></button>
+    <button class="tab-btn" id="tab-historique" onclick="showTab('historique')">📋 Historique</button>
+    <button class="tab-btn" id="tab-profil" onclick="showTab('profil')">👤 Profil</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <!-- En cours -->
+    <div id="view-actives">
+      <div id="list-actives">
+        <div class="empty-state">
+          <div class="empty-ico">🛵</div>
+          <div class="empty-title">Aucune livraison en cours</div>
+          <div class="empty-sub">Les commandes vous assignées apparaîtront ici</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- En attente -->
+    <div id="view-attente" style="display:none">
+      <div id="list-attente">
+        <div class="empty-state">
+          <div class="empty-ico">📦</div>
+          <div class="empty-title">Aucune commande en attente</div>
+          <div class="empty-sub">Les nouvelles commandes disponibles apparaîtront ici</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique -->
+    <div id="view-historique" style="display:none">
+      <div id="list-historique">
+        <div class="empty-state">
+          <div class="empty-ico">📋</div>
+          <div class="empty-title">Aucun historique</div>
+          <div class="empty-sub">Vos livraisons terminées apparaîtront ici</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profil -->
+    <div id="view-profil" style="display:none">
+      <div class="profil-section">
+        <div class="profil-header">
+          <div class="profil-avatar" id="profil-avatar">🚴</div>
+          <div>
+            <div class="profil-name" id="profil-nom">—</div>
+            <div class="profil-role">🚴 Livreur · OmniService TG</div>
+          </div>
+        </div>
+        <div class="profil-stat-grid">
+          <div class="profil-stat">
+            <div class="profil-stat-num" id="p-livrees">0</div>
+            <div class="profil-stat-lbl">Livraisons totales</div>
+          </div>
+          <div class="profil-stat">
+            <div class="profil-stat-num" id="p-aujourd-hui">0</div>
+            <div class="profil-stat-lbl">Aujourd'hui</div>
+          </div>
+        </div>
+        <div class="profil-row">
+          <span class="profil-row-label">📧 Email</span>
+          <span class="profil-row-val" id="p-email">—</span>
+        </div>
+        <div class="profil-row">
+          <span class="profil-row-label">📱 Téléphone</span>
+          <span class="profil-row-val" id="p-phone">—</span>
+        </div>
+        <div class="profil-row">
+          <span class="profil-row-label">📍 Zone</span>
+          <span class="profil-row-val" id="p-zone">—</span>
+        </div>
+        <div class="profil-row">
+          <span class="profil-row-label">🟢 Statut</span>
+          <span class="profil-row-val" id="p-statut">Disponible</span>
+        </div>
+      </div>
+      <button class="btn-action btn-probleme" style="width:100%;padding:14px;margin-bottom:8px;border-radius:12px" onclick="doLogout()">↩ Se déconnecter</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PROBLÈME -->
+<div class="modal-overlay" id="modal-probleme">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚠️ Signaler un problème</div>
+    <textarea class="modal-input" id="probleme-text" placeholder="Décrivez le problème rencontré (client absent, adresse introuvable, problème de paiement...)"></textarea>
+    <button class="btn-submit-modal" onclick="submitProbleme()">📤 Envoyer le rapport</button>
+    <button class="btn-action btn-probleme" style="width:100%;padding:12px;border-radius:12px;margin-top:8px" onclick="closeModal('modal-probleme')">Annuler</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, addDoc, serverTimestamp, onSnapshot, getDoc, setDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",
+  authDomain: "omniservicetg-59df3.firebaseapp.com",
+  projectId: "omniservicetg-59df3",
+  storageBucket: "omniservicetg-59df3.firebasestorage.app",
+  messagingSenderId: "196278567761",
+  appId: "1:196278567761:web:4f6416acaab58b67bf4970"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+
+let currentUser = null;
+let agentData = null;
+let currentCmdId = null;
+let unsubscribes = [];
+
+// ── SPLASH ──
+setTimeout(() => {
+  document.getElementById('splash').classList.add('out');
+  setTimeout(() => document.getElementById('splash').style.display = 'none', 400);
+}, 2500);
+
+// ── AUTH ──
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // Vérifier rôle
+    const snap = await getDoc(doc(db, 'agents', user.uid));
+    if (!snap.exists() || snap.data().role !== 'livreur') {
+      await signOut(auth);
+      showLogin('❌ Accès réservé aux livreurs');
+      return;
+    }
+    agentData = { uid: user.uid, email: user.email, ...snap.data() };
+    initApp();
+  } else {
+    showLogin();
+  }
+});
+
+function showLogin(err = '') {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  if (err) document.getElementById('login-err').textContent = err;
+}
+
+window.doLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const err = document.getElementById('login-err');
+  const btn = document.getElementById('btn-login');
+  if (!email || !pass) { err.textContent = '⚠️ Email et mot de passe requis'; return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Connexion...';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    err.textContent = '';
+  } catch(e) {
+    err.textContent = '❌ Email ou mot de passe incorrect';
+  } finally { btn.disabled = false; btn.textContent = 'Se connecter'; }
+};
+
+window.doLogout = async function() {
+  unsubscribes.forEach(u => u());
+  await signOut(auth);
+};
+
+// ── INIT APP ──
+function initApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  // Remplir profil
+  document.getElementById('top-name').textContent = agentData.nom || agentData.email;
+  document.getElementById('top-zone').textContent = 'Zone : ' + (agentData.zone || 'Non définie');
+  document.getElementById('profil-nom').textContent = agentData.nom || '—';
+  document.getElementById('p-email').textContent = agentData.email || '—';
+  document.getElementById('p-phone').textContent = agentData.telephone || '—';
+  document.getElementById('p-zone').textContent = agentData.zone || '—';
+  // Charger les commandes
+  loadCommandes();
+  loadStats();
+}
+
+// ── CHARGER COMMANDES ──
+function loadCommandes() {
+  // En cours (assignées à ce livreur)
+  const qActives = query(
+    collection(db, 'commandes'),
+    where('livreurId', '==', agentData.uid),
+    where('statut', 'in', ['En route', 'Confirmée'])
+  );
+  const unsub1 = onSnapshot(qActives, snap => {
+    renderActives(snap.docs.map(d => ({id:d.id,...d.data()})));
+    document.getElementById('count-actives').textContent = snap.size;
+  });
+  unsubscribes.push(unsub1);
+
+  // En attente (pas encore assignées)
+  const qAttente = query(
+    collection(db, 'commandes'),
+    where('statut', '==', 'En attente')
+  );
+  const unsub2 = onSnapshot(qAttente, snap => {
+    renderAttente(snap.docs.map(d => ({id:d.id,...d.data()})));
+    document.getElementById('count-attente').textContent = snap.size;
+  });
+  unsubscribes.push(unsub2);
+
+  // Historique (livrées par ce livreur)
+  const qHist = query(
+    collection(db, 'commandes'),
+    where('livreurId', '==', agentData.uid),
+    where('statut', 'in', ['Terminée', 'Annulée']),
+    orderBy('createdAt', 'desc'),
+    limit(30)
+  );
+  const unsub3 = onSnapshot(qHist, snap => {
+    renderHistorique(snap.docs.map(d => ({id:d.id,...d.data()})));
+  });
+  unsubscribes.push(unsub3);
+}
+
+function renderActives(cmds) {
+  const el = document.getElementById('list-actives');
+  if (!cmds.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-ico">🛵</div><div class="empty-title">Aucune livraison en cours</div><div class="empty-sub">Prenez en charge des commandes dans l'onglet "En attente"</div></div>`;
+    return;
+  }
+  el.innerHTML = cmds.map(c => cmdCard(c, 'active')).join('');
+}
+
+function renderAttente(cmds) {
+  const el = document.getElementById('list-attente');
+  if (!cmds.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-ico">📦</div><div class="empty-title">Aucune commande en attente</div><div class="empty-sub">Les nouvelles commandes disponibles apparaîtront ici</div></div>`;
+    return;
+  }
+  el.innerHTML = cmds.map(c => cmdCard(c, 'attente')).join('');
+}
+
+function renderHistorique(cmds) {
+  const el = document.getElementById('list-historique');
+  if (!cmds.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-title">Aucun historique</div></div>`;
+    return;
+  }
+  el.innerHTML = cmds.map(c => {
+    const date = c.createdAt ? new Date(c.createdAt.seconds*1000).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}) : '—';
+    const sc = c.statut === 'Terminée' ? 's-livree' : 'style="background:#FFEBEE;color:var(--red)"';
+    return `<div class="hist-card">
+      <div class="hist-icon">${svcEmoji(c.service)}</div>
+      <div class="hist-info">
+        <div class="hist-name">${c.serviceName||c.service||'Commande'}</div>
+        <div class="hist-date">📅 ${date} · #${c.id.slice(0,8).toUpperCase()}</div>
+      </div>
+      <div class="hist-right">
+        <span class="hist-statut ${c.statut === 'Terminée' ? 's-livree' : ''}" style="${c.statut !== 'Terminée' ? 'background:#FFEBEE;color:var(--red)' : ''}">${c.statut}</span>
+        ${c.total ? `<div class="hist-montant">${Number(c.total).toLocaleString('fr-FR')} FCFA</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function cmdCard(c, mode) {
+  const sEmoji = svcEmoji(c.service);
+  const isUrgent = c.urgent;
+  const statut = c.statut || 'En attente';
+  const sClass = statut === 'En route' ? 's-en-route' : 's-en-attente';
+  const dateStr = c.createdAt ? new Date(c.createdAt.seconds*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '—';
+  let actions = '';
+  if (mode === 'attente') {
+    actions = `<div class="cmd-actions">
+      <button class="btn-action btn-route" onclick="prendrEnCharge('${c.id}')">✅ Prendre en charge</button>
+    </div>`;
+  } else {
+    actions = `<div class="cmd-actions">
+      <button class="btn-action btn-maps" onclick="openMaps('${c.adresse||''}')">🗺 Maps</button>
+      <button class="btn-action btn-call" onclick="appeler('${c.telephone||c.phone||''}')">📞 Appeler</button>
+      <button class="btn-action btn-livree" onclick="marquerLivree('${c.id}')">✅ Livrée</button>
+      <button class="btn-action btn-probleme" onclick="openProbleme('${c.id}')">⚠️ Problème</button>
+    </div>`;
+  }
+  return `<div class="cmd-card ${isUrgent ? 'urgent' : ''}">
+    <div class="cmd-header">
+      <div class="cmd-service">
+        <div class="cmd-emoji">${sEmoji}</div>
+        <div>
+          <div class="cmd-service-name">${c.serviceName||c.service||'Commande'}</div>
+          <div class="cmd-ref">#${c.id.slice(0,8).toUpperCase()} · ${dateStr}</div>
+        </div>
+      </div>
+      <span class="cmd-statut ${sClass}">${statut}</span>
+    </div>
+    <div class="cmd-body">
+      ${c.adresse ? `<div class="cmd-info-row"><div class="cmd-info-ico">📍</div><div class="cmd-info-val"><strong>Adresse :</strong> ${c.adresse}</div></div>` : ''}
+      ${c.prenom||c.nom ? `<div class="cmd-info-row"><div class="cmd-info-ico">👤</div><div class="cmd-info-val"><strong>Client :</strong> ${c.prenom||''} ${c.nom||''}</div></div>` : ''}
+      ${c.telephone||c.phone ? `<div class="cmd-info-row"><div class="cmd-info-ico">📱</div><div class="cmd-info-val"><strong>Tél :</strong> ${c.telephone||c.phone}</div></div>` : ''}
+      ${c.modePaiement ? `<div class="cmd-info-row"><div class="cmd-info-ico">💳</div><div class="cmd-info-val"><strong>Paiement :</strong> ${c.modePaiement}${c.total ? ' — '+Number(c.total).toLocaleString('fr-FR')+' FCFA' : ''}</div></div>` : ''}
+      ${c.notes ? `<div class="cmd-info-row"><div class="cmd-info-ico">📝</div><div class="cmd-info-val">${c.notes}</div></div>` : ''}
+    </div>
+    ${actions}
+  </div>`;
+}
+
+function svcEmoji(s) {
+  const m = {food:'🍽',restaurant:'🍴',delivery:'📦',clothes:'👗',kits:'🎁',cleaning:'🧹'};
+  return m[s] || '📦';
+}
+
+// ── ACTIONS ──
+window.prendrEnCharge = async function(id) {
+  try {
+    await updateDoc(doc(db,'commandes',id), {
+      statut: 'En route',
+      livreurId: agentData.uid,
+      livreurNom: agentData.nom || agentData.email,
+      prisEnChargeAt: serverTimestamp()
+    });
+    showToast('🛵 Commande prise en charge !');
+    showTab('actives');
+  } catch(e) { showToast('❌ Erreur : ' + e.message); }
+};
+
+window.marquerLivree = async function(id) {
+  if (!confirm('Confirmer la livraison de cette commande ?')) return;
+  try {
+    await updateDoc(doc(db,'commandes',id), {
+      statut: 'Terminée',
+      livraisonAt: serverTimestamp()
+    });
+    showToast('✅ Livraison confirmée !');
+    loadStats();
+  } catch(e) { showToast('❌ Erreur : ' + e.message); }
+};
+
+window.openProbleme = function(id) {
+  currentCmdId = id;
+  document.getElementById('probleme-text').value = '';
+  document.getElementById('modal-probleme').classList.add('show');
+};
+
+window.submitProbleme = async function() {
+  const texte = document.getElementById('probleme-text').value.trim();
+  if (!texte) { showToast('⚠️ Décrivez le problème'); return; }
+  try {
+    await addDoc(collection(db,'problemes'), {
+      commandeId: currentCmdId,
+      livreurId: agentData.uid,
+      livreurNom: agentData.nom || agentData.email,
+      description: texte,
+      createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db,'commandes',currentCmdId), { statut: 'Problème', probleme: texte });
+    closeModal('modal-probleme');
+    showToast('📤 Problème signalé à l\'admin');
+  } catch(e) { showToast('❌ Erreur : ' + e.message); }
+};
+
+window.openMaps = function(adresse) {
+  if (!adresse) { showToast('⚠️ Adresse non disponible'); return; }
+  window.open('https://maps.google.com/?q=' + encodeURIComponent(adresse + ', Lomé, Togo'), '_blank');
+};
+
+window.appeler = function(tel) {
+  if (!tel) { showToast('⚠️ Numéro non disponible'); return; }
+  window.location.href = 'tel:' + tel;
+};
+
+// ── STATUS ──
+window.setStatus = async function(status) {
+  agentData.statut = status;
+  document.getElementById('btn-dispo').classList.toggle('on', status === 'disponible');
+  document.getElementById('btn-dispo').classList.toggle('disponible', status === 'disponible');
+  document.getElementById('btn-indispo').classList.toggle('on', status === 'indisponible');
+  document.getElementById('btn-indispo').classList.toggle('indispo', status === 'indisponible');
+  document.getElementById('badge-dispo').textContent = status === 'disponible' ? 'Disponible' : 'En pause';
+  document.getElementById('p-statut').textContent = status === 'disponible' ? '🟢 Disponible' : '⏸ En pause';
+  try {
+    await updateDoc(doc(db,'agents',agentData.uid), { statut: status, derniere_connexion: serverTimestamp() });
+  } catch(e) {}
+};
+
+// ── STATS ──
+async function loadStats() {
+  try {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const qAll = query(collection(db,'commandes'), where('livreurId','==',agentData.uid), where('statut','==','Terminée'));
+    const snap = await getDocs(qAll);
+    const todayCount = snap.docs.filter(d => {
+      const ts = d.data().livraisonAt;
+      if (!ts) return false;
+      return new Date(ts.seconds*1000) >= today;
+    }).length;
+    document.getElementById('stat-today').textContent = todayCount;
+    document.getElementById('stat-total').textContent = snap.size;
+    document.getElementById('p-livrees').textContent = snap.size;
+    document.getElementById('p-aujourd-hui').textContent = todayCount;
+  } catch(e) {}
+}
+
+// ── TABS ──
+window.showTab = function(tab) {
+  ['actives','attente','historique','profil'].forEach(t => {
+    document.getElementById('view-'+t).style.display = t === tab ? 'block' : 'none';
+    document.getElementById('tab-'+t).classList.toggle('on', t === tab);
+  });
+};
+
+// ── MODAL ──
+window.closeModal = function(id) { document.getElementById(id).classList.remove('show'); };
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Fermer modals en cliquant sur l'overlay
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+});
+</script>
+</body>
+</html>
