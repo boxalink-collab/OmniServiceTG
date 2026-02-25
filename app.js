@@ -31,16 +31,19 @@ const db    = getFirestore(fbApp);
 // ════════════════════════════════════════
 // ÉTAT GLOBAL
 // ════════════════════════════════════════
-let currentUser     = null;   // profil Firestore de l'utilisateur connecté
-let currentService  = null;
-let cart            = {};
-let locMode         = 'gps';
-let gpsCoords       = null;
-let selectedPayment = 'livraison';
-let sliderIdx       = 0;
-let sliderTimer     = null;
+let currentUser       = null;   // profil Firestore de l'utilisateur connecté
+let currentService    = null;
+let currentRestaurant = null;   // restaurant sélectionné dans la vue Restaurants
+let cart              = {};
+let locMode           = 'gps';
+let gpsCoords         = null;
+let selectedPayment   = 'livraison';
+let sliderIdx         = 0;
+let sliderTimer       = null;
 
-const CATALOGUE_SERVICES = ['food', 'restaurant', 'clothes'];
+const CATALOGUE_SERVICES = ['food', 'clothes'];
+const RESTAURANT_SERVICE = 'restaurant'; // service spécial avec vue par restaurant
+const KITS_SERVICE = 'kits'; // service spécial avec vue liste kits + détail
 
 // ════════════════════════════════════════
 // SPLASH SCREEN
@@ -413,13 +416,8 @@ const SVCS = {
     ]
   },
   restaurant: {
-    name:"Restauration", icon:"🍽️", bg:"#E3F2FD", active:true,
-    fields:[
-      {n:"type",l:"Type de service",t:"select",opts:["Plat restaurant partenaire","Service traiteur événement"]},
-      {n:"commande",l:"Plat ou menu souhaité",t:"textarea",ph:"Décrivez votre commande..."},
-      {n:"personnes",l:"Nombre de personnes",t:"number",ph:"Ex : 4"},
-      {n:"adresse",l:"Adresse de livraison",t:"text",ph:"Votre adresse à Lomé"}
-    ]
+    name:"Restaurants", icon:"🍽️", bg:"#E3F2FD", active:true,
+    fields:[]
   },
   delivery: {
     name:"Livraison & Courses", icon:"🚚", bg:"#FFF3E0", active:true,
@@ -455,6 +453,10 @@ const SVCS = {
       {n:"adresse",l:"Adresse",t:"text",ph:"Votre adresse à Lomé"},
       {n:"date",l:"Date souhaitée",t:"date"}
     ]
+  },
+  kits: {
+    name:"Kits & PACKS", icon:"🎁", bg:"#E8F5E9", active:true,
+    fields:[]
   },
   security: {
     name:"Gardiennage & Sécurité", icon:"🛡️", bg:"#E3F2FD", active:false, soon:"7 Avril 2026",
@@ -549,7 +551,7 @@ window.goTab = goTab;
 // ════════════════════════════════════════
 // VUES INTERNES À LA PAGE SERVICES
 // ════════════════════════════════════════
-const VIEWS = ['list','catalogue','form','delivery','payment','success'];
+const VIEWS = ['list','restaurants','kits','kit-detail','catalogue','form','delivery','payment','success'];
 function showView(v) {
   VIEWS.forEach(x => {
     const el = document.getElementById('view-'+x);
@@ -575,6 +577,23 @@ function openService(id) {
   cart = {};
   const svc = SVCS[id];
   if (!svc) return;
+
+  // ── Cas spécial : service Kits/PACKS → vue liste des kits ──
+  if (id === KITS_SERVICE) {
+    loadKitsList();
+    showView('kits');
+    return;
+  }
+
+  // ── Cas spécial : service Restaurants → vue liste des restaurants ──
+  if (id === RESTAURANT_SERVICE) {
+    document.getElementById('rest-svc-ico').style.background = svc.bg;
+    document.getElementById('rest-svc-ico').textContent = svc.icon;
+    document.getElementById('rest-svc-title').textContent = svc.name;
+    loadRestaurantsList();
+    showView('restaurants');
+    return;
+  }
 
   if (CATALOGUE_SERVICES.includes(id)) {
     document.getElementById('cat-ico').style.background = svc.bg;
@@ -613,8 +632,364 @@ function openService(id) {
 window.openService = openService;
 
 // ════════════════════════════════════════
-// CHARGER CATALOGUE DEPUIS FIRESTORE
+// RESTAURANTS — VUE LISTE
 // ════════════════════════════════════════
+
+// Restaurants par défaut intégrés dans l'app
+const DEFAULT_RESTAURANTS = [
+  {id:'rst1', nom:'Le Saveur d\'Afrique', specialites:'Cuisine togolaise traditionnelle', localite:'Adidogomé, Lomé', emoji:'🥘', description:'Spécialiste du fufu, du riz sauce et des plats locaux authentiques.'},
+  {id:'rst2', nom:'Chez Maman Akossiwa',  specialites:'Plats locaux & traiteur',         localite:'Bè Kpota, Lomé',   emoji:'🍲', description:'Cuisine familiale, plats du jour et service traiteur pour événements.'},
+  {id:'rst3', nom:'Grill Palace',          specialites:'Grillades & brochettes',           localite:'Kodjoviakopé, Lomé',emoji:'🔥', description:'Brochettes mixtes, poulet grillé, côtes de bœuf marinées.'},
+  {id:'rst4', nom:'La Terrasse Ivoirienne',specialites:'Attiéké, alloco & poissons',      localite:'Agbalépédogan, Lomé',emoji:'🐠', description:'Spécialités ivoiriennes, attiéké poisson, alloco banane.'},
+];
+
+async function loadRestaurantsList() {
+  const container = document.getElementById('restaurants-list');
+  if (!container) return;
+  container.innerHTML = `<div style="text-align:center;padding:40px;color:#9999BB"><div class="spinner" style="border-color:rgba(30,111,190,.2);border-top-color:#1E6FBE"></div><div style="margin-top:10px;font-size:12px">Chargement des restaurants...</div></div>`;
+
+  let dbRestaurants = [];
+  try {
+    let snap;
+    try {
+      const q = query(collection(db,'restaurants'), orderBy('ordre','asc'));
+      snap = await getDocs(q);
+    } catch(_) {
+      const q2 = query(collection(db,'restaurants'));
+      snap = await getDocs(q2);
+    }
+    snap.forEach(d => dbRestaurants.push({ id:d.id, _src:'db', ...d.data() }));
+  } catch(e) {
+    console.warn('[Restaurants] Firestore indisponible :', e.message);
+  }
+
+  // Fusionner DB + standards non encore présents en DB
+  const dbIds = new Set(dbRestaurants.map(r => r.id));
+  const stdRests = DEFAULT_RESTAURANTS
+    .filter(r => !dbIds.has(r.id))
+    .map(r => ({ ...r, _src:'std', actif:true }));
+
+  const allRests = [...dbRestaurants, ...stdRests].filter(r => r.actif !== false);
+  allRests.sort((a,b) => (a.ordre ?? 99) - (b.ordre ?? 99) || (a.nom||'').localeCompare(b.nom||''));
+
+  if (!allRests.length) {
+    container.innerHTML = `<div style="text-align:center;padding:40px;color:#9999BB">Aucun restaurant disponible pour le moment.</div>`;
+    return;
+  }
+
+  container.innerHTML = allRests.map(r => renderRestaurantCard(r)).join('');
+}
+window.loadRestaurantsList = loadRestaurantsList;
+
+function renderRestaurantCard(r) {
+  const imgHtml = r.imageUrl
+    ? `<img src="${r.imageUrl}" alt="${r.nom}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.outerHTML='<span style=font-size:48px>${r.emoji||'🍽️'}</span>'">`
+    : `<span style="font-size:48px">${r.emoji||'🍽️'}</span>`;
+
+  const specialites = r.specialites ? r.specialites.split(',')[0].trim() : 'Restaurant';
+
+  return `
+  <div class="kit-card" onclick="openRestaurant('${r.id}','${(r.nom||'').replace(/'/g,"\\'")}','${r.emoji||'🍽️'}')">
+    <div class="kit-img-wrap" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB)">
+      ${imgHtml}
+    </div>
+    <div class="kit-body">
+      <div class="kit-badge" style="color:#F5820A;background:#FFF3E0">${specialites}</div>
+      <div class="kit-name">${r.nom||'Restaurant'}</div>
+      <div class="kit-desc">${r.description||r.specialites||''}</div>
+      <div class="kit-footer">
+        <div style="font-size:11px;font-weight:600;color:#9999BB">📍 ${r.localite||'Lomé'}</div>
+        <div class="kit-count">Voir le menu</div>
+      </div>
+    </div>
+    <div class="kit-arrow">›</div>
+  </div>`;
+}
+
+// ── Ouvrir un restaurant → afficher son menu ──
+async function openRestaurant(restaurantId, restaurantNom, restaurantEmoji) {
+  currentRestaurant = { id: restaurantId, nom: restaurantNom, emoji: restaurantEmoji };
+
+  // Mettre à jour le header de la vue catalogue
+  const svc = SVCS['restaurant'];
+  document.getElementById('cat-ico').style.background = svc.bg;
+  document.getElementById('cat-ico').textContent = restaurantEmoji;
+  document.getElementById('cat-title').textContent = restaurantNom;
+
+  // Le bouton retour de la vue catalogue doit revenir à la liste des restaurants
+  const backBtn = document.getElementById('catalogue-back-btn');
+  if (backBtn) backBtn.onclick = () => showView('restaurants');
+
+  loadCatalogueRestaurant(restaurantId);
+  showView('catalogue');
+}
+window.openRestaurant = openRestaurant;
+
+// ── Charger les menus d'un restaurant ──
+async function loadCatalogueRestaurant(restaurantId) {
+  const container = document.getElementById('catalogue-items');
+  container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9999BB"><div class="spinner" style="border-color:rgba(30,111,190,.2);border-top-color:#1E6FBE"></div><div style="margin-top:10px;font-size:12px">Chargement du menu...</div></div>`;
+  updateCartBar();
+
+  // Articles par défaut pour chaque restaurant standard
+  const DEFAULT_MENUS = {
+    rst1: [
+      {id:'rst1_m1',name:'Riz sauce arachide',desc:'Plat traditionnel copieux',price:2500,unit:'plat',emoji:'🍚'},
+      {id:'rst1_m2',name:'Fufu + soupe de viande',desc:'Fufu de manioc, bouillon maison',price:3000,unit:'plat',emoji:'🍲'},
+      {id:'rst1_m3',name:'Akumé + sauce gombo',desc:'Pâte de maïs, sauce gombo',price:2200,unit:'plat',emoji:'🌽'},
+      {id:'rst1_m4',name:'Plateau traiteur 10 pers.',desc:'Pour événements et réceptions',price:35000,unit:'plateau',emoji:'🎉'},
+    ],
+    rst2: [
+      {id:'rst2_m1',name:'Plat du jour',desc:'Selon arrivage, servi avec boisson',price:2000,unit:'plat',emoji:'🍱'},
+      {id:'rst2_m2',name:'Poulet yassa',desc:'Mariné aux oignons et citron',price:4500,unit:'plat',emoji:'🍗'},
+      {id:'rst2_m3',name:'Riz sauce tomate',desc:'Sauce tomate maison, légumes',price:2000,unit:'plat',emoji:'🍅'},
+      {id:'rst2_m4',name:'Traiteur événement',desc:'Devis sur mesure pour vos événements',price:50000,unit:'forfait',emoji:'🥂'},
+    ],
+    rst3: [
+      {id:'rst3_m1',name:'Brochettes mixtes',desc:'Bœuf, poulet, foie grillés',price:2000,unit:'portion',emoji:'🍢'},
+      {id:'rst3_m2',name:'Poulet grillé entier',desc:'Avec frites et salade',price:8000,unit:'pièce',emoji:'🐔'},
+      {id:'rst3_m3',name:'Côtes de bœuf',desc:'Marinées au poivre, grillées au feu de bois',price:5500,unit:'portion',emoji:'🥩'},
+      {id:'rst3_m4',name:'Poisson braisé',desc:'Tilapia grillé entier avec garniture',price:3500,unit:'pièce',emoji:'🐟'},
+    ],
+    rst4: [
+      {id:'rst4_m1',name:'Attiéké poisson',desc:'Semoule de manioc + poisson braisé',price:2800,unit:'plat',emoji:'🐠'},
+      {id:'rst4_m2',name:'Alloco + poulet',desc:'Banane plantain frite, poulet braisé',price:3200,unit:'plat',emoji:'🍌'},
+      {id:'rst4_m3',name:'Garba',desc:'Attiéké + thon frit, spécialité ivoirienne',price:2500,unit:'plat',emoji:'🍽️'},
+      {id:'rst4_m4',name:'Placali + sauce graine',desc:'Pâte de manioc, sauce palmiste',price:2800,unit:'plat',emoji:'🌴'},
+    ],
+  };
+
+  let dbArticles = [];
+  try {
+    let snap;
+    try {
+      const q = query(collection(db,'articles'), where('service','==','restaurant'), where('restaurantId','==',restaurantId), orderBy('ordre','asc'));
+      snap = await getDocs(q);
+    } catch(_) {
+      const q2 = query(collection(db,'articles'), where('service','==','restaurant'), where('restaurantId','==',restaurantId));
+      snap = await getDocs(q2);
+    }
+    snap.forEach(d => dbArticles.push({ id:d.id, _src:'db', ...d.data() }));
+  } catch(e) {
+    console.warn('[Menu] Firestore indisponible :', e.message);
+  }
+
+  // Fusionner avec menus par défaut si le restaurant est un standard
+  const dbIds = new Set(dbArticles.map(a => a.id));
+  const stdMenus = (DEFAULT_MENUS[restaurantId] || [])
+    .filter(a => !dbIds.has(a.id))
+    .map(a => ({ ...a, _src:'std', stock:'en_stock', actif:true, restaurantId }));
+
+  let articles = [...dbArticles, ...stdMenus];
+  articles = articles.filter(a => a.actif !== false);
+  articles.sort((a,b) => (a.ordre ?? 99) - (b.ordre ?? 99) || (a.name||'').localeCompare(b.name||''));
+
+  if (!articles.length) {
+    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9999BB">Aucun plat disponible pour le moment.</div>`;
+    return;
+  }
+  container.innerHTML = articles.map(a => renderArticleCard(a)).join('');
+}
+
+// ════════════════════════════════════════
+// KITS & PACKS — VUE LISTE
+// ════════════════════════════════════════
+let currentKit = null;
+
+const DEFAULT_KITS = [
+  {
+    id:'kit1', nom:'Kit Repas Semaine', emoji:'🍱',
+    description:'Tout ce qu\'il faut pour nourrir votre famille pendant 7 jours',
+    prix_total:28500, categorie:'Alimentation',
+    articles:[
+      {name:'Tilapia frais', qty:2, unit:'kg', emoji:'🐟'},
+      {name:'Poulet fermier', qty:2, unit:'pièces', emoji:'🐔'},
+      {name:'Légumes assortis', qty:3, unit:'paniers', emoji:'🥬'},
+      {name:'Vin de palme', qty:1, unit:'bidon', emoji:'🍶'},
+      {name:'Néré (soumbara)', qty:2, unit:'sachets', emoji:'🫘'},
+    ]
+  },
+  {
+    id:'kit2', nom:'Pack Fête & Événement', emoji:'🎉',
+    description:'Pour vos cérémonies, mariages et réceptions (10-15 personnes)',
+    prix_total:75000, categorie:'Restauration',
+    articles:[
+      {name:'Plateau traiteur', qty:1, unit:'plateau', emoji:'🎊'},
+      {name:'Poulet yassa', qty:15, unit:'plats', emoji:'🍗'},
+      {name:'Riz sauce arachide', qty:15, unit:'plats', emoji:'🍚'},
+      {name:'Boissons variées', qty:1, unit:'lot', emoji:'🥤'},
+    ]
+  },
+  {
+    id:'kit3', nom:'Pack Mode Wax Complet', emoji:'👗',
+    description:'Ensemble prêt-à-porter africain complet pour homme ou femme',
+    prix_total:26000, categorie:'Prêt-à-porter',
+    articles:[
+      {name:'Boubou wax', qty:1, unit:'pièce', emoji:'👘'},
+      {name:'Sac assorti', qty:1, unit:'pièce', emoji:'👜'},
+      {name:'Sandales tressées', qty:1, unit:'paire', emoji:'👡'},
+      {name:'Kit cosmétiques', qty:1, unit:'kit', emoji:'✨'},
+    ]
+  },
+  {
+    id:'kit4', nom:'Kit Nettoyage Maison', emoji:'✨',
+    description:'Service de nettoyage + fournitures pour votre domicile (60m²)',
+    prix_total:18000, categorie:'Nettoyage',
+    articles:[
+      {name:'Nettoyage complet', qty:1, unit:'prestation', emoji:'🧹'},
+      {name:'Produits ménagers', qty:1, unit:'kit', emoji:'🧴'},
+      {name:'Désinfection', qty:1, unit:'prestation', emoji:'🦠'},
+    ]
+  },
+];
+
+async function loadKitsList() {
+  const container = document.getElementById('kits-list');
+  if (!container) return;
+  container.innerHTML = `<div style="text-align:center;padding:40px;color:#9999BB"><div class="spinner" style="border-color:rgba(30,111,190,.2);border-top-color:#1E6FBE"></div><div style="margin-top:10px;font-size:12px">Chargement des kits...</div></div>`;
+
+  let dbKits = [];
+  try {
+    let snap;
+    try {
+      const q = query(collection(db,'kits'), orderBy('ordre','asc'));
+      snap = await getDocs(q);
+    } catch(_) {
+      const q2 = query(collection(db,'kits'));
+      snap = await getDocs(q2);
+    }
+    snap.forEach(d => dbKits.push({ id:d.id, _src:'db', ...d.data() }));
+  } catch(e) {
+    console.warn('[Kits] Firestore indisponible :', e.message);
+  }
+
+  const dbIds = new Set(dbKits.map(k => k.id));
+  const stdKits = DEFAULT_KITS
+    .filter(k => !dbIds.has(k.id))
+    .map(k => ({ ...k, _src:'std', actif:true }));
+
+  const allKits = [...dbKits, ...stdKits].filter(k => k.actif !== false);
+  allKits.sort((a,b) => (a.ordre ?? 99) - (b.ordre ?? 99) || (a.nom||'').localeCompare(b.nom||''));
+
+  if (!allKits.length) {
+    container.innerHTML = `<div style="text-align:center;padding:40px;color:#9999BB">Aucun kit disponible pour le moment.</div>`;
+    return;
+  }
+
+  container.innerHTML = allKits.map(k => renderKitCard(k)).join('');
+}
+window.loadKitsList = loadKitsList;
+
+function renderKitCard(k) {
+  const imgHtml = k.imageUrl
+    ? `<img src="${k.imageUrl}" alt="${k.nom}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.outerHTML='<span style=font-size:48px>${k.emoji||'🎁'}</span>'">`
+    : `<span style="font-size:48px">${k.emoji||'🎁'}</span>`;
+  const articlesCount = (k.articles || []).length;
+  const prixStr = k.prix_total ? fmt(k.prix_total) : '—';
+  const catColor = {
+    'Alimentation':'#FFF3E0','Restauration':'#E3F2FD','Prêt-à-porter':'#FFF0F5','Nettoyage':'#F3E5F5'
+  }[k.categorie] || '#E8F5E9';
+
+  return `
+  <div class="kit-card" onclick="openKit('${k.id}','${(k.nom||'').replace(/'/g,"\\'")}','${k.emoji||'🎁'}')">
+    <div class="kit-img-wrap" style="background:${catColor}">
+      ${imgHtml}
+    </div>
+    <div class="kit-body">
+      <div class="kit-badge">${k.categorie||'Kit'}</div>
+      <div class="kit-name">${k.nom||'Kit'}</div>
+      <div class="kit-desc">${k.description||''}</div>
+      <div class="kit-footer">
+        <div class="kit-price">${prixStr}</div>
+        <div class="kit-count">${articlesCount} article${articlesCount>1?'s':''} inclus</div>
+      </div>
+    </div>
+    <div class="kit-arrow">›</div>
+  </div>`;
+}
+
+async function openKit(kitId, kitNom, kitEmoji) {
+  const container = document.getElementById('kit-detail-items');
+  const titleEl = document.getElementById('kit-detail-name');
+  const descEl  = document.getElementById('kit-detail-desc');
+  const priceEl = document.getElementById('kit-detail-price');
+  const headerIco = document.getElementById('kit-detail-ico');
+
+  if (titleEl) titleEl.textContent = kitNom;
+  if (headerIco) { headerIco.textContent = kitEmoji; }
+  const heroNameEl = document.getElementById('kit-hero-name');
+  if (heroNameEl) heroNameEl.textContent = kitNom;
+  const heroEl = document.getElementById('kit-hero');
+  if (heroEl) heroEl.setAttribute('data-emoji', kitEmoji);
+
+  showView('kit-detail');
+
+  // Chercher le kit dans DB ou defaults
+  let kit = null;
+  try {
+    const snap = await getDoc(doc(db,'kits',kitId));
+    if (snap.exists()) kit = { id:snap.id, ...snap.data() };
+  } catch(e) {}
+  if (!kit) kit = DEFAULT_KITS.find(k => k.id === kitId);
+  if (!kit) { if(container) container.innerHTML='<p>Kit introuvable.</p>'; return; }
+
+  currentKit = kit;
+  if (descEl) descEl.textContent = kit.description||'';
+  if (priceEl) priceEl.textContent = kit.prix_total ? fmt(kit.prix_total) : '';
+
+  const articles = kit.articles || [];
+  if (!articles.length) {
+    if(container) container.innerHTML = `<div style="text-align:center;padding:30px;color:#9999BB">Aucun article dans ce kit.</div>`;
+    return;
+  }
+
+  if(container) container.innerHTML = articles.map(a => `
+    <div class="kit-article-row">
+      <div class="kit-article-emoji">${a.emoji||'📦'}</div>
+      <div class="kit-article-info">
+        <div class="kit-article-name">${a.name}</div>
+        <div class="kit-article-qty">× ${a.qty} ${a.unit||''}</div>
+      </div>
+      ${a.prix ? `<div class="kit-article-price">${fmt(a.prix*a.qty)}</div>` : ''}
+    </div>`).join('');
+}
+window.openKit = openKit;
+
+async function commanderKit() {
+  if (!currentKit) return;
+  if (!currentUser) { openAuthModal('login'); return; }
+
+  // Remplir le panier avec les articles du kit
+  cart = {};
+  const articles = currentKit.articles || [];
+  articles.forEach((a, i) => {
+    const id = `kit_${currentKit.id}_${i}`;
+    cart[id] = { id, name: a.name, price: a.prix || 0, qty: a.qty || 1, emoji: a.emoji||'📦' };
+  });
+  // Si le kit a un prix total fixe, l'utiliser
+  if (currentKit.prix_total) {
+    // Utiliser un seul article "Kit" avec le prix total
+    cart = {};
+    cart[`kit_${currentKit.id}`] = {
+      id: `kit_${currentKit.id}`,
+      name: currentKit.nom,
+      price: currentKit.prix_total,
+      qty: 1,
+      emoji: currentKit.emoji || '🎁'
+    };
+  }
+
+  currentService = 'kits';
+  updateCartBar();
+
+  // Aller à la vue livraison
+  const backBtn = document.getElementById('delivery-back-btn');
+  if (backBtn) backBtn.onclick = () => showView('kit-detail');
+  showView('delivery');
+}
+window.commanderKit = commanderKit;
+
+
 async function loadCatalogue(svcId) {
   const container = document.getElementById('catalogue-items');
   container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--light)"><div class="spinner" style="border-color:rgba(30,111,190,.2);border-top-color:var(--blue)"></div><div style="margin-top:10px;font-size:12px">Chargement...</div></div>`;
@@ -704,6 +1079,7 @@ function addToCart(id, e) {
   const allDefaults = [...(DEFAULT_ARTICLES[currentService]||[])];
   let art = allDefaults.find(a => a.id === id);
   if (!art) {
+    // Pour les restaurants, chercher via le DOM directement
     const card = document.getElementById(`acard-${id}`);
     if (!card) return;
     const name      = card.querySelector('.art-name')?.textContent || '';
@@ -853,9 +1229,19 @@ async function confirmOrder() {
   try {
     const items = Object.values(cart).map(a=>({id:a.id,name:a.name,price:a.price,qty:a.qty}));
     const total = cartTotal();
+    const restaurantInfo = (currentService === 'restaurant' && currentRestaurant)
+      ? { restaurantId: currentRestaurant.id, restaurantNom: currentRestaurant.nom }
+      : {};
+    const kitInfo = (currentService === 'kits' && currentKit)
+      ? { kitId: currentKit.id, kitNom: currentKit.nom }
+      : {};
     const docRef = await addDoc(collection(db,'commandes'), {
       service:      currentService,
-      serviceName:  svc.name,
+      serviceName:  currentService === 'restaurant' && currentRestaurant
+                      ? `Restaurants — ${currentRestaurant.nom}`
+                      : currentService === 'kits' && currentKit
+                        ? `Kits/PACKS — ${currentKit.nom}`
+                        : svc.name,
       statut:       'En attente',
       // Infos client issues du profil (plus de saisie manuelle)
       uid:          currentUser.uid,
@@ -869,6 +1255,8 @@ async function confirmOrder() {
       modePaiement: selectedPayment,
       articles:     items,
       total,
+      ...restaurantInfo,
+      ...kitInfo,
       ...positionData,
       createdAt:    serverTimestamp()
     });
@@ -1067,61 +1455,156 @@ async function loadMyOrders() {
 }
 window.loadMyOrders = loadMyOrders;
 
+
 // ════════════════════════════════════════
-// PARTENAIRES → BANDEAU ADCARD
+// BANDEAU PUBLICITAIRE
+// loadPartnerSlides() charge Firestore, injecte les cartes,
+// puis appelle startAdband() — zero setTimeout aveugle.
 // ════════════════════════════════════════
+
+const PROMO_LABELS = {
+  partenaire:'PARTENAIRE OFFICIEL', sponsor:'SPONSOR',
+  collaborateur:'COLLABORATEUR', nouveaute:'NOUVEAUTE',
+  promotion:'PROMOTION', evenement:'EVENEMENT'
+};
+
+const STD_BANNER_IDS = new Set([
+  'std-delivery','std-restaurant','std-food','std-cleaning','std-clothes','std-kits'
+]);
+
+function startAdband() {
+  const track    = document.getElementById('adband-track');
+  const dotsWrap = document.getElementById('adband-dots');
+  if (!track) return;
+
+  const INTERVAL = 2400;
+  let idx = 0;
+  let originals = Array.from(track.querySelectorAll('.adcard'));
+  let clone = null, timer = null, paused = false, jumping = false;
+
+  if (originals.length < 2) return;
+
+  if (dotsWrap) {
+    dotsWrap.innerHTML = '';
+    originals.forEach(function(_,i) {
+      var d = document.createElement('span');
+      d.className = 'adband-dot' + (i===0?' on':'');
+      dotsWrap.appendChild(d);
+    });
+  }
+
+  function updateDot(i) {
+    if (!dotsWrap) return;
+    dotsWrap.querySelectorAll('.adband-dot').forEach(function(d,j){ d.classList.toggle('on', j===i); });
+  }
+  function scrollTo(el, smooth) {
+    track.scrollTo({ left: el.offsetLeft - track.offsetLeft, behavior: smooth?'smooth':'instant' });
+  }
+  function next() {
+    if (jumping) return;
+    if (idx+1 < originals.length) {
+      scrollTo(originals[++idx], true); updateDot(idx);
+    } else {
+      scrollTo(clone, true); updateDot(0); jumping=true;
+      setTimeout(function(){ idx=0; scrollTo(originals[0],false); jumping=false; }, 420);
+    }
+  }
+  function prev() {
+    idx = (idx-1+originals.length) % originals.length;
+    scrollTo(originals[idx],true); updateDot(idx);
+  }
+
+  clone = originals[0].cloneNode(true);
+  clone.setAttribute('aria-hidden','true');
+  clone.style.pointerEvents = 'none';
+  track.appendChild(clone);
+
+  scrollTo(originals[0], false);
+  updateDot(0);
+  timer = setInterval(function(){ if(!paused && !jumping) next(); }, INTERVAL);
+
+  track.addEventListener('mouseenter', function(){ paused=true; });
+  track.addEventListener('mouseleave', function(){ paused=false; });
+  var tx=0;
+  track.addEventListener('touchstart', function(e){ paused=true; tx=e.touches[0].clientX; }, {passive:true});
+  track.addEventListener('touchend',   function(e){
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx)>40) { if(dx<0) next(); else prev(); }
+    setTimeout(function(){ paused=false; }, INTERVAL);
+  }, {passive:true});
+}
+
 async function loadPartnerSlides() {
+  const track = document.getElementById('adband-track');
+  if (!track) { startAdband(); return; }
+
   try {
-    const q = query(collection(db,'partenaires'), orderBy('ordre','asc'));
-    const snap = await getDocs(q);
-    if (snap.empty) return;
+    const snap = await getDocs(query(collection(db,'partenaires'), orderBy('ordre','asc')));
 
-    const track   = document.getElementById('adband-track');
-    const dotsBox = document.getElementById('adband-dots');
-    if (!track || !dotsBox) return;
+    snap.forEach(function(d) {
+      const p = Object.assign({ id:d.id }, d.data());
 
-    snap.forEach(d => {
-      const p = d.data();
-      if (!p.nom && !p.imageUrl) return;
+      // Override d'un bandeau standard
+      if (STD_BANNER_IDS.has(p.id)) {
+        const service = p.id.replace('std-','');
+        const stdCard = track.querySelector('[data-service="'+service+'"]');
+        if (!stdCard) return;
+        if (p.actif === false) {
+          stdCard.remove();
+        } else {
+          if (p.nom)         { const el=stdCard.querySelector('.adcard-title'); if(el) el.textContent=p.nom; }
+          if (p.badge)       { const el=stdCard.querySelector('.adcard-badge'); if(el) el.textContent=p.badge; }
+          if (p.description) { const el=stdCard.querySelector('.adcard-sub');   if(el) el.textContent=p.description; }
+          if (p.imageUrl) {
+            const zone = stdCard.querySelector('.adcard-img');
+            if (zone) {
+              const img = document.createElement('img');
+              img.src=p.imageUrl; img.alt=p.nom||'';
+              img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1';
+              img.onerror=function(){ img.remove(); };
+              zone.prepend(img);
+            }
+          }
+        }
+        return;
+      }
+
+      // Partenaire pur Firestore
+      if (p.actif===false || (!p.nom && !p.imageUrl)) return;
 
       const card = document.createElement('div');
       card.className = 'adcard';
-      if (p.lien) {
-        card.style.cursor = 'pointer';
-        card.onclick = () => window.open(p.lien, '_blank');
-      }
-      const badgeText = p.badge || (p.nom ? '🤝 ' + p.nom : '🤝 Partenaire');
-      card.innerHTML = `
-        <div class="adcard-img" style="background:linear-gradient(135deg,#1A1A2E 0%,#1E6FBE 100%)">
-          <div class="adcard-gradient"></div>
-          ${p.imageUrl
-            ? `<img src="${p.imageUrl}" alt="${p.nom||'Partenaire'}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>`
-            : `<span class="adcard-emoji-bg">🤝</span>`}
-          <div class="adcard-badge">${badgeText}</div>
-        </div>
-        <div class="adcard-body">
-          <div class="adcard-promo">${{partenaire:'PARTENAIRE OFFICIEL',sponsor:'SPONSOR',collaborateur:'COLLABORATEUR',nouveaute:'NOUVEAUTÉ',promotion:'PROMOTION',evenement:'ÉVÉNEMENT'}[p.promo]||'PARTENAIRE OFFICIEL'}</div>
-          <div class="adcard-title">${p.nom||'Partenaire'}</div>
-          <div class="adcard-sub">${p.description||''}</div>
-          ${p.lien ? `<div class="adcard-cta">Découvrir →</div>` : ''}
-        </div>`;
-
+      if (p.lien) { card.style.cursor='pointer'; card.onclick=function(){ window.open(p.lien,'_blank'); }; }
+      const badge = p.badge || (p.nom ? '🤝 '+p.nom : '🤝 Partenaire');
+      const promoTxt = PROMO_LABELS[p.promo] || 'PARTENAIRE OFFICIEL';
+      const imgHtml = p.imageUrl
+        ? '<img src="'+p.imageUrl+'" alt="'+(p.nom||'')+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'"/>'
+        : '<span class="adcard-emoji-bg">🤝</span>';
+      const ctaHtml = p.lien ? '<div class="adcard-cta">Decouvrir</div>' : '';
+      card.innerHTML =
+        '<div class="adcard-img" style="background:linear-gradient(135deg,#1A1A2E 0%,#1E6FBE 100%)">'
+        +'<div class="adcard-gradient"></div>'
+        +imgHtml
+        +'<div class="adcard-badge">'+badge+'</div>'
+        +'</div>'
+        +'<div class="adcard-body">'
+        +'<div class="adcard-promo">'+promoTxt+'</div>'
+        +'<div class="adcard-title">'+(p.nom||'Partenaire')+'</div>'
+        +'<div class="adcard-sub">'+(p.description||'')+'</div>'
+        +ctaHtml
+        +'</div>';
       track.appendChild(card);
-
-      const dot = document.createElement('span');
-      dot.className = 'adband-dot';
-      dotsBox.appendChild(dot);
     });
 
   } catch(e) {
-    console.log('Partenaires non disponibles', e);
+    console.warn('Partenaires Firestore indisponibles :', e.message);
   }
+
+  // Lancer le slider APRES injection de toutes les cartes
+  startAdband();
 }
 loadPartnerSlides();
 
-// ════════════════════════════════════════
-// FILTRE RECHERCHE SERVICES
-// ════════════════════════════════════════
 function filterServices(q) {
   if (!document.getElementById('t-services')?.classList.contains('on')) goTab('services');
   document.querySelectorAll('#view-list .svc-row').forEach(r => {
@@ -1129,113 +1612,3 @@ function filterServices(q) {
   });
 }
 window.filterServices = filterServices;
-
-// ════════════════════════════════════════
-// BANDEAU PUBLICITAIRE — BOUCLE INFINIE SANS RETOUR VISIBLE
-// ════════════════════════════════════════
-(function initAdbandLoop() {
-  const track = document.getElementById('adband-track');
-  const dotsWrap = document.getElementById('adband-dots');
-  if (!track) return;
-
-  const INTERVAL = 3200; // ms entre chaque slide
-  let idx = 0;           // index de la carte visible actuelle (parmi les originales)
-  let originals = [];    // cartes d'origine (HTML + Firestore)
-  let clone = null;      // clone de la première carte, placé en fin de track
-  let timer = null;
-  let paused = false;
-  let jumping = false;   // vrai pendant le saut silencieux
-
-  // ── Dots ──
-  function updateDot(i) {
-    if (!dotsWrap) return;
-    dotsWrap.querySelectorAll('.adband-dot').forEach((d, j) => d.classList.toggle('on', j === i));
-  }
-
-  // ── Scroll vers un élément DOM ──
-  function scrollTo(el, smooth) {
-    track.scrollTo({ left: el.offsetLeft - track.offsetLeft, behavior: smooth ? 'smooth' : 'instant' });
-  }
-
-  // ── Avancer d'une carte ──
-  function next() {
-    if (jumping) return;
-    const n = idx + 1;
-
-    if (n < originals.length) {
-      // Cas normal : carte suivante
-      idx = n;
-      scrollTo(originals[idx], true);
-      updateDot(idx);
-    } else {
-      // Dernière → animer vers le CLONE de la première (identique visuellement)
-      scrollTo(clone, true);
-      updateDot(0);
-      jumping = true;
-      // Après l'animation (~420ms), sauter silencieusement à la vraie première
-      setTimeout(() => {
-        idx = 0;
-        scrollTo(originals[0], false);
-        jumping = false;
-      }, 430);
-    }
-  }
-
-  // ── Reculer d'une carte ──
-  function prev() {
-    idx = (idx - 1 + originals.length) % originals.length;
-    scrollTo(originals[idx], true);
-    updateDot(idx);
-  }
-
-  // ── Boucle auto ──
-  function startLoop() {
-    clearInterval(timer);
-    timer = setInterval(() => { if (!paused && !jumping) next(); }, INTERVAL);
-  }
-
-  // ── Pause au survol souris ──
-  track.addEventListener('mouseenter', () => { paused = true; });
-  track.addEventListener('mouseleave', () => { paused = false; });
-
-  // ── Swipe tactile ──
-  let tx = 0;
-  track.addEventListener('touchstart', e => {
-    paused = true;
-    tx = e.touches[0].clientX;
-  }, { passive: true });
-  track.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - tx;
-    if (Math.abs(dx) > 40) dx < 0 ? next() : prev();
-    setTimeout(() => { paused = false; }, INTERVAL);
-  }, { passive: true });
-
-  // ── Init : après que Firestore ait éventuellement ajouté ses cartes ──
-  setTimeout(() => {
-    originals = Array.from(track.querySelectorAll('.adcard'));
-    if (originals.length < 2) { updateDot(0); return; }
-
-    // Cloner la première carte et l'ajouter en fin de track
-    // Elle est identique visuellement → le saut sera invisible
-    clone = originals[0].cloneNode(true);
-    clone.setAttribute('aria-hidden', 'true');
-    clone.style.pointerEvents = 'none'; // évite les clics sur le clone
-    track.appendChild(clone);
-
-    // Synchroniser les dots : s'assurer qu'il y en a autant que de vraies cartes
-    if (dotsWrap) {
-      const existingDots = dotsWrap.querySelectorAll('.adband-dot');
-      // Ajouter des dots manquants si Firestore a rajouté des cartes
-      while (dotsWrap.querySelectorAll('.adband-dot').length < originals.length) {
-        const d = document.createElement('span');
-        d.className = 'adband-dot';
-        dotsWrap.appendChild(d);
-      }
-    }
-
-    idx = 0;
-    scrollTo(originals[0], false);
-    updateDot(0);
-    startLoop();
-  }, 1600);
-})();
