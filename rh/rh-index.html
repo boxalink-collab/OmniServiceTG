@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OmniService TG — RH</title>
+<link rel="icon" href="../assets/logo.png" type="image/png"/>
+<link rel="apple-touch-icon" href="../assets/logo.png"/>
+<link rel="manifest" href="rh-manifest.json"/>
+<meta name="theme-color" content="#0D1B2A"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="OmniRH"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0D1B2A;--ink2:#1E3A5F;
+  --teal:#00B4A6;--teal-d:#008F84;--teal-s:rgba(0,180,166,.12);
+  --amber:#F59E0B;--rose:#EF4444;--green:#10B981;--sky:#3B82F6;
+  --bg:#F0F4F8;--card:#FFFFFF;--border:#DCE4ED;--muted:#6B7E93;
+  --radius:16px;--shadow:0 2px 16px rgba(13,27,42,.08);--shadow-lg:0 8px 40px rgba(13,27,42,.15);
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:9999;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .5s,visibility .5s}
+#splash::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 30%,rgba(0,180,166,.15) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 85% 75%,rgba(245,158,11,.08) 0%,transparent 60%)}
+#splash::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,166,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,166,.04) 1px,transparent 1px);background-size:44px 44px}
+#splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.sp-logo{position:relative;z-index:2;width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,var(--teal),var(--teal-d));display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:28px;color:#fff;box-shadow:0 0 60px rgba(0,180,166,.4);animation:spPop .8s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes spPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.sp-title{position:relative;z-index:2;font-family:'DM Serif Display',serif;font-size:20px;color:#fff;animation:fadeUp .6s ease .4s both}
+.sp-sub{position:relative;z-index:2;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;animation:fadeUp .6s ease .55s both}
+.sp-bar{position:relative;z-index:2;width:110px;height:3px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;margin-top:6px;animation:fadeUp .5s ease .7s both}
+.sp-fill{height:100%;background:var(--teal);border-radius:99px;animation:barLoad 2.2s ease .8s both}
+@keyframes barLoad{from{width:0}to{width:100%}}
+@keyframes fadeUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* LOGIN */
+#login-screen{display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--ink);position:relative;overflow:hidden}
+#login-screen.active{display:flex}
+#login-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 10% 20%,rgba(0,180,166,.12) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 90% 80%,rgba(245,158,11,.07) 0%,transparent 60%)}
+#login-screen::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,180,166,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,166,.04) 1px,transparent 1px);background-size:44px 44px}
+.login-card{position:relative;z-index:2;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);border-radius:24px;padding:40px 32px;width:min(380px,92vw);animation:fadeUp .7s ease .2s both}
+.login-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,180,166,.15);border:1px solid rgba(0,180,166,.3);border-radius:99px;padding:5px 16px;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:22px}
+.login-card h1{font-family:'DM Serif Display',serif;font-size:28px;color:#fff;line-height:1.2;margin-bottom:6px}
+.login-card p{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:28px}
+.field-group{margin-bottom:14px}
+.field-group label{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px}
+.field-group input{width:100%;padding:13px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;font-size:15px;color:#fff;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,background .2s}
+.field-group input::placeholder{color:rgba(255,255,255,.22)}
+.field-group input:focus{border-color:var(--teal);background:rgba(0,180,166,.08)}
+.btn-login{width:100%;padding:14px;margin-top:8px;background:linear-gradient(135deg,var(--teal),var(--teal-d));border:none;border-radius:12px;font-size:15px;font-weight:700;color:#fff;font-family:'DM Sans',sans-serif;cursor:pointer;transition:transform .15s,box-shadow .2s;box-shadow:0 4px 20px rgba(0,180,166,.35)}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,180,166,.45)}
+.btn-login:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.login-error{margin-top:12px;padding:11px 14px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;font-size:13px;color:#FCA5A5;display:none}
+
+/* APP */
+#app{display:none}
+#app.active{display:block;min-height:100vh}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(240,244,248,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 18px}
+.topbar-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--teal-d));display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:14px;color:#fff;flex-shrink:0}
+.topbar-title{font-family:'DM Serif Display',serif;font-size:17px;color:var(--ink);flex:1}
+.topbar-user{font-size:12px;color:var(--muted);font-weight:500;flex-shrink:0}
+.btn-logout{padding:6px 12px;border-radius:8px;background:transparent;border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;flex-shrink:0}
+.btn-logout:hover{background:var(--rose);color:#fff;border-color:var(--rose)}
+
+/* NAV */
+.nav-tabs{display:flex;gap:3px;padding:10px 14px;overflow-x:auto;scrollbar-width:none;background:var(--card);border-bottom:1px solid var(--border)}
+.nav-tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:none;background:transparent;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.tab-btn.active{background:var(--teal-s);color:var(--teal)}
+.tab-btn:hover:not(.active){background:var(--bg)}
+
+/* SECTIONS */
+.section{display:none;padding:18px 16px;animation:secIn .3s ease both}
+.section.active{display:block}
+@keyframes secIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* STAT GRID */
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.stat-card{background:var(--card);border-radius:14px;padding:16px 14px;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:-16px;right:-16px;width:70px;height:70px;border-radius:50%;background:var(--ac,var(--teal));opacity:.07}
+.stat-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.stat-value{font-family:'DM Serif Display',serif;font-size:30px;color:var(--ink);line-height:1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* SECTION HEADER */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink)}
+.sec-badge{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:var(--teal-s);color:var(--teal)}
+
+/* BUTTONS */
+.btn-primary{padding:10px 18px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 3px 14px rgba(0,180,166,.3);display:inline-flex;align-items:center;gap:7px}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,180,166,.4)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-secondary{padding:9px 15px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--ink);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-secondary:hover{background:var(--bg)}
+.btn-danger{padding:6px 12px;border-radius:8px;border:none;background:rgba(239,68,68,.1);color:var(--rose);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-danger:hover{background:var(--rose);color:#fff}
+.btn-success{padding:6px 12px;border-radius:8px;border:none;background:rgba(16,185,129,.1);color:var(--green);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-success:hover{background:var(--green);color:#fff}
+
+/* AGENT CARD */
+.agent-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:14px;margin-bottom:9px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;animation:secIn .3s ease both}
+.agent-avatar{width:44px;height:44px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;font-family:'DM Serif Display',serif}
+.av-livreur{background:linear-gradient(135deg,#3B82F6,#1D4ED8)}
+.av-comptable{background:linear-gradient(135deg,#10B981,#065F46)}
+.av-stats{background:linear-gradient(135deg,#F59E0B,#B45309)}
+.av-comm{background:linear-gradient(135deg,#A855F7,#6D28D9)}
+.av-terrain{background:linear-gradient(135deg,#EF4444,#991B1B)}
+.av-rh{background:linear-gradient(135deg,#0D1B2A,#1E3A5F)}
+.agent-info{flex:1;min-width:0}
+.agent-name{font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agent-meta{font-size:11px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.role-badge{padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.rb-livreur{background:rgba(59,130,246,.12);color:#3B82F6}
+.rb-comptable{background:rgba(16,185,129,.12);color:#10B981}
+.rb-stats{background:rgba(245,158,11,.12);color:#F59E0B}
+.rb-comm{background:rgba(168,85,247,.12);color:#A855F7}
+.rb-terrain{background:rgba(239,68,68,.12);color:#EF4444}
+.rb-rh{background:rgba(13,27,42,.1);color:var(--ink)}
+.agent-code{font-family:monospace;font-size:12px;font-weight:700;color:var(--teal);background:var(--teal-s);padding:2px 8px;border-radius:6px}
+.agent-actions{display:flex;gap:6px;flex-shrink:0;flex-direction:column;align-items:flex-end}
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+.offline-dot{width:8px;height:8px;border-radius:50%;background:var(--border);display:inline-block}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* FORM FIELDS */
+.form-field{margin-bottom:14px}
+.form-field label{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:7px}
+.form-field input,.form-field select{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--ink);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.form-field input:focus,.form-field select:focus{border-color:var(--teal)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* CODE BOX */
+.code-box{background:linear-gradient(135deg,var(--teal-s),rgba(0,180,166,.04));border:2px dashed var(--teal);border-radius:14px;padding:20px;text-align:center;margin:14px 0;display:none}
+.code-main{font-family:'DM Serif Display',serif;font-size:38px;color:var(--teal);letter-spacing:5px;margin-bottom:4px}
+.code-hint{font-size:11px;color:var(--muted)}
+
+/* COMMANDES */
+.commande-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:15px;margin-bottom:9px;box-shadow:var(--shadow)}
+.cmd-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.cmd-id{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px}
+.cmd-client{font-size:14px;font-weight:700;color:var(--ink);margin-top:2px}
+.cmd-detail{font-size:12px;color:var(--muted);margin-top:2px}
+.status-badge{padding:4px 10px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+.s-attente{background:rgba(245,158,11,.12);color:var(--amber)}
+.s-encours{background:rgba(59,130,246,.12);color:var(--sky)}
+.s-livre{background:rgba(16,185,129,.12);color:var(--green)}
+.cmd-footer{display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid var(--border)}
+.assign-select{flex:1;padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;cursor:pointer;-webkit-appearance:none}
+.assign-select:focus{border-color:var(--teal)}
+.btn-assign{padding:7px 14px;border-radius:8px;border:none;background:var(--teal-s);color:var(--teal);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;flex-shrink:0}
+.btn-assign:hover{background:var(--teal);color:#fff}
+
+/* PERF */
+.perf-item{margin-bottom:14px}
+.perf-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.perf-name{font-size:13px;font-weight:600;color:var(--ink)}
+.perf-count{font-size:12px;font-weight:700;color:var(--teal)}
+.perf-bg{height:6px;background:var(--bg);border-radius:99px;overflow:hidden}
+.perf-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--teal-d));transition:width 1.2s cubic-bezier(.34,1.1,.64,1)}
+
+/* ZONE */
+.zone-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:15px;margin-bottom:9px;box-shadow:var(--shadow)}
+.zone-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.zone-name{font-size:14px;font-weight:700;color:var(--ink)}
+.zone-count{font-size:11px;color:var(--muted)}
+.zone-tags{display:flex;flex-wrap:wrap;gap:6px}
+.zone-tag{padding:4px 12px;background:var(--teal-s);color:var(--teal);border-radius:99px;font-size:11px;font-weight:600}
+
+/* SEARCH */
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:14px}
+.search-bar input{flex:1;border:none;outline:none;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--ink);background:transparent}
+.search-bar input::placeholder{color:var(--muted)}
+
+/* FILTERS */
+.filter-row{display:flex;gap:7px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:1px}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{flex-shrink:0;padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:var(--card);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s}
+.filter-chip.active{background:var(--teal);border-color:var(--teal);color:#fff}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(13,27,42,.6);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:24px 24px 0 0;width:min(520px,100%);max-height:90vh;overflow-y:auto;padding:28px 22px 40px;animation:slideUp .35s cubic-bezier(.34,1.2,.64,1) both}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 22px}
+.modal h2{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:6px}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:22px}
+.modal-actions{display:flex;gap:10px}
+.modal-actions .btn-primary{flex:1;justify-content:center}
+
+/* CARD/PANEL */
+.panel{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-icon{font-size:38px;margin-bottom:10px;opacity:.45}
+.empty-text{font-size:13px}
+
+/* INFO BOX */
+.info-box{background:rgba(0,180,166,.06);border:1px solid rgba(0,180,166,.18);border-radius:14px;padding:15px;margin-top:14px}
+.info-box-title{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:8px}
+.info-box-body{font-size:12px;color:var(--muted);line-height:1.9}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;padding:11px 22px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* INACTIF OVERLAY */
+.agent-card.inactif{opacity:.55}
+.inactif-tag{font-size:10px;font-weight:700;color:var(--rose);background:rgba(239,68,68,.1);padding:2px 8px;border-radius:6px}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-logo">RH</div>
+  <div class="sp-title">OmniService TG</div>
+  <div class="sp-sub">Ressources Humaines</div>
+  <div class="sp-bar"><div class="sp-fill"></div></div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-badge">👔 Accès RH</div>
+    <h1>Bienvenue,<br/><em>Manager RH</em></h1>
+    <p>Interface réservée aux Ressources Humaines</p>
+    <div class="field-group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="rh@omniservicetg.com" autocomplete="username"/>
+    </div>
+    <div class="field-group">
+      <label>Mot de passe</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="btn-login" id="login-btn">Se connecter</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">RH</div>
+    <div class="topbar-title">Ressources Humaines</div>
+    <span class="topbar-user" id="user-display">RH</span>
+    <button class="btn-logout" id="btn-logout">Quitter</button>
+  </div>
+  <div class="nav-tabs">
+    <button class="tab-btn active" data-tab="dashboard">📊 Tableau de bord</button>
+    <button class="tab-btn" data-tab="agents">👥 Agents</button>
+    <button class="tab-btn" data-tab="nouveau">➕ Nouveau compte</button>
+    <button class="tab-btn" data-tab="commandes">📦 Assignation</button>
+    <button class="tab-btn" data-tab="perf">🏆 Performances</button>
+    <button class="tab-btn" data-tab="zones">🗺️ Zones</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="section active">
+    <div class="stat-row">
+      <div class="stat-card" style="--ac:var(--teal)"><div class="stat-label">Agents actifs</div><div class="stat-value" id="s-actifs">—</div><div class="stat-sub">sur <span id="s-total">—</span> total</div></div>
+      <div class="stat-card" style="--ac:var(--green)"><div class="stat-label">Connectés</div><div class="stat-value" id="s-online">—</div><div class="stat-sub">aujourd'hui</div></div>
+      <div class="stat-card" style="--ac:var(--sky)"><div class="stat-label">Livreurs</div><div class="stat-value" id="s-livreurs">—</div><div class="stat-sub">disponibles</div></div>
+      <div class="stat-card" style="--ac:var(--amber)"><div class="stat-label">Commandes</div><div class="stat-value" id="s-cmd">—</div><div class="stat-sub">en attente</div></div>
+    </div>
+    <div class="sec-header"><div class="sec-title">Connectés aujourd'hui</div></div>
+    <div id="online-list"><div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Chargement…</div></div></div>
+  </div>
+
+  <!-- AGENTS -->
+  <div id="tab-agents" class="section">
+    <div class="sec-header"><div class="sec-title">Tous les agents</div><div class="sec-badge" id="badge-agents">0</div></div>
+    <div class="search-bar"><span>🔍</span><input type="text" id="agent-search" placeholder="Rechercher un agent…"/></div>
+    <div class="filter-row">
+      <button class="filter-chip active" data-role="tous">Tous</button>
+      <button class="filter-chip" data-role="livreur">🚚 Livreurs</button>
+      <button class="filter-chip" data-role="comptable">💰 Comptables</button>
+      <button class="filter-chip" data-role="stats">📊 Stats</button>
+      <button class="filter-chip" data-role="comm">📣 Comm</button>
+      <button class="filter-chip" data-role="terrain">🧹 Terrain</button>
+    </div>
+    <div id="agents-list"><div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Chargement…</div></div></div>
+  </div>
+
+  <!-- NOUVEAU COMPTE -->
+  <div id="tab-nouveau" class="section">
+    <div class="sec-header"><div class="sec-title">Créer un compte agent</div></div>
+    <div class="panel">
+      <div class="form-field"><label>Nom complet</label><input type="text" id="new-nom" placeholder="ex : Jean Kodjo"/></div>
+      <div class="form-field"><label>Téléphone</label><input type="tel" id="new-tel" placeholder="+228 90 00 00 00"/></div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Rôle</label>
+          <select id="new-role">
+            <option value="">— Choisir —</option>
+            <option value="livreur">🚚 Livreur</option>
+            <option value="comptable">💰 Comptable</option>
+            <option value="stats">📊 Statisticien</option>
+            <option value="comm">📣 Communication</option>
+            <option value="terrain">🧹 Agent terrain</option>
+          </select>
+        </div>
+        <div class="form-field" id="zone-field" style="display:none">
+          <label>Zone</label>
+          <input type="text" id="new-zone" placeholder="ex : Adidogomé"/>
+        </div>
+      </div>
+      <div class="form-field"><label>Email (généré)</label><input type="email" id="new-email" readonly style="cursor:not-allowed;color:var(--muted);background:#f5f7fa"/></div>
+      <div class="code-box" id="code-box">
+        <div class="code-hint">Code d'accès généré automatiquement</div>
+        <div class="code-main" id="code-display">—</div>
+        <div class="code-hint">Communiquer à l'agent · Sert de mot de passe initial</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-primary" id="btn-gen" style="flex:1;justify-content:center">⚡ Générer le code</button>
+        <button class="btn-primary" id="btn-creer" disabled style="flex:1;justify-content:center;background:linear-gradient(135deg,var(--green),#065F46)">✅ Créer le compte</button>
+      </div>
+      <div id="create-err" style="margin-top:10px;font-size:12px;color:var(--rose);display:none"></div>
+      <div id="create-ok" style="margin-top:10px;font-size:13px;color:var(--green);display:none"></div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-title">📋 Format des codes d'accès</div>
+      <div class="info-box-body">
+        🚚 Livreur : <b>LI01A</b> — <b>LI99Z</b><br/>
+        💰 Comptable : <b>CO01A</b> — <b>CO99Z</b><br/>
+        📊 Statisticien : <b>ST01A</b> — <b>ST99Z</b><br/>
+        📣 Communication : <b>CM01A</b> — <b>CM99Z</b><br/>
+        🧹 Agent terrain : <b>TE01A</b> — <b>TE99Z</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSIGNATION -->
+  <div id="tab-commandes" class="section">
+    <div class="sec-header"><div class="sec-title">Assigner les commandes</div><div class="sec-badge" id="badge-cmds">0</div></div>
+    <div class="filter-row">
+      <button class="filter-chip active" data-cstatus="tous">Toutes</button>
+      <button class="filter-chip" data-cstatus="attente">⏳ En attente</button>
+      <button class="filter-chip" data-cstatus="encours">🚚 En cours</button>
+    </div>
+    <div id="commandes-list"><div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Chargement…</div></div></div>
+  </div>
+
+  <!-- PERFORMANCES -->
+  <div id="tab-perf" class="section">
+    <div class="sec-header"><div class="sec-title">Performances agents</div></div>
+    <div class="filter-row">
+      <button class="filter-chip active" data-period="semaine">Cette semaine</button>
+      <button class="filter-chip" data-period="mois">Ce mois</button>
+      <button class="filter-chip" data-period="total">Tout</button>
+    </div>
+    <div class="panel"><div id="perf-list"><div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Chargement…</div></div></div></div>
+  </div>
+
+  <!-- ZONES -->
+  <div id="tab-zones" class="section">
+    <div class="sec-header"><div class="sec-title">Zones & livreurs</div></div>
+    <div id="zones-list"><div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Chargement…</div></div></div>
+    <div class="sec-header" style="margin-top:22px"><div class="sec-title">Modifier une zone</div></div>
+    <div class="panel">
+      <div class="form-field"><label>Livreur</label><select id="zone-agent-sel" style="width:100%;padding:11px 13px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none"><option value="">— Sélectionner un livreur —</option></select></div>
+      <div class="form-field"><label>Nouvelle zone</label><input type="text" id="zone-val" placeholder="ex : Bè, Lomé centre…"/></div>
+      <button class="btn-primary" id="btn-zone" style="width:100%;justify-content:center">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DÉSACTIVER -->
+<div class="modal-overlay" id="modal-desact">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>⚠️ Désactiver l'agent ?</h2>
+    <p id="modal-desact-label">Cet agent ne pourra plus se connecter.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btn-cancel-desact">Annuler</button>
+      <button class="btn-primary" id="btn-confirm-desact" style="background:linear-gradient(135deg,var(--rose),#991B1B)">Désactiver</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, getDoc, doc,
+         setDoc, updateDoc, query, orderBy, serverTimestamp }
+         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut,
+         createUserWithEmailAndPassword, onAuthStateChanged }
+         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const cfg = {
+  apiKey:"AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",
+  authDomain:"omniservicetg-59df3.firebaseapp.com",
+  projectId:"omniservicetg-59df3",
+  storageBucket:"omniservicetg-59df3.firebasestorage.app",
+  messagingSenderId:"196278567761",
+  appId:"1:196278567761:web:4f6416acaab58b67bf4970"
+};
+const fb  = initializeApp(cfg);
+const db  = getFirestore(fb);
+const auth= getAuth(fb);
+
+// ── STATE ──
+let agents=[], commandes=[];
+let roleFilter='tous', cmdFilter='tous', perfPeriod='semaine';
+let desactUid=null, genCode='', genEmail='';
+
+// ── SPLASH ──
+setTimeout(()=>document.getElementById('splash').classList.add('hidden'), 2400);
+
+// ── AUTH ──
+document.getElementById('login-btn').onclick = async()=>{
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-error');
+  err.style.display='none'; btn.disabled=true; btn.textContent='Connexion…';
+  try{
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    // Vérifier rôle RH
+    try{
+      const d = await getDoc(doc(db,'agents',cred.user.uid));
+      if(d.exists() && d.data().role && d.data().role!=='rh'){
+        await signOut(auth);
+        throw {code:'wrong-role'};
+      }
+    }catch(re){ if(re.code==='wrong-role') throw re; }
+  }catch(e){
+    const m={
+      'auth/invalid-credential':'❌ Email ou mot de passe incorrect.',
+      'auth/user-not-found':'❌ Compte introuvable.',
+      'auth/wrong-password':'❌ Mot de passe incorrect.',
+      'auth/too-many-requests':'⏳ Trop de tentatives, réessayez plus tard.',
+      'wrong-role':'❌ Accès réservé au compte RH.'
+    };
+    err.textContent=m[e.code]||'❌ Erreur de connexion.';
+    err.style.display='block';
+    btn.disabled=false; btn.textContent='Se connecter';
+  }
+};
+
+document.getElementById('btn-logout').onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth, async user=>{
+  if(!user){
+    document.getElementById('app').style.display='none';
+    document.getElementById('app').classList.remove('active');
+    document.getElementById('login-screen').classList.add('active');
+  } else {
+    document.getElementById('login-screen').classList.remove('active');
+    document.getElementById('app').style.display='';
+    document.getElementById('app').classList.add('active');
+    document.getElementById('user-display').textContent=user.email.split('@')[0].toUpperCase();
+    // Marquer connexion
+    try{ await updateDoc(doc(db,'agents',user.uid),{derniere_connexion:serverTimestamp(),en_ligne:true}); }catch(e){}
+    loadAll();
+  }
+});
+
+// ── TABS ──
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    const id='tab-'+btn.dataset.tab;
+    document.getElementById(id).classList.add('active');
+    if(btn.dataset.tab==='perf') renderPerf();
+    if(btn.dataset.tab==='zones') renderZones();
+    if(btn.dataset.tab==='commandes') renderCommandes();
+  };
+});
+
+// ── LOAD ──
+async function loadAll(){
+  await Promise.all([loadAgents(), loadCommandes()]);
+}
+
+async function loadAgents(){
+  try{
+    const snap=await getDocs(collection(db,'agents'));
+    agents=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderDashboard(); renderAgents(); populateLivreurSel();
+  }catch(e){console.error(e);}
+}
+
+async function loadCommandes(){
+  try{
+    const q=query(collection(db,'commandes'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    commandes=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderDashboard(); renderCommandes();
+    document.getElementById('badge-cmds').textContent=commandes.length;
+  }catch(e){console.error(e);}
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const actifs = agents.filter(a=>a.actif!==false);
+  const today  = new Date(); today.setHours(0,0,0,0);
+  const online = agents.filter(a=>{
+    if(!a.derniere_connexion) return false;
+    const d=a.derniere_connexion.toDate?a.derniere_connexion.toDate():new Date(a.derniere_connexion);
+    return d>=today;
+  });
+  const livreurs=agents.filter(a=>a.role==='livreur'&&a.actif!==false);
+  const attente=commandes.filter(c=>!c.livreur_id);
+  document.getElementById('s-actifs').textContent=actifs.length;
+  document.getElementById('s-total').textContent=agents.length;
+  document.getElementById('s-online').textContent=online.length;
+  document.getElementById('s-livreurs').textContent=livreurs.length;
+  document.getElementById('s-cmd').textContent=attente.length;
+
+  const el=document.getElementById('online-list');
+  if(!online.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">😴</div><div class="empty-text">Aucun agent connecté aujourd\'hui</div></div>';
+    return;
+  }
+  el.innerHTML=online.map((a,i)=>`
+    <div class="agent-card" style="animation-delay:${i*.06}s">
+      <div class="agent-avatar av-${a.role||'terrain'}">${ini(a.nom||a.email)}</div>
+      <div class="agent-info">
+        <div class="agent-name">${a.nom||a.email||'—'}</div>
+        <div class="agent-meta">
+          <span class="role-badge rb-${a.role||'terrain'}">${rlabel(a.role)}</span>
+          ${a.zone?`<span>📍 ${a.zone}</span>`:''}
+        </div>
+      </div>
+      <span class="online-dot"></span>
+    </div>`).join('');
+}
+
+// ── AGENTS ──
+function renderAgents(){
+  const search=(document.getElementById('agent-search').value||'').toLowerCase();
+  let list=agents;
+  if(roleFilter!=='tous') list=list.filter(a=>a.role===roleFilter);
+  if(search) list=list.filter(a=>(a.nom||'').toLowerCase().includes(search)||(a.email||'').toLowerCase().includes(search));
+  document.getElementById('badge-agents').textContent=list.length;
+  const el=document.getElementById('agents-list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">👤</div><div class="empty-text">Aucun agent trouvé</div></div>';return;}
+  el.innerHTML=list.map((a,i)=>`
+    <div class="agent-card${a.actif===false?' inactif':''}" style="animation-delay:${i*.05}s">
+      <div class="agent-avatar av-${a.role||'terrain'}">${ini(a.nom||a.email)}</div>
+      <div class="agent-info">
+        <div class="agent-name">${a.nom||a.email||'—'} ${a.actif===false?'<span class="inactif-tag">INACTIF</span>':''}</div>
+        <div class="agent-meta">
+          <span class="role-badge rb-${a.role||'terrain'}">${rlabel(a.role)}</span>
+          ${a.code_acces?`<span class="agent-code">${a.code_acces}</span>`:''}
+          ${a.zone?`<span>📍 ${a.zone}</span>`:''}
+        </div>
+        <div class="agent-meta" style="margin-top:3px;font-size:10px">
+          ${a.email||''} ${a.telephone?'· '+a.telephone:''}
+        </div>
+      </div>
+      <div class="agent-actions">
+        ${a.actif===false
+          ?`<button class="btn-success" data-uid="${a.id}">🔓 Réactiver</button>`
+          :`<button class="btn-danger" data-uid="${a.id}" data-nom="${esc(a.nom||a.email)}">🔒 Désactiver</button>`
+        }
+      </div>
+    </div>`).join('');
+
+  // Events
+  el.querySelectorAll('.btn-danger').forEach(btn=>btn.onclick=()=>openDesact(btn.dataset.uid, btn.dataset.nom));
+  el.querySelectorAll('.btn-success').forEach(btn=>btn.onclick=()=>reactivate(btn.dataset.uid));
+}
+
+document.getElementById('agent-search').oninput=()=>renderAgents();
+document.querySelectorAll('.filter-chip[data-role]').forEach(c=>c.onclick=()=>{
+  document.querySelectorAll('.filter-chip[data-role]').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active'); roleFilter=c.dataset.role; renderAgents();
+});
+
+// ── DÉSACTIVER ──
+function openDesact(uid, nom){
+  desactUid=uid;
+  document.getElementById('modal-desact-label').textContent=`Voulez-vous désactiver ${nom} ?`;
+  document.getElementById('modal-desact').classList.add('open');
+}
+document.getElementById('btn-cancel-desact').onclick=()=>document.getElementById('modal-desact').classList.remove('open');
+document.getElementById('btn-confirm-desact').onclick=async()=>{
+  if(!desactUid) return;
+  try{
+    await updateDoc(doc(db,'agents',desactUid),{actif:false});
+    toast('🔒 Agent désactivé'); document.getElementById('modal-desact').classList.remove('open');
+    await loadAgents();
+  }catch(e){toast('❌ '+e.message);}
+};
+document.getElementById('modal-desact').onclick=e=>{if(e.target===e.currentTarget) e.currentTarget.classList.remove('open');};
+
+async function reactivate(uid){
+  try{await updateDoc(doc(db,'agents',uid),{actif:true});toast('🔓 Agent réactivé');await loadAgents();}
+  catch(e){toast('❌ '+e.message);}
+}
+
+// ── NOUVEAU COMPTE ──
+document.getElementById('new-role').onchange=()=>{
+  const r=document.getElementById('new-role').value;
+  document.getElementById('zone-field').style.display=r==='livreur'?'block':'none';
+  document.getElementById('code-box').style.display='none';
+  document.getElementById('btn-creer').disabled=true;
+  document.getElementById('new-email').value='';
+  genCode=''; genEmail='';
+};
+
+document.getElementById('btn-gen').onclick=async()=>{
+  const nom=document.getElementById('new-nom').value.trim();
+  const role=document.getElementById('new-role').value;
+  if(!nom){showErr('Entrez le nom complet.');return;}
+  if(!role){showErr('Choisissez un rôle.');return;}
+  showErr('');
+
+  const pfx={livreur:'LI',comptable:'CO',stats:'ST',comm:'CM',terrain:'TE'}[role];
+  const existing=agents.filter(a=>a.role===role&&a.code_acces);
+  let max=0;
+  existing.forEach(a=>{const m=(a.code_acces||'').match(/\d+/);if(m)max=Math.max(max,+m[0]);});
+  const num=String(max+1).padStart(2,'0');
+  const ltr=String.fromCharCode(65+Math.floor(Math.random()*26));
+  genCode=`${pfx}${num}${ltr}`;
+
+  const slug=nom.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'.');
+  genEmail=`${slug}@omniservicetg.com`;
+
+  document.getElementById('code-display').textContent=genCode;
+  document.getElementById('code-box').style.display='block';
+  document.getElementById('new-email').value=genEmail;
+  document.getElementById('btn-creer').disabled=false;
+};
+
+document.getElementById('btn-creer').onclick=async()=>{
+  const nom=document.getElementById('new-nom').value.trim();
+  const tel=document.getElementById('new-tel').value.trim();
+  const role=document.getElementById('new-role').value;
+  const zone=document.getElementById('new-zone').value.trim();
+  if(!nom||!role||!genCode){showErr('Complétez tous les champs et générez le code.');return;}
+  document.getElementById('btn-creer').disabled=true;
+  document.getElementById('btn-creer').textContent='Création…';
+  try{
+    const cred=await createUserWithEmailAndPassword(auth, genEmail, genCode);
+    await setDoc(doc(db,'agents',cred.user.uid),{
+      uid:cred.user.uid, nom, telephone:tel||null, role,
+      email:genEmail, code_acces:genCode, zone:zone||null,
+      actif:true, createdAt:serverTimestamp(),
+      derniere_connexion:null, en_ligne:false
+    });
+    document.getElementById('create-ok').innerHTML=`
+      ✅ Compte créé !<br/>
+      <b>Email :</b> ${genEmail}<br/>
+      <b>Code d'accès :</b> <span style="font-family:monospace;font-size:16px;color:var(--teal);letter-spacing:2px">${genCode}</span><br/>
+      <span style="color:var(--rose);font-size:11px;display:block;margin-top:4px">⚠️ La création vous déconnecte — reconnectez-vous avec vos identifiants RH dans 5s.</span>`;
+    document.getElementById('create-ok').style.display='block';
+    showErr('');
+    // Reset
+    ['new-nom','new-tel','new-zone','new-email'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('new-role').value='';
+    document.getElementById('code-box').style.display='none';
+    genCode=''; genEmail='';
+    await loadAgents();
+    setTimeout(()=>signOut(auth),5000);
+  }catch(e){
+    showErr('❌ '+(e.code==='auth/email-already-in-use'?'Cet email est déjà utilisé.':e.message));
+    document.getElementById('btn-creer').disabled=false;
+    document.getElementById('btn-creer').textContent='✅ Créer le compte';
+  }
+};
+function showErr(msg){const e=document.getElementById('create-err');e.textContent=msg;e.style.display=msg?'block':'none';}
+
+// ── COMMANDES ──
+function renderCommandes(){
+  let list=commandes;
+  if(cmdFilter==='attente') list=list.filter(c=>!c.livreur_id);
+  if(cmdFilter==='encours') list=list.filter(c=>c.livreur_id&&c.statut!=='livre'&&c.statut!=='Livré');
+  const el=document.getElementById('commandes-list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Aucune commande</div></div>';return;}
+  const livreurs=agents.filter(a=>a.role==='livreur'&&a.actif!==false);
+  el.innerHTML=list.map((c,i)=>{
+    const statut=c.statut||'en_attente';
+    const date=c.createdAt?.toDate?c.createdAt.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}):'';
+    const opts=livreurs.map(l=>`<option value="${l.id}"${c.livreur_id===l.id?' selected':''}>${l.nom||l.email}</option>`).join('');
+    const scls=statut==='livre'||statut==='Livré'?'s-livre':statut==='en_cours'||statut==='En cours'?'s-encours':'s-attente';
+    return `<div class="commande-card" style="animation-delay:${i*.04}s">
+      <div class="cmd-top">
+        <div>
+          <div class="cmd-id">#${c.id.slice(-6).toUpperCase()} · ${date}</div>
+          <div class="cmd-client">${c.client_nom||c.nom_client||'Client'}</div>
+          <div class="cmd-detail">${c.service||''} ${c.zone?'· '+c.zone:''}</div>
+        </div>
+        <span class="status-badge ${scls}">${slabel(statut)}</span>
+      </div>
+      <div class="cmd-footer">
+        <select class="assign-select" id="sel-${c.id}">
+          <option value="">— Assigner livreur —</option>${opts}
+        </select>
+        <button class="btn-assign" data-cmd="${c.id}">✅ Assigner</button>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.btn-assign').forEach(btn=>btn.onclick=()=>assigner(btn.dataset.cmd));
+}
+
+document.querySelectorAll('.filter-chip[data-cstatus]').forEach(c=>c.onclick=()=>{
+  document.querySelectorAll('.filter-chip[data-cstatus]').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active'); cmdFilter=c.dataset.cstatus; renderCommandes();
+});
+
+async function assigner(cmdId){
+  const sel=document.getElementById('sel-'+cmdId);
+  const lid=sel.value;
+  if(!lid){toast('⚠️ Sélectionnez un livreur');return;}
+  const livreur=agents.find(a=>a.id===lid);
+  try{
+    await updateDoc(doc(db,'commandes',cmdId),{
+      livreur_id:lid, livreur_nom:livreur?.nom||livreur?.email||'',
+      statut:'en_cours', assigned_at:serverTimestamp()
+    });
+    toast('✅ Livreur assigné');
+    await loadCommandes();
+  }catch(e){toast('❌ '+e.message);}
+}
+
+// ── PERFORMANCES ──
+function renderPerf(){
+  const el=document.getElementById('perf-list');
+  const livreurs=agents.filter(a=>a.role==='livreur');
+  if(!livreurs.length){el.innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">Aucun livreur enregistré</div></div>';return;}
+  const now=new Date(); let since=new Date(0);
+  if(perfPeriod==='semaine'){since=new Date(now);since.setDate(since.getDate()-7);}
+  if(perfPeriod==='mois'){since=new Date(now);since.setDate(1);since.setHours(0,0,0,0);}
+  const counts={};
+  livreurs.forEach(l=>counts[l.id]=0);
+  commandes.forEach(c=>{
+    if(!c.livreur_id||counts[c.livreur_id]===undefined) return;
+    if(perfPeriod!=='total'){
+      const t=c.assigned_at?.toDate?c.assigned_at.toDate():new Date(c.assigned_at||0);
+      if(t<since) return;
+    }
+    counts[c.livreur_id]++;
+  });
+  const sorted=livreurs.map(l=>({...l,count:counts[l.id]||0})).sort((a,b)=>b.count-a.count);
+  const max=sorted[0]?.count||1;
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML=sorted.map((l,i)=>`
+    <div class="perf-item">
+      <div class="perf-top">
+        <div class="perf-name">${medals[i]||''} ${l.nom||l.email}</div>
+        <div class="perf-count">${l.count} livraison${l.count!==1?'s':''}</div>
+      </div>
+      <div class="perf-bg"><div class="perf-bar" style="width:${max>0?Math.round(l.count/max*100):0}%"></div></div>
+    </div>`).join('');
+}
+
+document.querySelectorAll('.filter-chip[data-period]').forEach(c=>c.onclick=()=>{
+  document.querySelectorAll('.filter-chip[data-period]').forEach(x=>x.classList.remove('active'));
+  c.classList.add('active'); perfPeriod=c.dataset.period; renderPerf();
+});
+
+// ── ZONES ──
+function renderZones(){
+  const livreurs=agents.filter(a=>a.role==='livreur'&&a.actif!==false);
+  const el=document.getElementById('zones-list');
+  if(!livreurs.length){el.innerHTML='<div class="empty"><div class="empty-icon">🗺️</div><div class="empty-text">Aucun livreur enregistré</div></div>';return;}
+  const zones={};
+  livreurs.forEach(l=>{const z=l.zone||'(Zone non définie)';if(!zones[z])zones[z]=[];zones[z].push(l);});
+  el.innerHTML=Object.entries(zones).map(([z,arr])=>`
+    <div class="zone-card">
+      <div class="zone-head"><div class="zone-name">📍 ${z}</div><div class="zone-count">${arr.length} livreur${arr.length>1?'s':''}</div></div>
+      <div class="zone-tags">${arr.map(a=>`<span class="zone-tag">${a.nom||a.email}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+function populateLivreurSel(){
+  const sel=document.getElementById('zone-agent-sel');
+  const livreurs=agents.filter(a=>a.role==='livreur');
+  sel.innerHTML='<option value="">— Sélectionner un livreur —</option>'+livreurs.map(l=>`<option value="${l.id}">${l.nom||l.email}</option>`).join('');
+}
+
+document.getElementById('btn-zone').onclick=async()=>{
+  const uid=document.getElementById('zone-agent-sel').value;
+  const z=document.getElementById('zone-val').value.trim();
+  if(!uid||!z){toast('⚠️ Sélectionnez un livreur et entrez une zone');return;}
+  try{
+    await updateDoc(doc(db,'agents',uid),{zone:z});
+    toast('✅ Zone mise à jour');
+    document.getElementById('zone-val').value='';
+    await loadAgents(); renderZones();
+  }catch(e){toast('❌ '+e.message);}
+};
+
+// ── UTILS ──
+function ini(name='?'){return (name+'').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'?';}
+function rlabel(r){return{livreur:'🚚 Livreur',comptable:'💰 Comptable',stats:'📊 Stats',comm:'📣 Comm',terrain:'🧹 Terrain',rh:'👔 RH',admin:'⚙️ Admin'}[r]||r||'—';}
+function slabel(s){return{en_attente:'En attente','En attente':'En attente',en_cours:'En cours','En cours':'En cours',livre:'Livré','Livré':'Livré'}[s]||s;}
+function esc(s){return (s+'').replace(/['"<>]/g,c=>({'\'':'&#39;','"':'&quot;','<':'&lt;','>':'&gt;'}[c]));}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+</script>
+</body>
+</html>
