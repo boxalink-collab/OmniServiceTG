@@ -302,7 +302,23 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
 .svc-tabs{display:flex;gap:6px;padding:14px 20px 0;flex-wrap:wrap}
 .svc-tab{padding:8px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;color:var(--mid);transition:all .2s;background:var(--bg)}
 .svc-tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
-/* ── PARTENAIRES ── */
+/* ── RESTAURANTS ── */
+.rst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px}
+.rst-admin-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.rst-admin-img{height:100px;background:linear-gradient(135deg,#1E6FBE,#0d3d6e);display:flex;align-items:center;justify-content:center;font-size:44px;position:relative;overflow:hidden}
+.rst-admin-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rst-admin-body{padding:12px 14px}
+.rst-admin-name{font-size:14px;font-weight:700;color:var(--dark);margin-bottom:3px}
+.rst-admin-spec{font-size:11px;color:var(--blue);margin-bottom:2px;font-weight:600}
+.rst-admin-loc{font-size:11px;color:var(--light)}
+.rst-admin-footer{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid var(--border)}
+.rst-menu-btn{background:var(--blue-s);color:var(--blue);border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif}
+.rst-menu-btn:hover{background:var(--blue);color:#fff}
+/* ── MENUS (articles d'un restaurant spécifique) ── */
+.menu-panel-hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg)}
+.menu-back-btn{background:transparent;border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:'Poppins',sans-serif;color:var(--mid)}
+.menu-back-btn:hover{background:#fff}
+
 .partner-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
 .partner-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)}
 .partner-img{height:140px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:40px;overflow:hidden}
@@ -485,6 +501,8 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
       <button class="sb-item" onclick="showSection('stats',this)"><span class="sb-ico">📊</span>Statistiques</button>
       <div class="sb-sec">Catalogue</div>
       <button class="sb-item" onclick="showSection('articles',this)"><span class="sb-ico">🏷️</span>Articles &amp; Prix</button>
+      <button class="sb-item" onclick="showSection('restaurants',this)"><span class="sb-ico">🍽️</span>Restaurants</button>
+      <button class="sb-item" onclick="showSection('kits',this)"><span class="sb-ico">🎁</span>Kits &amp; PACKS</button>
       <button class="sb-item" onclick="showSection('partenaires',this)"><span class="sb-ico">🤝</span>Publications Partenaires</button>
       <div class="sb-sec">Réglages</div>
       <button class="sb-item" onclick="showSection('settings',this)"><span class="sb-ico">⚙️</span>Paramètres</button>
@@ -567,7 +585,6 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
         <div class="articles-panel">
           <div class="svc-tabs">
             <button class="svc-tab on" onclick="loadArticles('food',this)">🥘 Alimentation</button>
-            <button class="svc-tab" onclick="loadArticles('restaurant',this)">🍽️ Restauration</button>
             <button class="svc-tab" onclick="loadArticles('clothes',this)">👗 Prêt-à-porter</button>
           </div>
           <div class="panel-hdr" style="margin-top:0;border-top:1px solid var(--border)">
@@ -577,6 +594,78 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
           <div id="articles-table">
             <div class="art-table-row art-table-head"><div></div><div>Article</div><div>Prix</div><div>Description</div><div>Dispo</div><div>Actions</div></div>
             <div style="text-align:center;padding:30px;color:var(--light)"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ RESTAURANTS ══ -->
+      <div id="section-restaurants" style="display:none">
+        <div class="pg-title">Restaurants</div>
+        <div class="pg-sub">Gérez les restaurants partenaires et leurs menus</div>
+
+        <!-- Vue : liste des restaurants -->
+        <div id="rst-view-list">
+          <button class="add-btn" onclick="openRestaurantModal()" style="margin-bottom:16px">+ Ajouter un restaurant</button>
+          <div class="rst-grid" id="rst-grid">
+            <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--light)"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Vue : menus d'un restaurant -->
+        <div id="rst-view-menus" style="display:none">
+          <div class="menu-panel-hdr">
+            <button class="menu-back-btn" onclick="showRstView('list')">← Retour</button>
+            <div id="menu-rst-emoji" style="font-size:26px"></div>
+            <div>
+              <div id="menu-rst-name" style="font-size:14px;font-weight:700;color:var(--dark)"></div>
+              <div style="font-size:11px;color:var(--light)">Gestion des plats &amp; menus</div>
+            </div>
+          </div>
+          <div class="articles-panel" style="border-radius:0 0 16px 16px">
+            <div class="panel-hdr" style="margin-top:0">
+              <div class="panel-title" id="menu-panel-title">Plats du restaurant</div>
+              <button class="add-btn" onclick="openMenuArticleModal()">+ Ajouter un plat</button>
+            </div>
+            <div id="menu-articles-table">
+              <div class="art-table-row art-table-head"><div></div><div>Plat</div><div>Prix</div><div>Description</div><div>Dispo</div><div>Actions</div></div>
+              <div style="text-align:center;padding:30px;color:var(--light)"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ KITS & PACKS ══ -->
+      <div id="section-kits" style="display:none">
+        <div class="pg-title">Kits &amp; PACKS</div>
+        <div class="pg-sub">Créez des associations d'articles prêtes à commander par les clients</div>
+
+        <!-- Vue : liste des kits -->
+        <div id="kits-view-list">
+          <button class="add-btn" onclick="openKitModal()" style="margin-bottom:16px">+ Créer un Kit/PACK</button>
+          <div class="rst-grid" id="kits-admin-grid">
+            <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--light)"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Vue : articles d'un kit -->
+        <div id="kits-view-articles" style="display:none">
+          <div class="menu-panel-hdr">
+            <button class="menu-back-btn" onclick="showKitView('list')">&#8592; Retour</button>
+            <div id="kit-detail-emoji" style="font-size:26px">&#127873;</div>
+            <div>
+              <div id="kit-detail-name" style="font-size:14px;font-weight:700;color:var(--dark)">Kit</div>
+              <div style="font-size:11px;color:var(--light)">Articles inclus dans ce kit</div>
+            </div>
+          </div>
+          <div class="articles-panel" style="border-radius:0 0 16px 16px">
+            <div class="panel-hdr" style="margin-top:0">
+              <div class="panel-title" id="kit-articles-panel-title">Articles du Kit</div>
+              <button class="add-btn" onclick="openKitArticleModal()">+ Ajouter un article</button>
+            </div>
+            <div id="kit-articles-table">
+              <div class="art-table-row art-table-head"><div></div><div>Article</div><div>Qte / Unite</div><div>Prix unit.</div><div>Actions</div></div>
+              <div style="text-align:center;padding:30px;color:var(--light)"><div class="spinner"></div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -637,6 +726,94 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
   </div>
 </div>
 
+<!-- Modal Restaurant -->
+<div class="modal-overlay" id="rst-modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('rst-modal').classList.remove('show')">✕</button>
+    <div class="modal-title" id="rst-modal-title">Ajouter un restaurant</div>
+    <input type="hidden" id="rst-id"/>
+    <div style="display:grid;grid-template-columns:74px 1fr;gap:10px">
+      <div>
+        <label class="f-label">Emoji</label>
+        <input type="text" class="f-inp" id="rst-emoji" placeholder="🍽️" maxlength="4"/>
+      </div>
+      <div>
+        <label class="f-label">Nom du restaurant *</label>
+        <input type="text" class="f-inp" id="rst-nom" placeholder="Ex : Le Saveur d'Afrique"/>
+      </div>
+    </div>
+    <label class="f-label">Spécialités *</label>
+    <input type="text" class="f-inp" id="rst-specialites" placeholder="Ex : Cuisine togolaise, grillades..."/>
+    <label class="f-label">Localité *</label>
+    <input type="text" class="f-inp" id="rst-localite" placeholder="Ex : Adidogomé, Lomé"/>
+    <label class="f-label">Description</label>
+    <textarea class="f-inp" id="rst-description" rows="3" placeholder="Décrivez le restaurant en quelques mots..." style="resize:vertical"></textarea>
+    <label class="f-label">URL de l'image (optionnel)</label>
+    <input type="url" class="f-inp" id="rst-img" placeholder="https://..."/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label class="f-label">Ordre d'affichage</label>
+        <input type="number" class="f-inp" id="rst-ordre" placeholder="1" value="1"/>
+      </div>
+      <div>
+        <label class="f-label">Statut</label>
+        <select class="f-sel" id="rst-actif">
+          <option value="1">✅ Actif (visible)</option>
+          <option value="0">🙈 Masqué</option>
+        </select>
+      </div>
+    </div>
+    <button class="modal-save-btn" id="rst-save-btn" onclick="saveRestaurant()">💾 Enregistrer le restaurant</button>
+  </div>
+</div>
+
+<!-- Modal Plat / Menu du restaurant -->
+<div class="modal-overlay" id="menu-art-modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('menu-art-modal').classList.remove('show')">✕</button>
+    <div class="modal-title" id="menu-art-modal-title">Ajouter un plat</div>
+    <input type="hidden" id="menu-art-id"/>
+    <div style="display:grid;grid-template-columns:74px 1fr;gap:10px">
+      <div>
+        <label class="f-label">Emoji</label>
+        <input type="text" class="f-inp" id="menu-art-emoji" placeholder="🍽️" maxlength="4"/>
+      </div>
+      <div>
+        <label class="f-label">Nom du plat *</label>
+        <input type="text" class="f-inp" id="menu-art-name" placeholder="Ex : Riz sauce arachide"/>
+      </div>
+    </div>
+    <label class="f-label">Description</label>
+    <input type="text" class="f-inp" id="menu-art-desc" placeholder="Ex : Plat traditionnel copieux"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label class="f-label">Prix (FCFA) *</label>
+        <input type="number" class="f-inp" id="menu-art-price" placeholder="2500"/>
+      </div>
+      <div>
+        <label class="f-label">Unité</label>
+        <input type="text" class="f-inp" id="menu-art-unit" placeholder="plat, portion, pièce…"/>
+      </div>
+    </div>
+    <label class="f-label">URL de l'image (optionnel)</label>
+    <input type="url" class="f-inp" id="menu-art-img" placeholder="https://..."/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label class="f-label">Ordre d'affichage</label>
+        <input type="number" class="f-inp" id="menu-art-ordre" placeholder="1" value="1"/>
+      </div>
+      <div>
+        <label class="f-label">Disponibilité</label>
+        <select class="f-sel" id="menu-art-stock">
+          <option value="en_stock">✅ En stock</option>
+          <option value="epuise">❌ Épuisé</option>
+        </select>
+      </div>
+    </div>
+    <button class="modal-save-btn" id="menu-art-save-btn" onclick="saveMenuArticle()">💾 Enregistrer le plat</button>
+  </div>
+</div>
+
 <!-- Modal Article -->
 <div class="modal-overlay" id="art-modal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal">
@@ -689,7 +866,100 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
   </div>
 </div>
 
-<!-- Modal Partenaire -->
+<!-- Modal Kit/PACK (infos générales seulement) -->
+<div class="modal-overlay" id="kit-modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="max-width:500px">
+    <button class="modal-close" onclick="document.getElementById('kit-modal').classList.remove('show')">&#x2715;</button>
+    <div class="modal-title" id="kit-modal-title">Creer un Kit/PACK</div>
+    <input type="hidden" id="kit-id"/>
+
+    <div id="kit-std-info" style="display:none;background:linear-gradient(135deg,#E3F2FD,#EDE7F6);border:1.5px solid #90CAF9;border-radius:11px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1A237E;line-height:1.6">
+      &#128204; <strong>Kit standard</strong> - Vos modifications s'appliqueront cote client et remplaceront la version par defaut.
+    </div>
+
+    <div style="display:grid;grid-template-columns:74px 1fr;gap:10px">
+      <div>
+        <label class="f-label">Emoji</label>
+        <input type="text" class="f-inp" id="kit-emoji" placeholder="&#127873;" maxlength="4"/>
+      </div>
+      <div>
+        <label class="f-label">Nom du Kit *</label>
+        <input type="text" class="f-inp" id="kit-nom" placeholder="Ex : Kit Repas Semaine"/>
+      </div>
+    </div>
+    <label class="f-label">Description</label>
+    <textarea class="f-inp" id="kit-description" rows="2" placeholder="Decrivez ce que contient ce kit..." style="resize:vertical"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label class="f-label">Categorie</label>
+        <select class="f-sel" id="kit-categorie">
+          <option value="Alimentation">&#129374; Alimentation</option>
+          <option value="Restauration">&#127869;&#65039; Restauration</option>
+          <option value="Pret-a-porter">&#128161; Pret-a-porter</option>
+          <option value="Nettoyage">&#129529; Nettoyage</option>
+          <option value="Evenement">&#127881; Evenement</option>
+          <option value="Mixte">&#128230; Mixte</option>
+        </select>
+      </div>
+      <div>
+        <label class="f-label">Prix total (FCFA) *</label>
+        <input type="number" class="f-inp" id="kit-prix" placeholder="Ex : 28500"/>
+      </div>
+    </div>
+    <label class="f-label">URL de l'image (optionnel)</label>
+    <input type="url" class="f-inp" id="kit-img" placeholder="https://..."/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label class="f-label">Ordre d'affichage</label>
+        <input type="number" class="f-inp" id="kit-ordre" value="1"/>
+      </div>
+      <div>
+        <label class="f-label">Statut</label>
+        <select class="f-sel" id="kit-actif">
+          <option value="1">&#x2705; Actif (visible)</option>
+          <option value="0">&#x1F648; Masque</option>
+        </select>
+      </div>
+    </div>
+    <button class="modal-save-btn" id="kit-save-btn" onclick="saveKit()">&#x1F4BE; Enregistrer le Kit</button>
+  </div>
+</div>
+
+<!-- Modal Article d'un Kit -->
+<div class="modal-overlay" id="kit-art-modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal" style="max-width:460px">
+    <button class="modal-close" onclick="document.getElementById('kit-art-modal').classList.remove('show')">&#x2715;</button>
+    <div class="modal-title" id="kit-art-modal-title">Ajouter un article au Kit</div>
+    <input type="hidden" id="kit-art-id"/>
+    <div style="display:grid;grid-template-columns:74px 1fr;gap:10px">
+      <div>
+        <label class="f-label">Emoji</label>
+        <input type="text" class="f-inp" id="kit-art-emoji" placeholder="&#128230;" maxlength="4"/>
+      </div>
+      <div>
+        <label class="f-label">Nom de l'article *</label>
+        <input type="text" class="f-inp" id="kit-art-name" placeholder="Ex : Tilapia frais"/>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label class="f-label">Quantite</label>
+        <input type="number" class="f-inp" id="kit-art-qty" placeholder="1" min="1" value="1"/>
+      </div>
+      <div>
+        <label class="f-label">Unite</label>
+        <input type="text" class="f-inp" id="kit-art-unit" placeholder="kg, piece, plat..."/>
+      </div>
+    </div>
+    <div>
+      <label class="f-label">Prix unitaire (FCFA)</label>
+      <input type="number" class="f-inp" id="kit-art-prix" placeholder="0" min="0"/>
+    </div>
+    <button class="modal-save-btn" id="kit-art-save-btn" onclick="saveKitArticle()">&#x1F4BE; Enregistrer l'article</button>
+  </div>
+</div>
+
+
 <div class="modal-overlay" id="partner-modal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="modal" style="max-width:500px">
     <button class="modal-close" onclick="document.getElementById('partner-modal').classList.remove('show')">✕</button>
@@ -807,7 +1077,7 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
 <script type="module">
 import { initializeApp }            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, getDocs, doc,
-         addDoc, updateDoc, deleteDoc, orderBy,
+         addDoc, updateDoc, deleteDoc, setDoc, orderBy,
          query, where, serverTimestamp }
                                     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut,
@@ -1397,6 +1667,381 @@ window.deleteArticle=async function(id){
     toast("🗑 Article supprimé définitivement","#C62828");
   }catch(e){toast("❌ Erreur","#C62828");}
 };
+// ════ RESTAURANTS ════
+const DEFAULT_RESTAURANTS_ADMIN = [
+  {id:'rst1', nom:'Le Saveur d\'Afrique',   specialites:'Cuisine togolaise traditionnelle', localite:'Adidogomé, Lomé',     emoji:'🥘', description:'Spécialiste du fufu, du riz sauce et des plats locaux authentiques.'},
+  {id:'rst2', nom:'Chez Maman Akossiwa',    specialites:'Plats locaux & traiteur',         localite:'Bè Kpota, Lomé',       emoji:'🍲', description:'Cuisine familiale, plats du jour et service traiteur pour événements.'},
+  {id:'rst3', nom:'Grill Palace',           specialites:'Grillades & brochettes',           localite:'Kodjoviakopé, Lomé',   emoji:'🔥', description:'Brochettes mixtes, poulet grillé, côtes de bœuf marinées.'},
+  {id:'rst4', nom:'La Terrasse Ivoirienne', specialites:'Attiéké, alloco & poissons',      localite:'Agbalépédogan, Lomé',  emoji:'🐠', description:'Spécialités ivoiriennes, attiéké poisson, alloco banane.'},
+];
+
+const DEFAULT_MENUS_ADMIN = {
+  rst1:[
+    {id:'rst1_m1',name:'Riz sauce arachide',desc:'Plat traditionnel copieux',price:2500,unit:'plat',emoji:'🍚'},
+    {id:'rst1_m2',name:'Fufu + soupe de viande',desc:'Fufu de manioc, bouillon maison',price:3000,unit:'plat',emoji:'🍲'},
+    {id:'rst1_m3',name:'Akumé + sauce gombo',desc:'Pâte de maïs, sauce gombo',price:2200,unit:'plat',emoji:'🌽'},
+    {id:'rst1_m4',name:'Plateau traiteur 10 pers.',desc:'Pour événements et réceptions',price:35000,unit:'plateau',emoji:'🎉'},
+  ],
+  rst2:[
+    {id:'rst2_m1',name:'Plat du jour',desc:'Selon arrivage, servi avec boisson',price:2000,unit:'plat',emoji:'🍱'},
+    {id:'rst2_m2',name:'Poulet yassa',desc:'Mariné aux oignons et citron',price:4500,unit:'plat',emoji:'🍗'},
+    {id:'rst2_m3',name:'Riz sauce tomate',desc:'Sauce tomate maison, légumes',price:2000,unit:'plat',emoji:'🍅'},
+    {id:'rst2_m4',name:'Traiteur événement',desc:'Devis sur mesure pour vos événements',price:50000,unit:'forfait',emoji:'🥂'},
+  ],
+  rst3:[
+    {id:'rst3_m1',name:'Brochettes mixtes',desc:'Bœuf, poulet, foie grillés',price:2000,unit:'portion',emoji:'🍢'},
+    {id:'rst3_m2',name:'Poulet grillé entier',desc:'Avec frites et salade',price:8000,unit:'pièce',emoji:'🐔'},
+    {id:'rst3_m3',name:'Côtes de bœuf',desc:'Marinées au poivre, grillées au feu de bois',price:5500,unit:'portion',emoji:'🥩'},
+    {id:'rst3_m4',name:'Poisson braisé',desc:'Tilapia grillé entier avec garniture',price:3500,unit:'pièce',emoji:'🐟'},
+  ],
+  rst4:[
+    {id:'rst4_m1',name:'Attiéké poisson',desc:'Semoule de manioc + poisson braisé',price:2800,unit:'plat',emoji:'🐠'},
+    {id:'rst4_m2',name:'Alloco + poulet',desc:'Banane plantain frite, poulet braisé',price:3200,unit:'plat',emoji:'🍌'},
+    {id:'rst4_m3',name:'Garba',desc:'Attiéké + thon frit, spécialité ivoirienne',price:2500,unit:'plat',emoji:'🍽️'},
+    {id:'rst4_m4',name:'Placali + sauce graine',desc:'Pâte de manioc, sauce palmiste',price:2800,unit:'plat',emoji:'🌴'},
+  ],
+};
+
+let restaurantsCache = [];
+let currentRst       = null; // restaurant en cours d'édition menus
+let editingRstId     = null;
+let menuArticlesCache= [];
+let editingMenuArtId = null;
+
+function showRstView(v) {
+  document.getElementById('rst-view-list').style.display  = v==='list'  ? 'block' : 'none';
+  document.getElementById('rst-view-menus').style.display = v==='menus' ? 'block' : 'none';
+}
+window.showRstView = showRstView;
+
+window.loadRestaurants = async function() {
+  const grid = document.getElementById('rst-grid');
+  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--light)"><div class="spinner"></div></div>`;
+  try {
+    let snap;
+    try { snap = await getDocs(query(collection(db,'restaurants'), orderBy('ordre','asc'))); }
+    catch(_) { snap = await getDocs(collection(db,'restaurants')); }
+    restaurantsCache = snap.docs.map(d => ({id:d.id, _src:'db', ...d.data()}));
+  } catch(e) { restaurantsCache = []; }
+
+  // Fusionner avec standards
+  const dbIds = new Set(restaurantsCache.map(r=>r.id));
+  const stds = DEFAULT_RESTAURANTS_ADMIN.filter(r=>!dbIds.has(r.id)).map(r=>({...r,_src:'std',actif:true}));
+  const all = [...restaurantsCache, ...stds];
+  all.sort((a,b)=>(a.ordre??99)-(b.ordre??99)||(a.nom||'').localeCompare(b.nom||''));
+  renderRestaurantsGrid(all);
+};
+
+function renderRestaurantsGrid(list) {
+  const grid = document.getElementById('rst-grid');
+  if (!list.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--light)">Aucun restaurant. Ajoutez-en via le bouton ci-dessus.</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(r => {
+    const isStd = r._src === 'std';
+    const isHidden = r.actif === false;
+    return `
+    <div class="rst-admin-card">
+      <div class="rst-admin-img">
+        ${r.imageUrl ? `<img src="${r.imageUrl}" alt="${r.nom||''}" onerror="this.style.display='none'"/>` : ''}
+        <span style="${r.imageUrl?'display:none':''}">${r.emoji||'🍽️'}</span>
+        ${isStd ? `<div style="position:absolute;top:8px;left:8px;background:rgba(30,111,190,.9);color:#fff;font-size:8px;font-weight:800;padding:3px 8px;border-radius:999px;letter-spacing:.5px">STD</div>` : ''}
+        ${isHidden ? `<div style="position:absolute;top:8px;right:8px;background:rgba(198,40,40,.9);color:#fff;font-size:8px;font-weight:800;padding:3px 8px;border-radius:999px">MASQUÉ</div>` : ''}
+      </div>
+      <div class="rst-admin-body">
+        <div class="rst-admin-name">${r.nom||'Restaurant'}</div>
+        <div class="rst-admin-spec">🍴 ${r.specialites||''}</div>
+        <div class="rst-admin-loc">📍 ${r.localite||''}</div>
+      </div>
+      <div class="rst-admin-footer">
+        <button class="rst-menu-btn" onclick="openRstMenus('${r.id}')">🍽️ Gérer les plats</button>
+        <div style="display:flex;gap:6px">
+          ${!isStd ? `<button class="art-edit" onclick="editRestaurant('${r.id}')">✏️</button>` : `<button class="art-edit" onclick="importAndEditRestaurant('${r.id}')">✏️ Modifier</button>`}
+          ${!isStd ? `<button class="art-del" onclick="deleteRestaurant('${r.id}')">🗑</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.openRestaurantModal = function() {
+  editingRstId = null;
+  document.getElementById('rst-modal-title').textContent = 'Ajouter un restaurant';
+  ['rst-id','rst-emoji','rst-nom','rst-specialites','rst-localite','rst-description','rst-img'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('rst-ordre').value = '1';
+  document.getElementById('rst-actif').value = '1';
+  document.getElementById('rst-modal').classList.add('show');
+};
+
+window.editRestaurant = function(id) {
+  const r = restaurantsCache.find(x=>x.id===id);
+  if (!r) return;
+  editingRstId = id;
+  document.getElementById('rst-modal-title').textContent = 'Modifier le restaurant';
+  document.getElementById('rst-id').value          = id;
+  document.getElementById('rst-emoji').value       = r.emoji||'';
+  document.getElementById('rst-nom').value         = r.nom||'';
+  document.getElementById('rst-specialites').value = r.specialites||'';
+  document.getElementById('rst-localite').value    = r.localite||'';
+  document.getElementById('rst-description').value = r.description||'';
+  document.getElementById('rst-img').value         = r.imageUrl||'';
+  document.getElementById('rst-ordre').value       = r.ordre||1;
+  document.getElementById('rst-actif').value       = r.actif===false ? '0' : '1';
+  document.getElementById('rst-modal').classList.add('show');
+};
+
+window.importAndEditRestaurant = async function(stdId) {
+  const r = DEFAULT_RESTAURANTS_ADMIN.find(x=>x.id===stdId);
+  if (!r) return;
+  const fsMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  await fsMod.setDoc(fsMod.doc(db,'restaurants',stdId), {
+    nom:r.nom, specialites:r.specialites, localite:r.localite,
+    description:r.description||'', emoji:r.emoji||'🍽️', imageUrl:'',
+    ordre:1, actif:true, createdAt:serverTimestamp(), updatedAt:serverTimestamp()
+  });
+  await loadRestaurants();
+  editRestaurant(stdId);
+};
+
+window.saveRestaurant = async function() {
+  const nom = document.getElementById('rst-nom').value.trim();
+  const specialites = document.getElementById('rst-specialites').value.trim();
+  const localite = document.getElementById('rst-localite').value.trim();
+  if (!nom || !localite) { toast('⚠️ Nom et localité obligatoires','#F5820A'); return; }
+  const data = {
+    nom, specialites, localite,
+    emoji:       document.getElementById('rst-emoji').value.trim()||'🍽️',
+    description: document.getElementById('rst-description').value.trim(),
+    imageUrl:    document.getElementById('rst-img').value.trim(),
+    ordre:       parseInt(document.getElementById('rst-ordre').value)||1,
+    actif:       document.getElementById('rst-actif').value === '1',
+    updatedAt:   serverTimestamp()
+  };
+  const btn = document.getElementById('rst-save-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Enregistrement...';}
+  try {
+    if (editingRstId) {
+      await updateDoc(doc(db,'restaurants',editingRstId), data);
+      toast('✅ Restaurant modifié !','#2E7D32');
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db,'restaurants'), data);
+      toast('✅ Restaurant ajouté !','#2E7D32');
+    }
+    document.getElementById('rst-modal').classList.remove('show');
+    loadRestaurants();
+  } catch(e) { toast('❌ Erreur : '+e.message,'#C62828'); }
+  finally { if(btn){btn.disabled=false;btn.textContent='💾 Enregistrer le restaurant';} }
+};
+
+window.deleteRestaurant = async function(id) {
+  if (!confirm('Supprimer ce restaurant et tous ses plats ?')) return;
+  try {
+    await deleteDoc(doc(db,'restaurants',id));
+    // Supprimer aussi les articles de ce restaurant
+    const snap = await getDocs(query(collection(db,'articles'), where('restaurantId','==',id)));
+    for (const d of snap.docs) await deleteDoc(d.ref);
+    restaurantsCache = restaurantsCache.filter(r=>r.id!==id);
+    const dbIds = new Set(restaurantsCache.map(r=>r.id));
+    const stds = DEFAULT_RESTAURANTS_ADMIN.filter(r=>!dbIds.has(r.id)).map(r=>({...r,_src:'std',actif:true}));
+    renderRestaurantsGrid([...restaurantsCache,...stds]);
+    toast('🗑 Restaurant supprimé','#C62828');
+  } catch(e) { toast('❌ Erreur : '+e.message,'#C62828'); }
+};
+
+// ── Gestion menus d'un restaurant ──
+window.openRstMenus = async function(rstId) {
+  const allRsts = [...restaurantsCache, ...DEFAULT_RESTAURANTS_ADMIN.filter(r=>!new Set(restaurantsCache.map(x=>x.id)).has(r.id))];
+  currentRst = allRsts.find(r=>r.id===rstId) || {id:rstId, nom:'Restaurant', emoji:'🍽️'};
+  document.getElementById('menu-rst-emoji').textContent = currentRst.emoji||'🍽️';
+  document.getElementById('menu-rst-name').textContent  = currentRst.nom||'Restaurant';
+  document.getElementById('menu-panel-title').textContent = `Plats — ${currentRst.nom}`;
+  showRstView('menus');
+  loadMenuArticles(rstId);
+};
+
+async function loadMenuArticles(rstId) {
+  const table = document.getElementById('menu-articles-table');
+  table.innerHTML = `<div style="text-align:center;padding:30px;color:var(--light)"><div class="spinner"></div></div>`;
+  try {
+    let snap;
+    try {
+      snap = await getDocs(query(collection(db,'articles'), where('service','==','restaurant'), where('restaurantId','==',rstId), orderBy('ordre','asc')));
+    } catch(_) {
+      snap = await getDocs(query(collection(db,'articles'), where('service','==','restaurant'), where('restaurantId','==',rstId)));
+    }
+    menuArticlesCache = snap.docs.map(d=>({id:d.id,_src:'db',...d.data()}));
+  } catch(e) { menuArticlesCache = []; }
+
+  // Fusionner avec menus standards
+  const dbIds = new Set(menuArticlesCache.map(a=>a.id));
+  const stds = (DEFAULT_MENUS_ADMIN[rstId]||[]).filter(a=>!dbIds.has(a.id)).map(a=>({...a,_src:'std',stock:'en_stock',actif:true,restaurantId:rstId}));
+  const all = [...menuArticlesCache, ...stds];
+  all.sort((a,b)=>(a.ordre??99)-(b.ordre??99)||(a.name||'').localeCompare(b.name||''));
+  renderMenuArticleTable(all);
+}
+
+function renderMenuArticleTable(all) {
+  const table = document.getElementById('menu-articles-table');
+  const head = `<div class="art-table-row art-table-head"><div></div><div>Plat</div><div>Prix</div><div>Description</div><div>Dispo</div><div>Actions</div></div>`;
+  if (!all.length) {
+    table.innerHTML = head + `<div style="text-align:center;padding:28px;color:var(--light);font-size:13px">Aucun plat. Ajoutez-en via le bouton ci-dessus.</div>`;
+    return;
+  }
+  table.innerHTML = head + all.map(a => {
+    const isStd = a._src==='std', isHidden = a.actif===false, isEpuise = a.stock==='epuise';
+    const badgeSrc = isStd ? `<span class="badge-std">STD</span>` : `<span class="badge-perso">PERSO</span>`;
+    const badgeHidden = isHidden ? `<span class="badge-masque">MASQUÉ</span>` : '';
+    const dispoHtml = isEpuise
+      ? `<button class="stock-btn btn-en-stock" onclick="setMenuStock('${a.id}','en_stock','${a._src}')">Remettre</button>`
+      : `<button class="stock-btn btn-epuise" onclick="setMenuStock('${a.id}','epuise','${a._src}')">Épuiser</button>`;
+    const actionsHtml = isStd
+      ? `<button class="art-edit" onclick="importAndEditMenu('${a.id}')">✏️ Modifier</button>
+         <button class="art-del" onclick="maskMenuDefault('${a.id}')">🙈</button>`
+      : `<button class="art-edit" onclick="editMenuArticle('${a.id}')">✏️</button>
+         ${isHidden
+           ? `<button class="stock-btn btn-afficher" style="margin-left:4px" onclick="setMenuActif('${a.id}',true)">👁</button>`
+           : `<button class="stock-btn btn-masquer" style="margin-left:4px" onclick="setMenuActif('${a.id}',false)">🙈</button>`}
+         <button class="art-del" onclick="deleteMenuArticle('${a.id}')">🗑</button>`;
+    return `<div class="art-table-row" style="${isHidden?'opacity:.5':''}">
+      <div class="art-emoji">${a.emoji||'🍽️'}</div>
+      <div><div style="font-weight:700;font-size:12px">${a.name}</div>${badgeSrc} ${badgeHidden}</div>
+      <div style="font-weight:700;font-size:12px;color:var(--blue)">${Number(a.price).toLocaleString('fr-FR')} FCFA</div>
+      <div style="font-size:11px;color:var(--light)">${a.desc||'—'}</div>
+      <div>${dispoHtml}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">${actionsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+window.openMenuArticleModal = function() {
+  editingMenuArtId = null;
+  document.getElementById('menu-art-modal-title').textContent = 'Ajouter un plat';
+  ['menu-art-id','menu-art-emoji','menu-art-name','menu-art-desc','menu-art-price','menu-art-unit','menu-art-img'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('menu-art-ordre').value = '1';
+  document.getElementById('menu-art-stock').value = 'en_stock';
+  document.getElementById('menu-art-modal').classList.add('show');
+};
+
+window.editMenuArticle = function(id) {
+  const a = menuArticlesCache.find(x=>x.id===id); if(!a) return;
+  editingMenuArtId = id;
+  document.getElementById('menu-art-modal-title').textContent = 'Modifier le plat';
+  document.getElementById('menu-art-id').value    = id;
+  document.getElementById('menu-art-emoji').value = a.emoji||'';
+  document.getElementById('menu-art-name').value  = a.name||'';
+  document.getElementById('menu-art-desc').value  = a.desc||'';
+  document.getElementById('menu-art-price').value = a.price||'';
+  document.getElementById('menu-art-unit').value  = a.unit||'';
+  document.getElementById('menu-art-img').value   = a.imageUrl||'';
+  document.getElementById('menu-art-ordre').value = a.ordre||1;
+  document.getElementById('menu-art-stock').value = a.stock||'en_stock';
+  document.getElementById('menu-art-modal').classList.add('show');
+};
+
+window.importAndEditMenu = async function(stdId) {
+  if (!currentRst) return;
+  const allStds = DEFAULT_MENUS_ADMIN[currentRst.id]||[];
+  const a = allStds.find(x=>x.id===stdId); if(!a) return;
+  const fsMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  await fsMod.setDoc(fsMod.doc(db,'articles',stdId),{
+    service:'restaurant', restaurantId:currentRst.id,
+    name:a.name, desc:a.desc||'', price:a.price, unit:a.unit||'',
+    emoji:a.emoji||'🍽️', imageUrl:'', ordre:a.ordre??99,
+    stock:'en_stock', actif:true, createdAt:serverTimestamp(), updatedAt:serverTimestamp()
+  });
+  toast('✅ Plat importé — modifiez-le','#2E7D32');
+  await loadMenuArticles(currentRst.id);
+  editMenuArticle(stdId);
+};
+
+window.maskMenuDefault = async function(stdId) {
+  if (!currentRst) return;
+  if (!confirm('Masquer ce plat standard aux clients ?')) return;
+  const allStds = DEFAULT_MENUS_ADMIN[currentRst.id]||[];
+  const a = allStds.find(x=>x.id===stdId); if(!a) return;
+  const fsMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  await fsMod.setDoc(fsMod.doc(db,'articles',stdId),{
+    service:'restaurant', restaurantId:currentRst.id,
+    name:a.name, desc:a.desc||'', price:a.price, unit:a.unit||'',
+    emoji:a.emoji||'🍽️', imageUrl:'', ordre:a.ordre??99,
+    stock:'en_stock', actif:false, createdAt:serverTimestamp(), updatedAt:serverTimestamp()
+  });
+  toast('🙈 Plat masqué','#E65100');
+  loadMenuArticles(currentRst.id);
+};
+
+window.setMenuStock = async function(id, val, src) {
+  if (src==='std') { toast('⚠️ Importez d\'abord ce plat pour modifier son stock','#F5820A'); return; }
+  try {
+    await updateDoc(doc(db,'articles',id),{stock:val,updatedAt:serverTimestamp()});
+    const a = menuArticlesCache.find(x=>x.id===id); if(a) a.stock=val;
+    const dbIds = new Set(menuArticlesCache.map(x=>x.id));
+    const stds = (DEFAULT_MENUS_ADMIN[currentRst.id]||[]).filter(a=>!dbIds.has(a.id)).map(a=>({...a,_src:'std',stock:'en_stock',actif:true}));
+    renderMenuArticleTable([...menuArticlesCache,...stds]);
+    toast(val==='epuise'?'❌ Plat épuisé':'✅ Plat remis en stock','#1A1A2E');
+  } catch(e) { toast('❌ Erreur : '+e.message,'#C62828'); }
+};
+
+window.setMenuActif = async function(id, val) {
+  try {
+    await updateDoc(doc(db,'articles',id),{actif:val,updatedAt:serverTimestamp()});
+    const a = menuArticlesCache.find(x=>x.id===id); if(a) a.actif=val;
+    const dbIds = new Set(menuArticlesCache.map(x=>x.id));
+    const stds = (DEFAULT_MENUS_ADMIN[currentRst.id]||[]).filter(a=>!dbIds.has(a.id)).map(a=>({...a,_src:'std',stock:'en_stock',actif:true}));
+    renderMenuArticleTable([...menuArticlesCache,...stds]);
+    toast(val?'👁 Plat réaffiché':'🙈 Plat masqué','#1A1A2E');
+  } catch(e) { toast('❌ Erreur : '+e.message,'#C62828'); }
+};
+
+window.saveMenuArticle = async function() {
+  if (!currentRst) { toast('❌ Aucun restaurant sélectionné','#C62828'); return; }
+  const name  = document.getElementById('menu-art-name').value.trim();
+  const price = parseFloat(document.getElementById('menu-art-price').value);
+  if (!name || isNaN(price) || price <= 0) { toast('⚠️ Nom et prix obligatoires','#F5820A'); return; }
+  const data = {
+    service: 'restaurant',
+    restaurantId: currentRst.id,
+    name, price,
+    emoji:    document.getElementById('menu-art-emoji').value.trim()||'🍽️',
+    desc:     document.getElementById('menu-art-desc').value.trim(),
+    unit:     document.getElementById('menu-art-unit').value.trim(),
+    imageUrl: document.getElementById('menu-art-img').value.trim(),
+    ordre:    parseInt(document.getElementById('menu-art-ordre').value)||1,
+    stock:    document.getElementById('menu-art-stock').value||'en_stock',
+    actif:    true,
+    updatedAt: serverTimestamp()
+  };
+  const btn = document.getElementById('menu-art-save-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Enregistrement...';}
+  try {
+    if (editingMenuArtId) {
+      await updateDoc(doc(db,'articles',editingMenuArtId), data);
+      toast('✅ Plat modifié !','#2E7D32');
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db,'articles'), data);
+      toast('✅ Plat ajouté !','#2E7D32');
+    }
+    document.getElementById('menu-art-modal').classList.remove('show');
+    loadMenuArticles(currentRst.id);
+  } catch(e) { toast('❌ Erreur : '+e.message,'#C62828'); }
+  finally { if(btn){btn.disabled=false;btn.textContent='💾 Enregistrer le plat';} }
+};
+
+window.deleteMenuArticle = async function(id) {
+  if (!confirm('Supprimer définitivement ce plat ?')) return;
+  try {
+    await deleteDoc(doc(db,'articles',id));
+    menuArticlesCache = menuArticlesCache.filter(a=>a.id!==id);
+    const dbIds = new Set(menuArticlesCache.map(x=>x.id));
+    const stds = (DEFAULT_MENUS_ADMIN[currentRst?.id]||[]).filter(a=>!dbIds.has(a.id)).map(a=>({...a,_src:'std',stock:'en_stock',actif:true}));
+    renderMenuArticleTable([...menuArticlesCache,...stds]);
+    toast('🗑 Plat supprimé','#C62828');
+  } catch(e) { toast('❌ Erreur','#C62828'); }
+};
+
 // ════ PARTENAIRES ════
 let partnersCache=[];
 window.loadPartners=async function(){
@@ -1416,8 +2061,14 @@ function renderPartners(){
     grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--light)">Aucune publication. Ajoutez-en via le bouton ci-dessus.</div>`;
     return;
   }
-  grid.innerHTML=partnersCache.map(p=>`
-    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)">
+  const promoLabels={partenaire:'PARTENAIRE OFFICIEL',sponsor:'SPONSOR',collaborateur:'COLLABORATEUR',nouveaute:'NOUVEAUTÉ',promotion:'PROMOTION',evenement:'ÉVÉNEMENT'};
+  grid.innerHTML=partnersCache.map(p=>{
+    const isHidden = p.actif === false;
+    const statutBadge = isHidden
+      ? `<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#E65100">Masqué</span>`
+      : `<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F5E9;color:var(--green)">Actif</span>`;
+    return `
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);${isHidden?'opacity:.6':''}">
       <!-- Aperçu adcard fidèle au client -->
       <div class="prev-adcard" style="border-radius:0;box-shadow:none;margin:0">
         <div class="prev-adcard-img">
@@ -1428,21 +2079,29 @@ function renderPartners(){
             : `<span class="prev-adcard-emoji">🤝</span>`}
         </div>
         <div class="prev-adcard-body">
-          <div class="prev-adcard-promo">${{partenaire:'PARTENAIRE OFFICIEL',sponsor:'SPONSOR',collaborateur:'COLLABORATEUR',nouveaute:'NOUVEAUTÉ',promotion:'PROMOTION',evenement:'ÉVÉNEMENT'}[p.promo]||'PARTENAIRE OFFICIEL'}</div>
+          <div class="prev-adcard-promo">${promoLabels[p.promo]||'PARTENAIRE OFFICIEL'}</div>
           <div class="prev-adcard-title">${p.nom||'Sans titre'}</div>
           <div class="prev-adcard-sub">${p.description||'—'}</div>
           ${p.lien?`<div class="prev-adcard-cta show">Découvrir →</div>`:''}
         </div>
       </div>
-      <!-- Actions admin -->
-      <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)">
-        <div style="font-size:10px;color:var(--light);font-weight:600">Ordre : ${p.ordre||1}${p.lien?` · <a href="${p.lien}" target="_blank" style="color:var(--blue)">🔗 Lien</a>`:''}</div>
-        <div style="display:flex;gap:7px">
+      <!-- Bandeau statut + actions admin -->
+      <div style="padding:8px 14px;display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-top:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:7px">
+          ${statutBadge}
+          <span style="font-size:10px;color:var(--light);font-weight:600">Ordre : ${p.ordre||1}</span>
+          ${p.lien?`<a href="${p.lien}" target="_blank" style="font-size:10px;color:var(--blue)">🔗 Voir le lien</a>`:''}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="art-edit" onclick="editPartner('${p.id}')">✏️ Modifier</button>
+          ${isHidden
+            ? `<button class="stock-btn btn-afficher" onclick="setPartnerActif('${p.id}',true)">👁 Afficher</button>`
+            : `<button class="stock-btn btn-masquer"  onclick="setPartnerActif('${p.id}',false)">🙈 Masquer</button>`}
           <button class="art-del" onclick="deletePartner('${p.id}')">🗑</button>
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 window.openPartnerModal=function(){
@@ -1505,6 +2164,7 @@ window.savePartner=async function(){
       await updateDoc(doc(db,'partenaires',editingPartnerId),data);
       toast("✅ Publication modifiée !","#2E7D32");
     } else {
+      data.actif=true;
       data.createdAt=serverTimestamp();
       await addDoc(collection(db,'partenaires'),data);
       toast("✅ Publication ajoutée !","#2E7D32");
@@ -1519,14 +2179,467 @@ window.deletePartner=async function(id){
   try{await deleteDoc(doc(db,'partenaires',id));partnersCache=partnersCache.filter(p=>p.id!==id);renderPartners();toast("🗑 Supprimée");}catch(e){toast("❌ Erreur","#C62828");}
 };
 
+window.setPartnerActif = async function(id, actif) {
+  try {
+    await updateDoc(doc(db,'partenaires',id), {actif, updatedAt:serverTimestamp()});
+    const p = partnersCache.find(x=>x.id===id); if(p) p.actif=actif;
+    renderPartners();
+    toast(actif ? '👁 Publication affichée' : '🙈 Publication masquée', actif ? '#2E7D32' : '#F5820A');
+  } catch(e) { toast('❌ Erreur : '+e.message,'#C62828'); }
+};
+
+// ════════════════════════════════════════
+// KITS & PACKS ADMIN
+// ════════════════════════════════════════
+
+const DEFAULT_KITS_ADMIN = [
+  { id:'kit1', nom:'Kit Repas Semaine', emoji:'🍱', description:"Tout ce qu'il faut pour nourrir votre famille pendant 7 jours",
+    prix_total:28500, categorie:'Alimentation', ordre:1,
+    articles:[
+      {emoji:'🐟', name:'Tilapia frais',      qty:2, unit:'kg',        prix:3500},
+      {emoji:'🐔', name:'Poulet fermier',      qty:2, unit:'pièces',    prix:5500},
+      {emoji:'🥬', name:'Légumes assortis',    qty:3, unit:'paniers',   prix:1500},
+      {emoji:'🍶', name:'Vin de palme',        qty:1, unit:'bidon',     prix:4000},
+      {emoji:'🫘', name:'Néré (soumbara)',     qty:2, unit:'sachets',   prix:1000},
+    ]},
+  { id:'kit2', nom:'Pack Fête & Événement', emoji:'🎉', description:'Pour vos cérémonies, mariages et réceptions (10-15 personnes)',
+    prix_total:75000, categorie:'Événement', ordre:2,
+    articles:[
+      {emoji:'🎊', name:'Plateau traiteur',   qty:1,  unit:'plateau',  prix:35000},
+      {emoji:'🍗', name:'Poulet yassa',       qty:15, unit:'plats',    prix:4500},
+      {emoji:'🍚', name:'Riz sauce arachide', qty:15, unit:'plats',    prix:2500},
+      {emoji:'🥤', name:'Boissons variées',   qty:1,  unit:'lot',      prix:8000},
+    ]},
+  { id:'kit3', nom:'Pack Mode Wax Complet', emoji:'👗', description:'Ensemble prêt-à-porter africain complet pour homme ou femme',
+    prix_total:26000, categorie:'Pret-a-porter', ordre:3,
+    articles:[
+      {emoji:'👘', name:'Boubou wax',         qty:1, unit:'pièce',    prix:12000},
+      {emoji:'👜', name:'Sac assorti',        qty:1, unit:'pièce',    prix:15000},
+      {emoji:'👡', name:'Sandales tressées',  qty:1, unit:'paire',    prix:7500},
+      {emoji:'✨', name:'Kit cosmétiques',    qty:1, unit:'kit',      prix:4500},
+    ]},
+  { id:'kit4', nom:'Kit Nettoyage Maison', emoji:'✨', description:'Service de nettoyage + fournitures pour votre domicile (60m²)',
+    prix_total:18000, categorie:'Nettoyage', ordre:4,
+    articles:[
+      {emoji:'🧹', name:'Nettoyage complet',  qty:1, unit:'prestation', prix:12000},
+      {emoji:'🧴', name:'Produits ménagers',  qty:1, unit:'kit',        prix:3500},
+      {emoji:'🦠', name:'Désinfection',       qty:1, unit:'prestation', prix:2500},
+    ]},
+];
+
+const KIT_CAT_COLORS = {
+  'Alimentation':'#FFF3E0','Restauration':'#E3F2FD','Pret-a-porter':'#FFF0F5',
+  'Nettoyage':'#F3E5F5','Événement':'#E8F5E9','Mixte':'#E8EAF0'
+};
+
+let kitsCache        = [];
+let editingKitId     = null;
+let currentKit       = null; // kit ouvert dans la vue articles
+let kitArtCache      = [];   // articles du kit courant (copies locales)
+let editingKitArtIdx = null; // index dans kitArtCache
+
+// ── Helpers ──
+function _stdKitData(k, extra={}) {
+  return {
+    nom:k.nom, emoji:k.emoji||'🎁', description:k.description||'',
+    categorie:k.categorie, prix_total:k.prix_total,
+    articles: JSON.parse(JSON.stringify(k.articles||[])),
+    imageUrl:'', ordre:k.ordre||99, actif:true, epuise:false,
+    createdAt:serverTimestamp(), updatedAt:serverTimestamp(), ...extra
+  };
+}
+
+function showKitView(v) {
+  document.getElementById('kits-view-list').style.display     = v==='list'     ? 'block' : 'none';
+  document.getElementById('kits-view-articles').style.display = v==='articles' ? 'block' : 'none';
+}
+window.showKitView = showKitView;
+
+// ── Chargement liste kits ──
+window.loadKitsAdmin = async function() {
+  const grid = document.getElementById('kits-admin-grid');
+  if (!grid) return;
+  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--light)"><div class="spinner"></div></div>`;
+  try {
+    let snap;
+    try { snap = await getDocs(query(collection(db,'kits'), orderBy('ordre','asc'))); }
+    catch(_) { snap = await getDocs(collection(db,'kits')); }
+    kitsCache = snap.docs.map(d => ({id:d.id, _src:'db', ...d.data()}));
+  } catch(e) { kitsCache = []; }
+
+  const dbIds   = new Set(kitsCache.map(k => k.id));
+  const stdKits = DEFAULT_KITS_ADMIN
+    .filter(k => !dbIds.has(k.id))
+    .map(k => ({...k, _src:'std', actif:true, epuise:false}));
+  const allKits = [...kitsCache, ...stdKits];
+  allKits.sort((a,b) => (a.ordre??99)-(b.ordre??99) || (a.nom||'').localeCompare(b.nom||''));
+  renderKitsAdmin(allKits);
+};
+
+// ── Rendu grille kits ──
+function renderKitsAdmin(allKits) {
+  const grid = document.getElementById('kits-admin-grid');
+  if (!grid) return;
+  if (!allKits || !allKits.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--light)">Aucun kit. Créez-en un via le bouton ci-dessus.</div>`;
+    return;
+  }
+  grid.innerHTML = allKits.map(k => {
+    const arts     = k.articles || [];
+    const isStd    = k._src === 'std';
+    const isHidden = k.actif   === false;
+    const isEpuise = k.epuise  === true;
+    const prixStr  = k.prix_total ? Number(k.prix_total).toLocaleString('fr-FR') + ' FCFA' : '—';
+    const catColor = KIT_CAT_COLORS[k.categorie] || '#E8F5E9';
+
+    const badgeSrc = isStd
+      ? `<span class="badge-std" title="Kit standard">STD</span>`
+      : `<span class="badge-perso">PERSO</span>`;
+
+    const badges = [
+      isEpuise ? `<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;background:#FFEBEE;color:var(--red)">Épuisé</span>` : '',
+      isHidden ? `<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;background:#FFF3E0;color:#E65100">Masqué</span>` : '',
+      (!isHidden && !isEpuise) ? `<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;background:#E8F5E9;color:var(--green)">Actif</span>` : ''
+    ].filter(Boolean).join('');
+
+    let actions;
+    if (isStd) {
+      actions = `
+        <button class="art-edit"  onclick="importAndEditKit('${k.id}')">✏️ Modifier</button>
+        <button class="art-edit"  onclick="openKitArticlesView('${k.id}')" style="background:#E8F5E9;color:var(--green)">📋 Articles</button>
+        <button class="stock-btn btn-epuise" onclick="markStdKitEpuise('${k.id}')">❌ Épuiser</button>
+        <button class="art-del"  onclick="maskDefaultKit('${k.id}')">🙈 Masquer</button>`;
+    } else {
+      actions = `
+        <button class="art-edit"  onclick="editKit('${k.id}')">✏️ Modifier</button>
+        <button class="art-edit"  onclick="openKitArticlesView('${k.id}')" style="background:#E8F5E9;color:var(--green)">📋 Articles</button>
+        ${isEpuise
+          ? `<button class="stock-btn btn-en-stock" onclick="setKitEpuise('${k.id}',false)">✅ Remettre</button>`
+          : `<button class="stock-btn btn-epuise"   onclick="setKitEpuise('${k.id}',true)">❌ Épuiser</button>`}
+        ${isHidden
+          ? `<button class="stock-btn btn-afficher" onclick="setKitActif('${k.id}',true)">👁 Afficher</button>`
+          : `<button class="stock-btn btn-masquer"  onclick="setKitActif('${k.id}',false)">🙈 Masquer</button>`}
+        <button class="art-del" onclick="deleteKit('${k.id}')">🗑</button>`;
+    }
+
+    return `
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);${(isHidden||isEpuise)?'opacity:.65':''}">
+      <div style="padding:14px 16px;background:${catColor};display:flex;align-items:flex-start;gap:12px">
+        <div style="font-size:30px;line-height:1;flex-shrink:0">${k.emoji||'🎁'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:700;color:var(--dark)">${k.nom||'Kit'}</span>
+            ${badgeSrc} ${badges}
+          </div>
+          <div style="font-size:11px;color:var(--mid)">${k.categorie||''} · ${arts.length} article${arts.length>1?'s':''} · <strong style="color:var(--blue)">${prixStr}</strong></div>
+        </div>
+      </div>
+      <div style="padding:10px 16px">
+        <div style="font-size:11px;color:var(--light);margin-bottom:6px;line-height:1.5">${k.description||'—'}</div>
+        ${arts.length ? `<div style="display:flex;flex-wrap:wrap;gap:5px">
+          ${arts.slice(0,4).map(a=>`<span style="font-size:10px;background:var(--bg);border-radius:9px;padding:3px 9px;color:var(--mid)">${a.emoji||'📦'} ${a.name} ×${a.qty}${a.unit?' '+a.unit:''}</span>`).join('')}
+          ${arts.length>4 ? `<span style="font-size:10px;background:var(--bg);border-radius:9px;padding:3px 9px;color:var(--mid)">+${arts.length-4} autres</span>` : ''}
+        </div>` : '<div style="font-size:11px;color:var(--light);font-style:italic">Aucun article — cliquez Articles pour en ajouter</div>'}
+        ${isStd ? `<div style="margin-top:8px;padding:7px 10px;background:linear-gradient(135deg,#E3F2FD,#EDE7F6);border-radius:9px;font-size:10px;color:#1A237E">
+          📌 <strong>Kit standard</strong> — Cliquez <em>Modifier</em> pour personnaliser dans Firestore.
+        </div>` : ''}
+      </div>
+      <div style="padding:10px 14px;display:flex;justify-content:flex-end;gap:6px;border-top:1px solid var(--border);flex-wrap:wrap">
+        ${actions}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Importer standard → Firestore puis ouvrir l'édition ──
+window.importAndEditKit = async function(stdId) {
+  const k = DEFAULT_KITS_ADMIN.find(x => x.id === stdId);
+  if (!k) return;
+  const evtBtn = event?.target;
+  if (evtBtn) { evtBtn.disabled=true; evtBtn.textContent='⏳…'; }
+  try {
+    await setDoc(doc(db,'kits', stdId), _stdKitData(k));
+    const entry = { id:stdId, _src:'db', ..._stdKitData(k), createdAt:null, updatedAt:null };
+    const existing = kitsCache.find(x => x.id===stdId);
+    if (existing) Object.assign(existing, entry); else kitsCache.push(entry);
+    toast('✅ Kit importé — ouvre la modification…', '#2E7D32');
+    editKit(stdId);
+  } catch(e) {
+    toast('❌ Erreur import : ' + e.message, '#C62828');
+    if (evtBtn) { evtBtn.disabled=false; evtBtn.textContent='✏️ Modifier'; }
+  }
+};
+
+// ── Masquer un standard (sans modification complète) ──
+window.maskDefaultKit = async function(stdId) {
+  const k = DEFAULT_KITS_ADMIN.find(x => x.id===stdId);
+  if (!k) return;
+  if (!confirm(`Masquer le kit "${k.nom}" aux clients ?`)) return;
+  try {
+    await setDoc(doc(db,'kits', stdId), _stdKitData(k, {actif:false}));
+    toast('🙈 Kit masqué', '#F5820A');
+    loadKitsAdmin();
+  } catch(e) { toast('❌ Erreur : ' + e.message, '#C62828'); }
+};
+
+// ── Épuiser un standard ──
+window.markStdKitEpuise = async function(stdId) {
+  const k = DEFAULT_KITS_ADMIN.find(x => x.id===stdId);
+  if (!k) return;
+  if (!confirm(`Marquer le kit "${k.nom}" comme épuisé ?`)) return;
+  try {
+    await setDoc(doc(db,'kits', stdId), _stdKitData(k, {epuise:true}));
+    toast('❌ Kit épuisé', '#C62828');
+    loadKitsAdmin();
+  } catch(e) { toast('❌ Erreur : ' + e.message, '#C62828'); }
+};
+
+window.setKitActif = async function(id, actif) {
+  try {
+    await updateDoc(doc(db,'kits',id), {actif, updatedAt:serverTimestamp()});
+    toast(actif ? '👁 Kit affiché' : '🙈 Kit masqué', actif ? '#2E7D32' : '#F5820A');
+    loadKitsAdmin();
+  } catch(e) { toast('❌ Erreur', '#C62828'); }
+};
+
+window.setKitEpuise = async function(id, epuise) {
+  try {
+    await updateDoc(doc(db,'kits',id), {epuise, updatedAt:serverTimestamp()});
+    toast(epuise ? '❌ Kit épuisé' : '✅ Kit remis en stock', epuise ? '#C62828' : '#2E7D32');
+    loadKitsAdmin();
+  } catch(e) { toast('❌ Erreur', '#C62828'); }
+};
+
+// ── Ouvrir modale création ──
+window.openKitModal = function() {
+  editingKitId = null;
+  document.getElementById('kit-modal-title').textContent   = 'Créer un Kit/PACK';
+  document.getElementById('kit-std-info').style.display    = 'none';
+  ['kit-id','kit-nom','kit-description','kit-img'].forEach(x => document.getElementById(x).value='');
+  document.getElementById('kit-emoji').value     = '🎁';
+  document.getElementById('kit-prix').value      = '';
+  document.getElementById('kit-ordre').value     = '1';
+  document.getElementById('kit-actif').value     = '1';
+  document.getElementById('kit-categorie').value = 'Alimentation';
+  document.getElementById('kit-modal').classList.add('show');
+};
+
+// ── Ouvrir modale édition ──
+window.editKit = function(id) {
+  let k = kitsCache.find(x => x.id===id);
+  const fromStd = !k;
+  if (!k) k = DEFAULT_KITS_ADMIN.find(x => x.id===id);
+  if (!k) { toast('❌ Kit introuvable','#C62828'); return; }
+  editingKitId = id;
+  document.getElementById('kit-modal-title').textContent   = 'Modifier le Kit/PACK';
+  document.getElementById('kit-std-info').style.display    = fromStd ? 'block' : 'none';
+  document.getElementById('kit-id').value          = id;
+  document.getElementById('kit-nom').value         = k.nom           || '';
+  document.getElementById('kit-emoji').value       = k.emoji         || '🎁';
+  document.getElementById('kit-description').value = k.description   || '';
+  document.getElementById('kit-img').value         = k.imageUrl      || '';
+  document.getElementById('kit-prix').value        = k.prix_total    || '';
+  document.getElementById('kit-ordre').value       = k.ordre         || 1;
+  document.getElementById('kit-actif').value       = k.actif===false ? '0' : '1';
+  document.getElementById('kit-categorie').value   = k.categorie     || 'Alimentation';
+  document.getElementById('kit-modal').classList.add('show');
+};
+
+// ── Sauvegarder kit (infos générales) ──
+window.saveKit = async function() {
+  const nom  = document.getElementById('kit-nom').value.trim();
+  const prix = parseFloat(document.getElementById('kit-prix').value) || 0;
+  if (!nom)  { toast('⚠️ Le nom est obligatoire','#F5820A'); return; }
+  if (!prix) { toast('⚠️ Le prix total est obligatoire','#F5820A'); return; }
+
+  const data = {
+    nom,
+    emoji:       document.getElementById('kit-emoji').value       || '🎁',
+    description: document.getElementById('kit-description').value.trim(),
+    imageUrl:    document.getElementById('kit-img').value.trim(),
+    categorie:   document.getElementById('kit-categorie').value,
+    prix_total:  prix,
+    ordre:       parseInt(document.getElementById('kit-ordre').value) || 1,
+    actif:       document.getElementById('kit-actif').value === '1',
+    updatedAt:   serverTimestamp()
+  };
+
+  const btn = document.getElementById('kit-save-btn');
+  if (btn) { btn.disabled=true; btn.textContent='⏳ Enregistrement…'; }
+  try {
+    if (editingKitId) {
+      await setDoc(doc(db,'kits', editingKitId), data, {merge:true});
+      toast('✅ Kit modifié !','#2E7D32');
+    } else {
+      data.createdAt   = serverTimestamp();
+      data.epuise      = false;
+      data.articles    = [];
+      await addDoc(collection(db,'kits'), data);
+      toast('✅ Kit créé ! Ajoutez maintenant les articles via 📋 Articles','#2E7D32');
+    }
+    document.getElementById('kit-modal').classList.remove('show');
+    loadKitsAdmin();
+  } catch(e) {
+    toast('❌ Erreur : ' + e.message,'#C62828');
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent='💾 Enregistrer le Kit'; }
+  }
+};
+
+// ── Supprimer un kit ──
+window.deleteKit = async function(id) {
+  const k   = kitsCache.find(x => x.id===id);
+  const nom = k ? k.nom : id;
+  const isStdId = DEFAULT_KITS_ADMIN.some(x => x.id===id);
+  const msg = isStdId
+    ? `Supprimer les personnalisations du kit "${nom}" ?\n\nIl reviendra à sa version standard.`
+    : `Supprimer définitivement le kit "${nom}" ?`;
+  if (!confirm(msg)) return;
+  try {
+    await deleteDoc(doc(db,'kits', id));
+    kitsCache = kitsCache.filter(x => x.id!==id);
+    toast('🗑 Kit supprimé','#C62828');
+    loadKitsAdmin();
+  } catch(e) { toast('❌ Erreur : ' + e.message,'#C62828'); }
+};
+
+// ════ GESTION ARTICLES D'UN KIT ════
+
+// ── Ouvrir la vue articles d'un kit ──
+window.openKitArticlesView = async function(kitId) {
+  // Trouver le kit (DB ou standard)
+  let k = kitsCache.find(x => x.id===kitId);
+  if (!k) {
+    // Standard non importé : l'importer d'abord silencieusement
+    const std = DEFAULT_KITS_ADMIN.find(x => x.id===kitId);
+    if (!std) return;
+    await setDoc(doc(db,'kits', kitId), _stdKitData(std));
+    const entry = {id:kitId, _src:'db', ..._stdKitData(std), createdAt:null, updatedAt:null};
+    kitsCache.push(entry);
+    k = entry;
+    toast('✅ Kit importé automatiquement','#2E7D32');
+    loadKitsAdmin();
+  }
+  currentKit  = k;
+  kitArtCache = JSON.parse(JSON.stringify(k.articles || []));
+
+  document.getElementById('kit-detail-emoji').textContent     = k.emoji || '🎁';
+  document.getElementById('kit-detail-name').textContent      = k.nom   || 'Kit';
+  document.getElementById('kit-articles-panel-title').textContent = `Articles — ${k.nom}`;
+
+  showKitView('articles');
+  renderKitArticleTable();
+};
+
+function renderKitArticleTable() {
+  const table = document.getElementById('kit-articles-table');
+  const head  = `<div class="art-table-row art-table-head"><div></div><div>Article</div><div>Qté / Unité</div><div>Prix unitaire</div><div>Actions</div></div>`;
+  if (!kitArtCache.length) {
+    table.innerHTML = head + `<div style="text-align:center;padding:28px;color:var(--light);font-size:13px">Aucun article dans ce kit. Ajoutez-en via le bouton ci-dessus.</div>`;
+    return;
+  }
+  table.innerHTML = head + kitArtCache.map((a, i) => `
+    <div class="art-table-row">
+      <div class="art-emoji">${a.emoji||'📦'}</div>
+      <div><div style="font-weight:700;font-size:12px">${a.name||'—'}</div></div>
+      <div style="font-size:12px;color:var(--mid)">${a.qty||1} ${a.unit||''}</div>
+      <div style="font-weight:700;font-size:12px;color:var(--blue)">${a.prix ? Number(a.prix).toLocaleString('fr-FR')+' FCFA' : '—'}</div>
+      <div style="display:flex;gap:5px">
+        <button class="art-edit" onclick="editKitArticle(${i})">✏️</button>
+        <button class="art-del"  onclick="deleteKitArticle(${i})">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── Sauvegarder le tableau d'articles dans Firestore ──
+async function persistKitArticles() {
+  if (!currentKit) return;
+  await updateDoc(doc(db,'kits', currentKit.id), {
+    articles:  kitArtCache,
+    updatedAt: serverTimestamp()
+  });
+  // Mettre à jour le cache local
+  const cached = kitsCache.find(x => x.id===currentKit.id);
+  if (cached) cached.articles = JSON.parse(JSON.stringify(kitArtCache));
+}
+
+// ── Ouvrir modale ajout d'article ──
+window.openKitArticleModal = function() {
+  editingKitArtIdx = null;
+  document.getElementById('kit-art-modal-title').textContent = 'Ajouter un article au Kit';
+  ['kit-art-id','kit-art-emoji','kit-art-name','kit-art-unit'].forEach(x => document.getElementById(x).value='');
+  document.getElementById('kit-art-emoji').value = '📦';
+  document.getElementById('kit-art-qty').value   = '1';
+  document.getElementById('kit-art-prix').value  = '';
+  document.getElementById('kit-art-modal').classList.add('show');
+};
+
+// ── Ouvrir modale édition d'article ──
+window.editKitArticle = function(i) {
+  const a = kitArtCache[i];
+  if (!a) return;
+  editingKitArtIdx = i;
+  document.getElementById('kit-art-modal-title').textContent = 'Modifier l\'article';
+  document.getElementById('kit-art-emoji').value = a.emoji || '';
+  document.getElementById('kit-art-name').value  = a.name  || '';
+  document.getElementById('kit-art-qty').value   = a.qty   || 1;
+  document.getElementById('kit-art-unit').value  = a.unit  || '';
+  document.getElementById('kit-art-prix').value  = a.prix  || '';
+  document.getElementById('kit-art-modal').classList.add('show');
+};
+
+// ── Sauvegarder article du kit ──
+window.saveKitArticle = async function() {
+  const name = document.getElementById('kit-art-name').value.trim();
+  if (!name) { toast('⚠️ Le nom est obligatoire','#F5820A'); return; }
+  const art = {
+    emoji: document.getElementById('kit-art-emoji').value.trim() || '📦',
+    name,
+    qty:  parseInt(document.getElementById('kit-art-qty').value)   || 1,
+    unit: document.getElementById('kit-art-unit').value.trim(),
+    prix: parseFloat(document.getElementById('kit-art-prix').value) || 0,
+  };
+  const btn = document.getElementById('kit-art-save-btn');
+  if (btn) { btn.disabled=true; btn.textContent='⏳…'; }
+  try {
+    if (editingKitArtIdx !== null) {
+      kitArtCache[editingKitArtIdx] = art;
+      toast('✅ Article modifié','#2E7D32');
+    } else {
+      kitArtCache.push(art);
+      toast('✅ Article ajouté','#2E7D32');
+    }
+    await persistKitArticles();
+    document.getElementById('kit-art-modal').classList.remove('show');
+    renderKitArticleTable();
+  } catch(e) {
+    toast('❌ Erreur : ' + e.message,'#C62828');
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent='💾 Enregistrer l\'article'; }
+  }
+};
+
+// ── Supprimer article du kit ──
+window.deleteKitArticle = async function(i) {
+  if (!confirm('Supprimer cet article du kit ?')) return;
+  kitArtCache.splice(i, 1);
+  try {
+    await persistKitArticles();
+    renderKitArticleTable();
+    toast('🗑 Article supprimé','#C62828');
+  } catch(e) { toast('❌ Erreur : ' + e.message,'#C62828'); }
+};
+
 // ════ SECTIONS ════
 window.showSection=function(id,btn){
-  ['orders','stats','articles','partenaires','settings','password'].forEach(s=>{
+  ['orders','stats','articles','restaurants','kits','partenaires','settings','password'].forEach(s=>{
     const el=document.getElementById("section-"+s); if(el)el.style.display=s===id?'block':'none';
   });
   document.querySelectorAll(".sb-item").forEach(b=>b.classList.remove("on"));
   if(btn)btn.classList.add("on");
   if(id==='stats'){updateStats();}
+  if(id==='restaurants'){loadRestaurants();showRstView('list');}
+  if(id==='kits'){loadKitsAdmin();showKitView('list');}
   if(window.innerWidth<769)document.getElementById("sidebar").classList.remove("open");
 };
 
