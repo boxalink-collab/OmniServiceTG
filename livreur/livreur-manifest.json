@@ -1,0 +1,14 @@
+{
+  "name": "OmniService TG — Livreur",
+  "short_name": "OmniLivreur",
+  "description": "Interface Livreur — OmniService TG",
+  "start_url": "/livreur/index.html",
+  "display": "standalone",
+  "background_color": "#0A1628",
+  "theme_color": "#0A1628",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "../assets/logo.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "../assets/logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
