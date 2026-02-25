@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OmniService TG — Communication</title>
+<link rel="icon" href="../assets/logo.png" type="image/png"/>
+<link rel="apple-touch-icon" href="../assets/logo.png"/>
+<link rel="manifest" href="comm-manifest.json"/>
+<meta name="theme-color" content="#1A0533"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="OmniComm"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1A0533;--pur:#7C3AED;--pur-d:#5B21B6;--pur-s:rgba(124,58,237,.12);
+  --pink:#EC4899;--pink-s:rgba(236,72,153,.1);
+  --amber:#F59E0B;--green:#10B981;--red:#EF4444;
+  --bg:#F8F5FF;--card:#FFFFFF;--border:#EDE9F7;--muted:#7B6F8A;
+  --radius:18px;--shadow:0 2px 18px rgba(26,5,51,.08);
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:9999;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .5s,visibility .5s}
+#splash::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 30% 20%,rgba(124,58,237,.25) 0%,transparent 55%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(236,72,153,.18) 0%,transparent 55%)}
+#splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.sp-i{position:relative;z-index:2;font-size:52px;animation:spPop .7s cubic-bezier(.34,1.56,.64,1) .2s both}
+@keyframes spPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.sp-t{position:relative;z-index:2;font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:#fff;animation:fadeUp .5s ease .45s both}
+.sp-s{position:relative;z-index:2;font-size:11px;color:rgba(255,255,255,.38);letter-spacing:2.5px;text-transform:uppercase;animation:fadeUp .5s ease .6s both}
+.sp-b{position:relative;z-index:2;width:100px;height:3px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;margin-top:6px;animation:fadeUp .4s ease .7s both}
+.sp-bf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pur),var(--pink));animation:barLoad 2s ease .8s both}
+@keyframes barLoad{from{width:0}to{width:100%}}
+@keyframes fadeUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* LOGIN */
+#login-screen{display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--ink);padding:24px;position:relative;overflow:hidden}
+#login-screen.active{display:flex}
+#login-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 90% 60% at 20% 10%,rgba(124,58,237,.22) 0%,transparent 55%),radial-gradient(ellipse 70% 50% at 85% 90%,rgba(236,72,153,.16) 0%,transparent 55%)}
+#login-screen::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(124,58,237,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.05) 1px,transparent 1px);background-size:40px 40px}
+.lcard{position:relative;z-index:2;width:100%;max-width:380px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);border-radius:24px;padding:36px 28px;animation:fadeUp .6s ease .1s both}
+.lbadge{display:inline-flex;align-items:center;gap:7px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);border-radius:99px;padding:5px 14px;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#C4B5FD;margin-bottom:20px}
+.lcard h1{font-family:'Playfair Display',serif;font-size:28px;color:#fff;line-height:1.2;margin-bottom:6px}
+.lcard p{font-size:13px;color:rgba(255,255,255,.38);margin-bottom:28px}
+.lf{margin-bottom:13px}
+.lf label{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,.38);letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px}
+.lf input{width:100%;padding:14px 16px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;font-size:15px;color:#fff;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s,background .2s}
+.lf input::placeholder{color:rgba(255,255,255,.2)}
+.lf input:focus{border-color:var(--pur);background:rgba(124,58,237,.1)}
+.btn-login{width:100%;padding:15px;margin-top:6px;background:linear-gradient(135deg,var(--pur),var(--pink));border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;transition:transform .15s,box-shadow .2s;box-shadow:0 6px 24px rgba(124,58,237,.4)}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(124,58,237,.5)}
+.btn-login:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.lerr{margin-top:11px;padding:11px 14px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;font-size:13px;color:#FCA5A5;display:none;text-align:center}
+
+/* APP */
+#app{display:none}
+#app.active{display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(135deg,var(--ink),#2D0A5E);padding:14px 18px 16px;position:relative;overflow:hidden}
+.topbar::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 100% at 80% 50%,rgba(236,72,153,.12) 0%,transparent 60%);pointer-events:none}
+.tb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.tb-brand{display:flex;align-items:center;gap:10px}
+.tb-logo{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--pur),var(--pink));display:flex;align-items:center;justify-content:center;font-size:16px}
+.tb-name{font-family:'Playfair Display',serif;font-size:17px;color:#fff}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-user{font-size:12px;color:rgba(255,255,255,.45);font-weight:500}
+.btn-deco{padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;font-size:12px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s}
+.btn-deco:hover{background:var(--red);border-color:var(--red);color:#fff}
+.tb-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ts{background:rgba(255,255,255,.07);border-radius:11px;padding:9px 12px;border:1px solid rgba(255,255,255,.06)}
+.ts-val{font-family:'Playfair Display',serif;font-size:22px;color:#fff;line-height:1}
+.ts-lbl{font-size:10px;color:rgba(255,255,255,.38);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+/* NAV */
+.nav{display:flex;background:var(--card);border-bottom:1px solid var(--border);padding:0 4px}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border:none;background:transparent;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Outfit',sans-serif;transition:color .2s;position:relative}
+.nav-btn.active{color:var(--pur)}
+.nav-btn.active::after{content:'';position:absolute;bottom:0;left:15%;right:15%;height:2.5px;background:linear-gradient(90deg,var(--pur),var(--pink));border-radius:99px}
+.ni{font-size:19px}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:16px 14px 90px}
+.section{display:none;animation:secIn .25s ease both}
+.section.active{display:block}
+@keyframes secIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink)}
+.sec-badge{padding:3px 10px;border-radius:99px;background:var(--pur-s);color:var(--pur);font-size:11px;font-weight:700}
+
+/* BUTTONS */
+.btn-p{padding:10px 18px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--pur),var(--pur-d));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(124,58,237,.3);display:inline-flex;align-items:center;gap:7px}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,.4)}
+.btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-s{padding:9px 15px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--ink);font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.btn-s:hover{background:var(--bg)}
+.btn-d{padding:7px 12px;border-radius:8px;border:none;background:rgba(239,68,68,.1);color:var(--red);font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.btn-d:hover{background:var(--red);color:#fff}
+.btn-e{padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.btn-e:hover{background:var(--bg)}
+.btn-ton{padding:7px 12px;border-radius:8px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;background:rgba(236,72,153,.1);color:var(--pink)}
+.btn-ton:hover{background:var(--pink);color:#fff}
+.btn-toff{padding:7px 12px;border-radius:8px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;background:rgba(16,185,129,.1);color:var(--green)}
+.btn-toff:hover{background:var(--green);color:#fff}
+
+/* BANDEAU CARD */
+.bc{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden;animation:secIn .3s ease both}
+.bc-prev{height:80px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.bc-prev-txt{position:relative;z-index:1;font-size:14px;font-weight:700;color:#fff;text-align:center;padding:0 16px;text-shadow:0 1px 4px rgba(0,0,0,.3);line-height:1.4}
+.bc-body{padding:13px 15px}
+.bc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.bc-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--ink)}
+.bc-tag{display:inline-flex;padding:3px 10px;border-radius:99px;background:var(--pur-s);color:var(--pur);font-size:10px;font-weight:600}
+.bc-meta{font-size:11px;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.dot-on{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 5px var(--green);animation:pulse 2s infinite;flex-shrink:0}
+.dot-off{width:7px;height:7px;border-radius:50%;background:var(--border);display:inline-block;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.bc-actions{display:flex;gap:7px;flex-wrap:wrap}
+.sched-tag{font-size:10px;color:var(--amber);background:rgba(245,158,11,.1);padding:2px 8px;border-radius:6px;font-weight:600}
+
+/* PANEL */
+.panel{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+
+/* APERÇU */
+.apercu-box{border-radius:12px;overflow:hidden;border:2px dashed var(--border);margin:12px 0;min-height:75px}
+.apercu-inner{height:75px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;text-align:center;padding:0 16px;text-shadow:0 1px 4px rgba(0,0,0,.3);line-height:1.4;transition:background .3s}
+
+/* FORM */
+.ff{margin-bottom:14px}
+.ff label{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:7px}
+.ff input,.ff select,.ff textarea{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--ink);font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--pur)}
+.ff textarea{resize:vertical;min-height:80px;line-height:1.5}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* COLOR SWATCHES */
+.color-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:6px}
+.csw{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .2s;flex-shrink:0}
+.csw.sel{border-color:var(--ink);transform:scale(1.15)}
+.csw:hover{transform:scale(1.1)}
+
+/* STATS */
+.vrow{display:flex;align-items:center;margin-bottom:12px;gap:10px}
+.vlabel{font-size:12px;color:var(--ink);min-width:110px}
+.vbar-bg{flex:1;height:6px;background:var(--bg);border-radius:99px;overflow:hidden}
+.vbar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pur),var(--pink));transition:width 1.2s cubic-bezier(.34,1.1,.64,1)}
+.vcount{font-size:12px;font-weight:700;color:var(--pur);white-space:nowrap}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.ei{font-size:44px;margin-bottom:10px;opacity:.4;display:block}
+.et{font-size:14px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(26,5,51,.7);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:28px 28px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:24px 20px 48px;animation:slideUp .35s cubic-bezier(.34,1.2,.64,1) both}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:36px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 20px}
+.modal h2{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:4px}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:20px}
+.mactions{display:flex;gap:10px;margin-top:4px}
+.mactions .btn-p{flex:1;justify-content:center}
+
+/* INFO BOX */
+.ibox{background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:10px;padding:12px;font-size:12px;color:var(--muted);margin-bottom:14px}
+
+/* FILTER ROW */
+.frow{display:flex;gap:7px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:1px}
+.frow::-webkit-scrollbar{display:none}
+.fchip{flex-shrink:0;padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:var(--card);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.fchip.on{background:var(--pur);border-color:var(--pur);color:#fff}
+
+/* TOAST */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:14px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(26,5,51,.3)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-i">📣</div>
+  <div class="sp-t">OmniService TG</div>
+  <div class="sp-s">Communication</div>
+  <div class="sp-b"><div class="sp-bf"></div></div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="lcard">
+    <div class="lbadge">📣 Accès Communication</div>
+    <h1>Espace<br/><em>Communication</em></h1>
+    <p>Connectez-vous avec votre compte OmniService</p>
+    <div class="lf"><label>Email</label><input type="email" id="login-email" placeholder="prenom.nom@omniservicetg.com" autocomplete="username"/></div>
+    <div class="lf"><label>Code d'accès</label><input type="password" id="login-pass" placeholder="ex : CM01A" autocomplete="current-password"/></div>
+    <button class="btn-login" id="login-btn">Se connecter</button>
+    <div class="lerr" id="login-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="tb-top">
+      <div class="tb-brand">
+        <div class="tb-logo">📣</div>
+        <div class="tb-name">Communication</div>
+      </div>
+      <div class="tb-right">
+        <span class="tb-user" id="user-disp">COMM</span>
+        <button class="btn-deco" id="btn-logout">Quitter</button>
+      </div>
+    </div>
+    <div class="tb-stats">
+      <div class="ts"><div class="ts-val" id="ts-act">—</div><div class="ts-lbl">Actifs</div></div>
+      <div class="ts"><div class="ts-val" id="ts-tot">—</div><div class="ts-lbl">Total</div></div>
+      <div class="ts"><div class="ts-val" id="ts-prg">—</div><div class="ts-lbl">Programmés</div></div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" data-tab="bandeaux"><span class="ni">🖼️</span>Bandeaux</button>
+    <button class="nav-btn" data-tab="creer"><span class="ni">✨</span>Créer</button>
+    <button class="nav-btn" data-tab="stats"><span class="ni">📊</span>Stats</button>
+    <button class="nav-btn" data-tab="standards"><span class="ni">⚙️</span>Standards</button>
+  </div>
+
+  <div class="content">
+
+    <!-- BANDEAUX -->
+    <div id="tab-bandeaux" class="section active">
+      <div class="sec-head">
+        <div class="sec-title">Publications</div>
+        <div class="sec-badge" id="badge-b">0</div>
+      </div>
+      <div class="frow" id="frow-bandeaux">
+        <button class="fchip on" data-fv="tous">Tous</button>
+        <button class="fchip" data-fv="actif">✅ Actifs</button>
+        <button class="fchip" data-fv="masque">🚫 Masqués</button>
+        <button class="fchip" data-fv="prog">⏰ Programmés</button>
+      </div>
+      <div id="list-b"><div class="empty"><span class="ei">⏳</span><div class="et">Chargement…</div></div></div>
+    </div>
+
+    <!-- CRÉER -->
+    <div id="tab-creer" class="section">
+      <div class="sec-head"><div class="sec-title">Créer un bandeau</div></div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Aperçu en direct</div>
+        <div class="apercu-box">
+          <div class="apercu-inner" id="ap-inner" style="background:linear-gradient(135deg,#7C3AED,#EC4899)">
+            <span id="ap-txt">Votre texte apparaîtra ici…</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ff"><label>Nom du partenaire / marque</label><input type="text" id="n-part" placeholder="ex : Restaurant Le Bœuf d'Or"/></div>
+        <div class="ff"><label>Texte du bandeau</label><textarea id="n-texte" placeholder="ex : 🍗 Livraison gratuite dès 5000F · Commandez !" rows="3"></textarea></div>
+        <div class="ff">
+          <label>Service cible</label>
+          <select id="n-svc">
+            <option value="">— Tous les services —</option>
+            <option value="restaurant">🍽️ Restaurant</option>
+            <option value="livraison">🚚 Livraison</option>
+            <option value="alimentation">🛒 Alimentation</option>
+            <option value="nettoyage">🧹 Nettoyage</option>
+            <option value="couture">👗 Couture</option>
+            <option value="kits">🧴 Kits</option>
+          </select>
+        </div>
+        <div class="ff">
+          <label>Couleur de fond</label>
+          <div class="color-row" id="cr-new">
+            <div class="csw sel" data-g="linear-gradient(135deg,#7C3AED,#EC4899)" style="background:linear-gradient(135deg,#7C3AED,#EC4899)"></div>
+            <div class="csw" data-g="linear-gradient(135deg,#1A6BFF,#0050CC)" style="background:linear-gradient(135deg,#1A6BFF,#0050CC)"></div>
+            <div class="csw" data-g="linear-gradient(135deg,#F59E0B,#D97706)" style="background:linear-gradient(135deg,#F59E0B,#D97706)"></div>
+            <div class="csw" data-g="linear-gradient(135deg,#10B981,#065F46)" style="background:linear-gradient(135deg,#10B981,#065F46)"></div>
+            <div class="csw" data-g="linear-gradient(135deg,#EF4444,#991B1B)" style="background:linear-gradient(135deg,#EF4444,#991B1B)"></div>
+            <div class="csw" data-g="linear-gradient(135deg,#0A1628,#1E3A5F)" style="background:linear-gradient(135deg,#0A1628,#1E3A5F)"></div>
+            <div class="csw" data-g="linear-gradient(135deg,#FF6B2B,#CC4500)" style="background:linear-gradient(135deg,#FF6B2B,#CC4500)"></div>
+            <div class="csw" data-g="linear-gradient(135deg,#06B6D4,#0284C7)" style="background:linear-gradient(135deg,#06B6D4,#0284C7)"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="ff"><label>Date de début</label><input type="datetime-local" id="n-debut"/></div>
+          <div class="ff"><label>Date de fin</label><input type="datetime-local" id="n-fin"/></div>
+        </div>
+        <div class="ibox">💡 Sans date → publication immédiate et indéfinie. Avec date → programmation automatique.</div>
+        <div class="ff"><label>Lien (optionnel)</label><input type="url" id="n-lien" placeholder="https://…"/></div>
+        <button class="btn-p" id="btn-pub" style="width:100%;justify-content:center">✨ Publier le bandeau</button>
+        <div id="pub-err" style="margin-top:10px;font-size:12px;color:var(--red);display:none"></div>
+        <div id="pub-ok" style="margin-top:10px;font-size:13px;color:var(--green);display:none"></div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div id="tab-stats" class="section">
+      <div class="sec-head"><div class="sec-title">Visibilité</div></div>
+      <div class="panel">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);margin-bottom:14px">Répartition globale</div>
+        <div id="stats-global"><div class="empty"><span class="ei">⏳</span><div class="et">Chargement…</div></div></div>
+      </div>
+      <div class="panel">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);margin-bottom:14px">Par service</div>
+        <div id="stats-svc"><div class="empty"><span class="ei">⏳</span><div class="et">Chargement…</div></div></div>
+      </div>
+    </div>
+
+    <!-- STANDARDS -->
+    <div id="tab-standards" class="section">
+      <div class="sec-head"><div class="sec-title">Bandeaux standards</div></div>
+      <div class="ibox">Ces 6 bandeaux sont intégrés dans l'app cliente. Masquez-les ou modifiez leur texte.</div>
+      <div id="list-std"><div class="empty"><span class="ei">⏳</span><div class="et">Chargement…</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ÉDITION -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <h2>✏️ Modifier le bandeau</h2>
+    <p id="m-sub">Modification</p>
+    <div class="ff"><label>Nom partenaire</label><input type="text" id="e-part"/></div>
+    <div class="ff"><label>Texte du bandeau</label><textarea id="e-texte" rows="3"></textarea></div>
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Aperçu</div>
+    <div class="apercu-box"><div class="apercu-inner" id="e-ap-inner"><span id="e-ap-txt">—</span></div></div>
+    <div class="ff" style="margin-top:14px">
+      <label>Couleur</label>
+      <div class="color-row" id="cr-edit">
+        <div class="csw sel" data-g="linear-gradient(135deg,#7C3AED,#EC4899)" style="background:linear-gradient(135deg,#7C3AED,#EC4899)"></div>
+        <div class="csw" data-g="linear-gradient(135deg,#1A6BFF,#0050CC)" style="background:linear-gradient(135deg,#1A6BFF,#0050CC)"></div>
+        <div class="csw" data-g="linear-gradient(135deg,#F59E0B,#D97706)" style="background:linear-gradient(135deg,#F59E0B,#D97706)"></div>
+        <div class="csw" data-g="linear-gradient(135deg,#10B981,#065F46)" style="background:linear-gradient(135deg,#10B981,#065F46)"></div>
+        <div class="csw" data-g="linear-gradient(135deg,#EF4444,#991B1B)" style="background:linear-gradient(135deg,#EF4444,#991B1B)"></div>
+        <div class="csw" data-g="linear-gradient(135deg,#0A1628,#1E3A5F)" style="background:linear-gradient(135deg,#0A1628,#1E3A5F)"></div>
+        <div class="csw" data-g="linear-gradient(135deg,#FF6B2B,#CC4500)" style="background:linear-gradient(135deg,#FF6B2B,#CC4500)"></div>
+        <div class="csw" data-g="linear-gradient(135deg,#06B6D4,#0284C7)" style="background:linear-gradient(135deg,#06B6D4,#0284C7)"></div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="ff"><label>Date début</label><input type="datetime-local" id="e-debut"/></div>
+      <div class="ff"><label>Date fin</label><input type="datetime-local" id="e-fin"/></div>
+    </div>
+    <div class="mactions">
+      <button class="btn-s" id="btn-cancel-edit">Annuler</button>
+      <button class="btn-p" id="btn-save-edit">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, getDoc, doc,
+         addDoc, updateDoc, setDoc, query, orderBy, serverTimestamp }
+         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const fb = initializeApp({
+  apiKey:"AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",
+  authDomain:"omniservicetg-59df3.firebaseapp.com",
+  projectId:"omniservicetg-59df3",
+  storageBucket:"omniservicetg-59df3.firebasestorage.app",
+  messagingSenderId:"196278567761",
+  appId:"1:196278567761:web:4f6416acaab58b67bf4970"
+});
+const db=getFirestore(fb), auth=getAuth(fb);
+
+const STDS=[
+  {id:'std-delivery', label:'🚚 Livraison Express', svc:'livraison', def:'Livraison rapide partout à Lomé · Service disponible 7j/7'},
+  {id:'std-restaurant', label:'🍽️ Restaurant', svc:'restaurant', def:'Commandez vos repas préférés · Livraison à domicile'},
+  {id:'std-food', label:'🛒 Alimentation', svc:'alimentation', def:"Courses alimentaires livrées chez vous en moins d'1h"},
+  {id:'std-cleaning', label:'🧹 Nettoyage', svc:'nettoyage', def:'Services de nettoyage professionnel · Réservez maintenant'},
+  {id:'std-clothes', label:'👗 Couture', svc:'couture', def:'Retouches & créations sur mesure · Qualité garantie'},
+  {id:'std-kits', label:'🧴 Kits & Produits', svc:'kits', def:'Kits bien-être & produits essentiels livrés chez vous'},
+];
+const STD_COLORS={'std-delivery':'linear-gradient(135deg,#1A6BFF,#0050CC)','std-restaurant':'linear-gradient(135deg,#EF4444,#991B1B)','std-food':'linear-gradient(135deg,#10B981,#065F46)','std-cleaning':'linear-gradient(135deg,#06B6D4,#0284C7)','std-clothes':'linear-gradient(135deg,#A855F7,#6D28D9)','std-kits':'linear-gradient(135deg,#F59E0B,#D97706)'};
+
+let bandeaux=[], filt='tous', selColor='linear-gradient(135deg,#7C3AED,#EC4899)', editColor='linear-gradient(135deg,#7C3AED,#EC4899)', editId=null;
+
+// SPLASH
+setTimeout(()=>document.getElementById('splash').classList.add('hidden'),2200);
+
+// AUTH
+document.getElementById('login-btn').onclick=async()=>{
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value.trim();
+  const btn=document.getElementById('login-btn'),err=document.getElementById('login-err');
+  err.style.display='none';btn.disabled=true;btn.textContent='Connexion…';
+  try{
+    const cred=await signInWithEmailAndPassword(auth,email,pass);
+    const d=await getDoc(doc(db,'agents',cred.user.uid));
+    if(d.exists()&&d.data().role&&!['comm','admin'].includes(d.data().role)){await signOut(auth);throw{code:'wrong-role'};}
+  }catch(e){
+    const m={'auth/invalid-credential':'❌ Email ou code incorrect.','auth/user-not-found':'❌ Compte introuvable.','auth/wrong-password':'❌ Code incorrect.','auth/too-many-requests':'⏳ Trop de tentatives.','wrong-role':'❌ Accès réservé à la Communication.'};
+    err.textContent=m[e.code]||'❌ Erreur de connexion.';err.style.display='block';btn.disabled=false;btn.textContent='Se connecter';
+  }
+};
+document.getElementById('btn-logout').onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,async user=>{
+  if(!user){
+    document.getElementById('app').style.display='none';document.getElementById('app').classList.remove('active');
+    document.getElementById('login-screen').classList.add('active');
+  }else{
+    document.getElementById('login-screen').classList.remove('active');
+    document.getElementById('app').style.display='';document.getElementById('app').classList.add('active');
+    document.getElementById('user-disp').textContent=user.email.split('@')[0].toUpperCase();
+    try{await updateDoc(doc(db,'agents',user.uid),{derniere_connexion:serverTimestamp()});}catch(e){}
+    loadAll();
+  }
+});
+
+async function loadAll(){await Promise.all([loadBandeaux(),loadStds()]);}
+
+async function loadBandeaux(){
+  try{
+    const snap=await getDocs(query(collection(db,'partenaires'),orderBy('createdAt','desc')));
+    bandeaux=snap.docs.map(d=>({id:d.id,...d.data()})).filter(b=>!b.supprime);
+    renderBandeaux();renderStats();updateTopStats();
+  }catch(e){console.error(e);}
+}
+
+function updateTopStats(){
+  const act=bandeaux.filter(b=>b.actif!==false).length;
+  const prg=bandeaux.filter(b=>b.date_debut).length;
+  document.getElementById('ts-act').textContent=act;
+  document.getElementById('ts-tot').textContent=bandeaux.length;
+  document.getElementById('ts-prg').textContent=prg;
+}
+
+function renderBandeaux(){
+  let list=bandeaux;
+  if(filt==='actif') list=list.filter(b=>b.actif!==false);
+  if(filt==='masque') list=list.filter(b=>b.actif===false);
+  if(filt==='prog') list=list.filter(b=>b.date_debut);
+  document.getElementById('badge-b').textContent=list.length;
+  const el=document.getElementById('list-b');
+  if(!list.length){el.innerHTML='<div class="empty"><span class="ei">📭</span><div class="et">Aucune publication</div></div>';return;}
+  el.innerHTML=list.map((b,i)=>{
+    const act=b.actif!==false;
+    const clr=b.couleur||'linear-gradient(135deg,#7C3AED,#EC4899)';
+    const prog=b.date_debut?`<span class="sched-tag">⏰ ${fmtD(b.date_debut)}</span>`:'';
+    const fin=b.date_fin?`<span style="font-size:10px">— fin ${fmtD(b.date_fin)}</span>`:'';
+    return `<div class="bc" style="animation-delay:${i*.05}s">
+      <div class="bc-prev" style="background:${clr}"><div class="bc-prev-txt">${b.texte||b.partenaire||'—'}</div></div>
+      <div class="bc-body">
+        <div class="bc-top"><div class="bc-name">${b.partenaire||'Sans nom'}</div>${b.service?`<span class="bc-tag">${b.service}</span>`:''}</div>
+        <div class="bc-meta"><span class="${act?'dot-on':'dot-off'}"></span><span>${act?'Actif':'Masqué'}</span>${prog}${fin}</div>
+        <div class="bc-actions">
+          <button class="${act?'btn-ton':'btn-toff'}" data-id="${b.id}" data-a="${act}">${act?'🚫 Masquer':'✅ Activer'}</button>
+          <button class="btn-e" data-id="${b.id}">✏️ Modifier</button>
+          <button class="btn-d" data-id="${b.id}">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.btn-ton,.btn-toff').forEach(btn=>btn.onclick=()=>toggleB(btn.dataset.id,btn.dataset.a==='true'));
+  el.querySelectorAll('.btn-e').forEach(btn=>btn.onclick=()=>openEdit(btn.dataset.id));
+  el.querySelectorAll('.btn-d').forEach(btn=>btn.onclick=()=>deleteB(btn.dataset.id));
+}
+
+// FILTER CHIPS
+document.querySelectorAll('#frow-bandeaux .fchip').forEach(c=>c.onclick=()=>{
+  document.querySelectorAll('#frow-bandeaux .fchip').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on'); filt=c.dataset.fv; renderBandeaux();
+});
+
+async function toggleB(id,act){
+  try{await updateDoc(doc(db,'partenaires',id),{actif:!act});toast(act?'🚫 Masqué':'✅ Activé');await loadBandeaux();}
+  catch(e){toast('❌ '+e.message);}
+}
+async function deleteB(id){
+  if(!confirm('Supprimer ce bandeau ?')) return;
+  try{await updateDoc(doc(db,'partenaires',id),{supprime:true,actif:false});toast('🗑️ Supprimé');await loadBandeaux();}
+  catch(e){toast('❌ '+e.message);}
+}
+
+// APERÇU LIVE
+document.getElementById('n-texte').oninput=()=>{
+  document.getElementById('ap-txt').textContent=document.getElementById('n-texte').value||'Votre texte apparaîtra ici…';
+};
+
+// COLOR SWATCHES NEW
+document.querySelectorAll('#cr-new .csw').forEach(s=>s.onclick=()=>{
+  document.querySelectorAll('#cr-new .csw').forEach(x=>x.classList.remove('sel'));
+  s.classList.add('sel'); selColor=s.dataset.g;
+  document.getElementById('ap-inner').style.background=selColor;
+});
+
+// COLOR SWATCHES EDIT
+document.querySelectorAll('#cr-edit .csw').forEach(s=>s.onclick=()=>{
+  document.querySelectorAll('#cr-edit .csw').forEach(x=>x.classList.remove('sel'));
+  s.classList.add('sel'); editColor=s.dataset.g;
+  document.getElementById('e-ap-inner').style.background=editColor;
+});
+document.getElementById('e-texte').oninput=()=>{
+  document.getElementById('e-ap-txt').textContent=document.getElementById('e-texte').value||'…';
+};
+
+// PUBLIER
+document.getElementById('btn-pub').onclick=async()=>{
+  const part=document.getElementById('n-part').value.trim();
+  const texte=document.getElementById('n-texte').value.trim();
+  const svc=document.getElementById('n-svc').value;
+  const debut=document.getElementById('n-debut').value;
+  const fin=document.getElementById('n-fin').value;
+  const lien=document.getElementById('n-lien').value.trim();
+  const err=document.getElementById('pub-err'),ok=document.getElementById('pub-ok');
+  err.style.display='none';ok.style.display='none';
+  if(!part){err.textContent='⚠️ Entrez un nom de partenaire.';err.style.display='block';return;}
+  if(!texte){err.textContent='⚠️ Entrez le texte du bandeau.';err.style.display='block';return;}
+  const btn=document.getElementById('btn-pub');
+  btn.disabled=true;btn.textContent='Publication…';
+  try{
+    const actif=!debut||new Date(debut)<=new Date();
+    await addDoc(collection(db,'partenaires'),{
+      partenaire:part,texte,service:svc||null,couleur:selColor,
+      lien:lien||null,date_debut:debut||null,date_fin:fin||null,
+      actif,createdAt:serverTimestamp(),type:'partenaire'
+    });
+    ok.innerHTML=`✅ Bandeau publié !${debut?' · Programmé pour le '+fmtD(debut):''}`;
+    ok.style.display='block';
+    ['n-part','n-texte','n-svc','n-debut','n-fin','n-lien'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    document.getElementById('ap-txt').textContent='Votre texte apparaîtra ici…';
+    document.getElementById('ap-inner').style.background='linear-gradient(135deg,#7C3AED,#EC4899)';
+    await loadBandeaux();
+  }catch(e){err.textContent='❌ '+e.message;err.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='✨ Publier le bandeau';}
+};
+
+// EDIT
+function openEdit(id){
+  const b=bandeaux.find(x=>x.id===id);if(!b) return;
+  editId=id; editColor=b.couleur||'linear-gradient(135deg,#7C3AED,#EC4899)';
+  document.getElementById('m-sub').textContent=b.partenaire||'Bandeau';
+  document.getElementById('e-part').value=b.partenaire||'';
+  document.getElementById('e-texte').value=b.texte||'';
+  document.getElementById('e-ap-txt').textContent=b.texte||'—';
+  document.getElementById('e-ap-inner').style.background=editColor;
+  document.getElementById('e-debut').value=b.date_debut||'';
+  document.getElementById('e-fin').value=b.date_fin||'';
+  document.querySelectorAll('#cr-edit .csw').forEach(s=>s.classList.toggle('sel',s.dataset.g===editColor));
+  document.getElementById('modal-edit').classList.add('open');
+}
+
+document.getElementById('btn-cancel-edit').onclick=()=>document.getElementById('modal-edit').classList.remove('open');
+document.getElementById('modal-edit').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');};
+
+document.getElementById('btn-save-edit').onclick=async()=>{
+  if(!editId) return;
+  const texte=document.getElementById('e-texte').value.trim();
+  const part=document.getElementById('e-part').value.trim();
+  const debut=document.getElementById('e-debut').value;
+  const fin=document.getElementById('e-fin').value;
+  if(!texte){toast('⚠️ Entrez un texte');return;}
+  const btn=document.getElementById('btn-save-edit');
+  btn.disabled=true;btn.textContent='Enregistrement…';
+  try{
+    await setDoc(doc(db,'partenaires',editId),{texte,couleur:editColor,...(part&&{partenaire:part}),...(debut&&{date_debut:debut}),...(fin&&{date_fin:fin})},{merge:true});
+    toast('✅ Mis à jour');document.getElementById('modal-edit').classList.remove('open');await loadBandeaux();
+  }catch(e){toast('❌ '+e.message);}
+  finally{btn.disabled=false;btn.textContent='💾 Enregistrer';}
+};
+
+// STANDARDS
+async function loadStds(){
+  const el=document.getElementById('list-std');
+  try{
+    const ovs={};
+    for(const s of STDS){
+      try{const d=await getDoc(doc(db,'partenaires',s.id));if(d.exists())ovs[s.id]=d.data();}catch(e){}
+    }
+    el.innerHTML=STDS.map(s=>{
+      const ov=ovs[s.id]||{};const act=ov.actif!==false;const txt=ov.texte||s.def;const clr=STD_COLORS[s.id];
+      return `<div class="bc" id="sc-${s.id}">
+        <div class="bc-prev" style="background:${clr}"><div class="bc-prev-txt">${txt}</div></div>
+        <div class="bc-body">
+          <div class="bc-top"><div class="bc-name">${s.label}</div><span class="bc-tag">${s.svc}</span></div>
+          <div class="bc-meta"><span class="${act?'dot-on':'dot-off'}"></span><span>${act?'Visible':'Masqué'}</span></div>
+          <div class="bc-actions">
+            <button class="${act?'btn-ton':'btn-toff'}" data-sid="${s.id}" data-sa="${act}">${act?'🚫 Masquer':'✅ Afficher'}</button>
+            <button class="btn-e" data-sid="${s.id}" data-stxt="${esc(txt)}" data-sclr="${clr}">✏️ Modifier texte</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('[data-sid]').forEach(btn=>{
+      if(btn.classList.contains('btn-ton')||btn.classList.contains('btn-toff')){
+        btn.onclick=async()=>{
+          await setDoc(doc(db,'partenaires',btn.dataset.sid),{actif:btn.dataset.sa==='true'?false:true},{merge:true});
+          toast('✅ Mis à jour');loadStds();
+        };
+      } else {
+        btn.onclick=()=>{
+          editId=btn.dataset.sid;editColor=btn.dataset.sclr;
+          document.getElementById('m-sub').textContent='Standard · '+btn.dataset.sid;
+          document.getElementById('e-part').value='';
+          document.getElementById('e-part').placeholder='Laisser vide (bandeau standard)';
+          document.getElementById('e-texte').value=btn.dataset.stxt;
+          document.getElementById('e-ap-txt').textContent=btn.dataset.stxt;
+          document.getElementById('e-ap-inner').style.background=editColor;
+          document.getElementById('e-debut').value='';document.getElementById('e-fin').value='';
+          document.getElementById('modal-edit').classList.add('open');
+        };
+      }
+    });
+  }catch(e){console.error(e);el.innerHTML='<div class="empty"><span class="ei">❌</span><div class="et">Erreur de chargement</div></div>';}
+}
+
+// STATS
+function renderStats(){
+  const act=bandeaux.filter(b=>b.actif!==false).length;
+  const mas=bandeaux.filter(b=>b.actif===false).length;
+  const prg=bandeaux.filter(b=>b.date_debut).length;
+  const tot=bandeaux.length||1;
+  document.getElementById('stats-global').innerHTML=[
+    {l:'✅ Actifs',n:act,p:Math.round(act/tot*100)},
+    {l:'🚫 Masqués',n:mas,p:Math.round(mas/tot*100)},
+    {l:'⏰ Programmés',n:prg,p:Math.round(prg/tot*100)},
+  ].map(x=>`<div class="vrow"><div class="vlabel">${x.l}</div><div class="vbar-bg"><div class="vbar" style="width:${x.p}%"></div></div><div class="vcount">${x.n}</div></div>`).join('');
+
+  const svcs={};bandeaux.forEach(b=>{const s=b.service||'Tous';svcs[s]=(svcs[s]||0)+1;});
+  const mx=Math.max(...Object.values(svcs),1);
+  document.getElementById('stats-svc').innerHTML=Object.entries(svcs).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<div class="vrow"><div class="vlabel">${s}</div><div class="vbar-bg"><div class="vbar" style="width:${Math.round(n/mx*100)}%"></div></div><div class="vcount">${n}</div></div>`).join('')||'<div class="empty"><span class="ei">📊</span><div class="et">Aucune donnée</div></div>';
+}
+
+// TABS
+document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById('tab-'+b.dataset.tab).classList.add('active');
+  if(b.dataset.tab==='stats') renderStats();
+  if(b.dataset.tab==='standards') loadStds();
+});
+
+function fmtD(s){if(!s) return '';try{return new Date(s).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return s;}}
+function esc(s){return(s+'').replace(/'/g,"&#39;").replace(/"/g,'&quot;');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+</script>
+</body>
+</html>
