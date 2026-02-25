@@ -1,0 +1,20 @@
+{
+  "name": "OmniService TG — RH Manager",
+  "short_name": "RH OmniTG",
+  "description": "Interface Responsable RH — Gestion des agents OmniService TG",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a1220",
+  "theme_color": "#7B1FA2",
+  "orientation": "any",
+  "lang": "fr",
+  "icons": [
+    { "src": "../assets/logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "../assets/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    { "name": "Créer un agent", "short_name": "Créer agent", "url": "./index.html#create", "icons": [{ "src": "../assets/logo.png", "sizes": "96x96" }] },
+    { "name": "Liste agents", "short_name": "Agents", "url": "./index.html#agents", "icons": [{ "src": "../assets/logo.png", "sizes": "96x96" }] }
+  ]
+}
