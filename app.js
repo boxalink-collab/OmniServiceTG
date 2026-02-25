@@ -1,19 +1,18 @@
 /* ══════════════════════════════════════════
-   OmniService TG — app.js v5.0
-   + Authentification complète (Inscription/Connexion par téléphone)
+   OmniService TG — app.js v4.0
+   + Authentification complète (Inscription/Connexion)
    + Commandes liées au compte utilisateur (UID)
    + Avatars homme/femme
-   + Compatibilité avec les interfaces métier (agents)
-   + Mise à jour Firestore rules v2 (collection agents)
+   + Suppression du téléphone dans les formulaires de commande
    ══════════════════════════════════════════ */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, query, where,
-  getDocs, orderBy, serverTimestamp, doc, setDoc, getDoc, updateDoc
+  getDocs, orderBy, serverTimestamp, doc, setDoc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
-  getAuth, onAuthStateChanged
+  getAuth
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 // ── Config Firebase ──
@@ -28,12 +27,11 @@ const firebaseConfig = {
 
 const fbApp = initializeApp(firebaseConfig);
 const db    = getFirestore(fbApp);
-const auth  = getAuth(fbApp);  // ← AJOUT v5 : on garde getAuth initialisé pour compatibilité
 
 // ════════════════════════════════════════
 // ÉTAT GLOBAL
 // ════════════════════════════════════════
-let currentUser       = null;   // profil Firestore de l'utilisateur connecté (collection users)
+let currentUser       = null;   // profil Firestore de l'utilisateur connecté
 let currentService    = null;
 let currentRestaurant = null;   // restaurant sélectionné dans la vue Restaurants
 let cart              = {};
@@ -66,6 +64,8 @@ window.addEventListener('DOMContentLoaded', () => {
 // ════════════════════════════════════════
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    // Chemin relatif obligatoire pour GitHub Pages (sous-dossier /OmniServiceTG/)
+    // '/sw.js' cherche à la racine du domaine → 404
     navigator.serviceWorker.register('./sw.js', { scope: './' })
       .then(r => console.log('[PWA] SW enregistré, scope :', r.scope))
       .catch(e => console.warn('[PWA] SW erreur :', e));
@@ -129,6 +129,7 @@ async function restoreSession() {
     if (snap && snap.exists()) {
       currentUser = { uid: savedUid, ...snap.data() };
     } else {
+      // UID sauvegardé invalide → nettoyer
       localStorage.removeItem('omni_uid');
       currentUser = null;
     }
@@ -194,6 +195,7 @@ async function doLogin() {
 
   if (!phone) { err.textContent = '⚠️ Veuillez saisir votre numéro de téléphone.'; return; }
 
+  // Normaliser le numéro (retirer espaces et tirets)
   const phoneNorm = phone.replace(/[\s\-().]/g, '');
 
   btn.disabled = true;
@@ -201,6 +203,7 @@ async function doLogin() {
   err.textContent = '';
 
   try {
+    // Chercher le compte dans Firestore par numéro de téléphone
     const q = query(collection(db, 'users'), where('phone', '==', phoneNorm));
     const snap = await getDocs(q);
 
@@ -212,18 +215,27 @@ async function doLogin() {
     const userDoc = snap.docs[0];
     const userData = userDoc.data();
 
+    // Bloquer onAuthStateChanged pendant qu'on gère manuellement
     _authHandledManually = true;
 
+    // Utiliser l'uid existant du profil Firestore
     const existingUid = userDoc.id;
 
+    // Mettre à jour la date de dernière connexion
     await setDoc(doc(db, 'users', existingUid), {
       lastLogin: serverTimestamp()
     }, { merge: true });
 
+    // Mettre à jour currentUser immédiatement
     currentUser = { uid: existingUid, ...userData };
+
+    // Sauvegarder la session en local
     localStorage.setItem('omni_uid', existingUid);
+
+    // Réactiver onAuthStateChanged
     _authHandledManually = false;
 
+    // Mettre à jour l'interface
     updateNavForAuth(true);
     updateProfilePage();
     closeAuthModal();
@@ -254,6 +266,7 @@ async function doSignup() {
     err.textContent = '⚠️ Veuillez remplir tous les champs.'; return;
   }
 
+  // Normaliser le numéro
   const phoneNorm = phone.replace(/[\s\-().]/g, '');
   if (phoneNorm.length < 8) {
     err.textContent = '⚠️ Numéro de téléphone invalide.'; return;
@@ -264,6 +277,7 @@ async function doSignup() {
   err.textContent = '';
 
   try {
+    // Vérifier si le numéro est déjà utilisé
     const q = query(collection(db, 'users'), where('phone', '==', phoneNorm));
     const existing = await getDocs(q);
     if (!existing.empty) {
@@ -271,10 +285,13 @@ async function doSignup() {
       return;
     }
 
+    // Bloquer onAuthStateChanged pendant qu'on gère manuellement
     _authHandledManually = true;
 
+    // Générer un UID unique sans Firebase Anonymous Auth
     const newUid = crypto.randomUUID();
 
+    // Profil complet à sauvegarder
     const profil = {
       nom, prenom, genre,
       phone: phoneNorm,
@@ -283,12 +300,19 @@ async function doSignup() {
       createdAt: serverTimestamp()
     };
 
+    // Sauvegarder dans Firestore
     await setDoc(doc(db, 'users', newUid), profil);
 
+    // Mettre à jour currentUser immédiatement (sans attendre Firestore)
     currentUser = { uid: newUid, nom, prenom, genre, phone: phoneNorm, ville };
+
+    // Sauvegarder la session en local
     localStorage.setItem('omni_uid', newUid);
+
+    // Réactiver onAuthStateChanged
     _authHandledManually = false;
 
+    // Mettre à jour l'interface
     updateNavForAuth(true);
     updateProfilePage();
     closeAuthModal();
@@ -333,6 +357,7 @@ function updateProfilePage() {
     if (heroSub)    heroSub.textContent    = currentUser.phone || currentUser.email || '';
     if (profCard)   profCard.style.display = 'block';
     if (authCard)   authCard.style.display = 'none';
+    // Remplir les champs info
     const fi = {
       'pf-nom':    currentUser.nom    || '',
       'pf-prenom': currentUser.prenom || '',
@@ -344,6 +369,7 @@ function updateProfilePage() {
       const el = document.getElementById(id);
       if (el) el.value = val;
     });
+    // Afficher la ville dans le sous-titre
     if (heroSub && currentUser.ville) {
       heroSub.textContent = `📍 ${currentUser.ville} · ${currentUser.phone || ''}`;
     }
@@ -377,6 +403,7 @@ window.saveProfile = saveProfile;
 
 // ════════════════════════════════════════
 // DÉFINITION DES SERVICES
+// (sans champ phone — récupéré depuis le profil)
 // ════════════════════════════════════════
 const SVCS = {
   food: {
@@ -393,49 +420,77 @@ const SVCS = {
     fields:[]
   },
   delivery: {
-    name:"Livraison express", icon:"📦", bg:"#F3E5F5", active:true,
+    name:"Livraison & Courses", icon:"🚚", bg:"#FFF3E0", active:true,
     fields:[
-      {n:"description",l:"Ce que vous souhaitez livrer",t:"textarea",ph:"Description du colis..."},
-      {n:"adresse_ramassage",l:"Adresse de ramassage",t:"text",ph:"Où récupérer le colis ?"},
-      {n:"adresse_livraison",l:"Adresse de livraison",t:"text",ph:"Où livrer ?"},
-      {n:"notes",l:"Instructions (optionnel)",t:"textarea",ph:"Fragile, urgence...",opt:true}
+      {n:"type",l:"Type",t:"select",opts:["Livraison express","Courses personnalisées","Livraison entreprise","Livraison de plats"]},
+      {n:"detail",l:"Lieu de collecte / Liste d'articles",t:"textarea",ph:"Adresse ou liste..."},
+      {n:"adresse",l:"Adresse de livraison",t:"text",ph:"Votre adresse à Lomé"},
+      {n:"urgence",l:"Urgence",t:"select",opts:["Express (< 1h)","Dans la journée","Planifier"]}
     ]
   },
-  cleaning: {
-    name:"Nettoyage & Entretien", icon:"🧹", bg:"#E8F5E9", active:true,
+  maintenance: {
+    name:"Maintenance Technique", icon:"🔧", bg:"#E3F2FD", active:false, soon:"16 Mars 2026",
     fields:[
-      {n:"type_nettoyage",l:"Type de nettoyage",t:"select",opts:["Domicile","Bureau","Après travaux","Vitre","Autre"]},
-      {n:"superficie",l:"Superficie approx. (m²)",t:"text",ph:"Ex: 60"},
-      {n:"adresse",l:"Adresse",t:"text",ph:"Votre adresse"},
-      {n:"date",l:"Date souhaitée",t:"date"},
-      {n:"notes",l:"Précisions (optionnel)",t:"textarea",ph:"Accès, matériel...",opt:true}
+      {n:"type",l:"Type d'intervention",t:"select",opts:["Électricité","Plomberie","Voiture","Électroménager","Informatique","Pose TV/Antenne","Autres travaux"]},
+      {n:"problem",l:"Description du problème",t:"textarea",ph:"Décrivez le problème..."},
+      {n:"adresse",l:"Adresse",t:"text",ph:"Votre adresse à Lomé"}
     ]
   },
   clothes: {
-    name:"Prêt-à-porter Africain", icon:"👗", bg:"#FCE4EC", active:true,
-    fields:[]
+    name:"Prêt-à-porter", icon:"👗", bg:"#FFF3E0", active:true,
+    fields:[
+      {n:"categorie",l:"Catégorie",t:"select",opts:["Vêtements Homme","Vêtements Femme","Vêtements Enfant","Sacs","Chaussures","Cosmétiques & Accessoires"]},
+      {n:"article",l:"Article souhaité",t:"textarea",ph:"Couleur, taille, style..."},
+      {n:"budget",l:"Budget estimé (FCFA)",t:"number",ph:"Ex : 15000"},
+      {n:"adresse",l:"Adresse de livraison",t:"text",ph:"Votre adresse à Lomé"}
+    ]
+  },
+  cleaning: {
+    name:"Entretien & Nettoyage", icon:"🧹", bg:"#E3F2FD", active:true,
+    fields:[
+      {n:"type",l:"Type",t:"select",opts:["Nettoyage résidentiel","Nettoyage bureaux","Entretien régulier","Entretien industriel"]},
+      {n:"superficie",l:"Superficie (m²)",t:"number",ph:"Ex : 60"},
+      {n:"adresse",l:"Adresse",t:"text",ph:"Votre adresse à Lomé"},
+      {n:"date",l:"Date souhaitée",t:"date"}
+    ]
   },
   kits: {
-    name:"Kits & Packs", icon:"🎁", bg:"#E8EAF6", active:true,
+    name:"Kits & PACKS", icon:"🎁", bg:"#E8F5E9", active:true,
     fields:[]
   },
+  security: {
+    name:"Gardiennage & Sécurité", icon:"🛡️", bg:"#E3F2FD", active:false, soon:"7 Avril 2026",
+    fields:[
+      {n:"type",l:"Type",t:"select",opts:["Gardiennage Résidentiel","Gardiennage Boutique","Sécurité Événementielle","Surveillance Temporaire"]},
+      {n:"detail",l:"Description du besoin",t:"textarea",ph:"Vos besoins en sécurité..."},
+      {n:"adresse",l:"Lieu / Adresse",t:"text",ph:"Votre adresse à Lomé"}
+    ]
+  }
 };
 
 // ════════════════════════════════════════
-// ARTICLES PAR DÉFAUT (Catalogue)
+// ARTICLES PAR DÉFAUT
 // ════════════════════════════════════════
 const DEFAULT_ARTICLES = {
   food: [
-    {id:'f1',name:'Tilapia frais',desc:'Poisson local, vendu au kg',price:3500,unit:'kg',emoji:'🐟'},
-    {id:'f2',name:'Poulet fermier',desc:'Élevage local, entier',price:6000,unit:'pièce',emoji:'🐔'},
-    {id:'f3',name:'Légumes assortis',desc:'Tomates, oignons, piment',price:2000,unit:'panier',emoji:'🥬'},
-    {id:'f4',name:'Vin de palme frais',desc:'Récolté du jour, bidon 5L',price:2500,unit:'bidon',emoji:'🍶'},
-    {id:'f5',name:'Néré (soumbala)',desc:'Condiment traditionnel',price:1000,unit:'sachet',emoji:'🫘'},
-    {id:'f6',name:'Huile de palme rouge',desc:'Huile locale non raffinée',price:4500,unit:'bidon 5L',emoji:'🫙'},
+    {id:'f1',name:'Tilapia frais',desc:'Par kg, pêche locale',price:3500,unit:'kg',emoji:'🐟'},
+    {id:'f2',name:'Poulet fermier',desc:'Par pièce, élevage local',price:5500,unit:'pièce',emoji:'🐔'},
+    {id:'f3',name:'Légumes assortis',desc:'Tomates, oignons, piment',price:1500,unit:'panier',emoji:'🥬'},
+    {id:'f4',name:'Vin de palme',desc:'Par bidon de 5L',price:4000,unit:'bidon',emoji:'🍶'},
+    {id:'f5',name:'Néré (soumbara)',desc:'Condiment traditionnel',price:1000,unit:'sachet',emoji:'🫘'},
+    {id:'f6',name:'Kit repas famille',desc:'Pour 4-6 personnes',price:8500,unit:'kit',emoji:'🥘'},
+  ],
+  restaurant: [
+    {id:'r1',name:'Riz sauce arachide',desc:'Plat traditionnel copieux',price:2500,unit:'plat',emoji:'🍚'},
+    {id:'r2',name:'Fufu + soupe',desc:'Fufu de manioc, soupe de viande',price:3000,unit:'plat',emoji:'🍲'},
+    {id:'r3',name:'Brochettes mixtes',desc:'Bœuf, poulet, foie',price:2000,unit:'portion',emoji:'🍢'},
+    {id:'r4',name:'Poulet yassa',desc:'Mariné aux oignons et citron',price:4500,unit:'plat',emoji:'🍗'},
+    {id:'r5',name:'Attiéké poisson',desc:'Semoule de manioc + poisson braisé',price:2800,unit:'plat',emoji:'🐠'},
+    {id:'r6',name:'Plateau traiteur',desc:'Pour 10 personnes (événement)',price:35000,unit:'plateau',emoji:'🎉'},
   ],
   clothes: [
-    {id:'c1',name:'Boubou wax homme',desc:'Tissu wax 6 yards, taille unique',price:18000,unit:'pièce',emoji:'👘'},
-    {id:'c2',name:'Robe wax femme',desc:'Coupe moderne, motif africain',price:15000,unit:'pièce',emoji:'👗'},
+    {id:'c1',name:'Boubou homme',desc:'Tissu wax, tailles S-XXL',price:12000,unit:'pièce',emoji:'👘'},
+    {id:'c2',name:'Robe femme africaine',desc:'Couture locale, colorée',price:9500,unit:'pièce',emoji:'👗'},
     {id:'c3',name:'Ensemble enfant',desc:'3-12 ans, tissu wax',price:6000,unit:'pièce',emoji:'🧒'},
     {id:'c4',name:'Sac en cuir',desc:'Fabriqué localement',price:15000,unit:'pièce',emoji:'👜'},
     {id:'c5',name:'Sandales tressées',desc:'Artisanat togolais',price:7500,unit:'paire',emoji:'👡'},
@@ -476,6 +531,7 @@ function goTab(id) {
   if (id === 'services') showView('list');
   if (id === 'orders') {
     if (!currentUser) {
+      // Afficher un message pour se connecter
       const out = document.getElementById('orders-out');
       if (out) out.innerHTML = `
         <div class="orders-empty">
@@ -509,6 +565,7 @@ window.showView = showView;
 // OUVRIR UN SERVICE
 // ════════════════════════════════════════
 function openService(id) {
+  // Vérifier la connexion avant de commander
   if (!currentUser) {
     openAuthModal('login');
     showToast('⚠️ Connectez-vous pour passer une commande', '#F5820A');
@@ -521,12 +578,14 @@ function openService(id) {
   const svc = SVCS[id];
   if (!svc) return;
 
+  // ── Cas spécial : service Kits/PACKS → vue liste des kits ──
   if (id === KITS_SERVICE) {
     loadKitsList();
     showView('kits');
     return;
   }
 
+  // ── Cas spécial : service Restaurants → vue liste des restaurants ──
   if (id === RESTAURANT_SERVICE) {
     document.getElementById('rest-svc-ico').style.background = svc.bg;
     document.getElementById('rest-svc-ico').textContent = svc.icon;
@@ -552,7 +611,7 @@ function openService(id) {
       soonEl.style.display = 'block';
       soonDateEl.textContent = `Opérationnel le ${svc.soon}. Vous pouvez déjà pré-enregistrer votre demande.`;
     } else {
-      if(soonEl) soonEl.style.display = 'none';
+      soonEl.style.display = 'none';
     }
     let html = '';
     svc.fields.forEach(f => {
@@ -575,6 +634,8 @@ window.openService = openService;
 // ════════════════════════════════════════
 // RESTAURANTS — VUE LISTE
 // ════════════════════════════════════════
+
+// Restaurants par défaut intégrés dans l'app
 const DEFAULT_RESTAURANTS = [
   {id:'rst1', nom:'Le Saveur d\'Afrique', specialites:'Cuisine togolaise traditionnelle', localite:'Adidogomé, Lomé', emoji:'🥘', description:'Spécialiste du fufu, du riz sauce et des plats locaux authentiques.'},
   {id:'rst2', nom:'Chez Maman Akossiwa',  specialites:'Plats locaux & traiteur',         localite:'Bè Kpota, Lomé',   emoji:'🍲', description:'Cuisine familiale, plats du jour et service traiteur pour événements.'},
@@ -602,6 +663,7 @@ async function loadRestaurantsList() {
     console.warn('[Restaurants] Firestore indisponible :', e.message);
   }
 
+  // Fusionner DB + standards non encore présents en DB
   const dbIds = new Set(dbRestaurants.map(r => r.id));
   const stdRests = DEFAULT_RESTAURANTS
     .filter(r => !dbIds.has(r.id))
@@ -621,37 +683,35 @@ window.loadRestaurantsList = loadRestaurantsList;
 
 function renderRestaurantCard(r) {
   const imgHtml = r.imageUrl
-    ? `<img src="${r.imageUrl}" alt="${r.nom}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.outerHTML='<span style=font-size:48px>${r.emoji||'🍽️'}</span>'">`
+    ? `<img src="${r.imageUrl}" alt="${r.nom}" style="width:100%;height:100%;object-fit:cover;border-radius:12px" onerror="this.outerHTML='<span style=font-size:48px>${r.emoji||'🍽️'}</span>'">`
     : `<span style="font-size:48px">${r.emoji||'🍽️'}</span>`;
 
-  const specialites = r.specialites ? r.specialites.split(',')[0].trim() : 'Restaurant';
-
   return `
-  <div class="kit-card" onclick="openRestaurant('${r.id}','${(r.nom||'').replace(/'/g,"\\'")}','${r.emoji||'🍽️'}')">
-    <div class="kit-img-wrap" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB)">
+  <div class="restaurant-card" onclick="openRestaurant('${r.id}','${(r.nom||'').replace(/'/g,"\\'")}','${r.emoji||'🍽️'}')">
+    <div class="rst-img-wrap">
       ${imgHtml}
     </div>
-    <div class="kit-body">
-      <div class="kit-badge" style="color:#F5820A;background:#FFF3E0">${specialites}</div>
-      <div class="kit-name">${r.nom||'Restaurant'}</div>
-      <div class="kit-desc">${r.description||r.specialites||''}</div>
-      <div class="kit-footer">
-        <div style="font-size:11px;font-weight:600;color:#9999BB">📍 ${r.localite||'Lomé'}</div>
-        <div class="kit-count">Voir le menu</div>
-      </div>
+    <div class="rst-body">
+      <div class="rst-name">${r.nom||'Restaurant'}</div>
+      <div class="rst-spec">🍴 ${r.specialites||''}</div>
+      <div class="rst-loc">📍 ${r.localite||'Lomé'}</div>
+      ${r.description ? `<div class="rst-desc">${r.description}</div>` : ''}
     </div>
-    <div class="kit-arrow">›</div>
+    <div class="rst-arrow">›</div>
   </div>`;
 }
 
+// ── Ouvrir un restaurant → afficher son menu ──
 async function openRestaurant(restaurantId, restaurantNom, restaurantEmoji) {
   currentRestaurant = { id: restaurantId, nom: restaurantNom, emoji: restaurantEmoji };
 
+  // Mettre à jour le header de la vue catalogue
   const svc = SVCS['restaurant'];
   document.getElementById('cat-ico').style.background = svc.bg;
   document.getElementById('cat-ico').textContent = restaurantEmoji;
   document.getElementById('cat-title').textContent = restaurantNom;
 
+  // Le bouton retour de la vue catalogue doit revenir à la liste des restaurants
   const backBtn = document.getElementById('catalogue-back-btn');
   if (backBtn) backBtn.onclick = () => showView('restaurants');
 
@@ -660,11 +720,13 @@ async function openRestaurant(restaurantId, restaurantNom, restaurantEmoji) {
 }
 window.openRestaurant = openRestaurant;
 
+// ── Charger les menus d'un restaurant ──
 async function loadCatalogueRestaurant(restaurantId) {
   const container = document.getElementById('catalogue-items');
   container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9999BB"><div class="spinner" style="border-color:rgba(30,111,190,.2);border-top-color:#1E6FBE"></div><div style="margin-top:10px;font-size:12px">Chargement du menu...</div></div>`;
   updateCartBar();
 
+  // Articles par défaut pour chaque restaurant standard
   const DEFAULT_MENUS = {
     rst1: [
       {id:'rst1_m1',name:'Riz sauce arachide',desc:'Plat traditionnel copieux',price:2500,unit:'plat',emoji:'🍚'},
@@ -707,6 +769,7 @@ async function loadCatalogueRestaurant(restaurantId) {
     console.warn('[Menu] Firestore indisponible :', e.message);
   }
 
+  // Fusionner avec menus par défaut si le restaurant est un standard
   const dbIds = new Set(dbArticles.map(a => a.id));
   const stdMenus = (DEFAULT_MENUS[restaurantId] || [])
     .filter(a => !dbIds.has(a.id))
@@ -816,22 +879,24 @@ function renderKitCard(k) {
   const imgHtml = k.imageUrl
     ? `<img src="${k.imageUrl}" alt="${k.nom}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.outerHTML='<span style=font-size:48px>${k.emoji||'🎁'}</span>'">`
     : `<span style="font-size:48px">${k.emoji||'🎁'}</span>`;
-
-  const totalStr = k.prix_total ? fmt(k.prix_total) : '';
-  const articles = k.articles || [];
+  const articlesCount = (k.articles || []).length;
+  const prixStr = k.prix_total ? fmt(k.prix_total) : '—';
+  const catColor = {
+    'Alimentation':'#FFF3E0','Restauration':'#E3F2FD','Prêt-à-porter':'#FFF0F5','Nettoyage':'#F3E5F5'
+  }[k.categorie] || '#E8F5E9';
 
   return `
   <div class="kit-card" onclick="openKit('${k.id}','${(k.nom||'').replace(/'/g,"\\'")}','${k.emoji||'🎁'}')">
-    <div class="kit-img-wrap" style="background:linear-gradient(135deg,#E8EAF6,#C5CAE9)">
+    <div class="kit-img-wrap" style="background:${catColor}">
       ${imgHtml}
     </div>
     <div class="kit-body">
-      <div class="kit-badge" style="color:#5C6BC0;background:#E8EAF6">${k.categorie||'Pack'}</div>
+      <div class="kit-badge">${k.categorie||'Kit'}</div>
       <div class="kit-name">${k.nom||'Kit'}</div>
       <div class="kit-desc">${k.description||''}</div>
       <div class="kit-footer">
-        <div style="font-weight:700;color:#1E6FBE">${totalStr}</div>
-        <div class="kit-count">${articles.length} article${articles.length>1?'s':''}</div>
+        <div class="kit-price">${prixStr}</div>
+        <div class="kit-count">${articlesCount} article${articlesCount>1?'s':''} inclus</div>
       </div>
     </div>
     <div class="kit-arrow">›</div>
@@ -839,10 +904,10 @@ function renderKitCard(k) {
 }
 
 async function openKit(kitId, kitNom, kitEmoji) {
-  const container = document.getElementById('kit-articles');
-  const titleEl   = document.getElementById('kit-detail-title');
-  const descEl    = document.getElementById('kit-detail-desc');
-  const priceEl   = document.getElementById('kit-detail-price');
+  const container = document.getElementById('kit-detail-items');
+  const titleEl = document.getElementById('kit-detail-name');
+  const descEl  = document.getElementById('kit-detail-desc');
+  const priceEl = document.getElementById('kit-detail-price');
   const headerIco = document.getElementById('kit-detail-ico');
 
   if (titleEl) titleEl.textContent = kitNom;
@@ -854,6 +919,7 @@ async function openKit(kitId, kitNom, kitEmoji) {
 
   showView('kit-detail');
 
+  // Chercher le kit dans DB ou defaults
   let kit = null;
   try {
     const snap = await getDoc(doc(db,'kits',kitId));
@@ -888,13 +954,16 @@ async function commanderKit() {
   if (!currentKit) return;
   if (!currentUser) { openAuthModal('login'); return; }
 
+  // Remplir le panier avec les articles du kit
   cart = {};
   const articles = currentKit.articles || [];
   articles.forEach((a, i) => {
     const id = `kit_${currentKit.id}_${i}`;
     cart[id] = { id, name: a.name, price: a.prix || 0, qty: a.qty || 1, emoji: a.emoji||'📦' };
   });
+  // Si le kit a un prix total fixe, l'utiliser
   if (currentKit.prix_total) {
+    // Utiliser un seul article "Kit" avec le prix total
     cart = {};
     cart[`kit_${currentKit.id}`] = {
       id: `kit_${currentKit.id}`,
@@ -908,6 +977,7 @@ async function commanderKit() {
   currentService = 'kits';
   updateCartBar();
 
+  // Aller à la vue livraison
   const backBtn = document.getElementById('delivery-back-btn');
   if (backBtn) backBtn.onclick = () => showView('kit-detail');
   showView('delivery');
@@ -920,6 +990,7 @@ async function loadCatalogue(svcId) {
   container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--light)"><div class="spinner" style="border-color:rgba(30,111,190,.2);border-top-color:var(--blue)"></div><div style="margin-top:10px;font-size:12px">Chargement...</div></div>`;
   updateCartBar();
 
+  // 1. Charger les articles personnalisés depuis Firestore
   let dbArticles = [];
   try {
     let snap;
@@ -927,6 +998,7 @@ async function loadCatalogue(svcId) {
       const q = query(collection(db,'articles'), where('service','==',svcId), orderBy('ordre','asc'));
       snap = await getDocs(q);
     } catch(_) {
+      // Index composite absent → sans tri Firestore, on trie côté client
       const q2 = query(collection(db,'articles'), where('service','==',svcId));
       snap = await getDocs(q2);
     }
@@ -935,13 +1007,19 @@ async function loadCatalogue(svcId) {
     console.warn('[Catalogue] Firestore indisponible :', e.message);
   }
 
+  // 2. Standards non encore gérés dans Firestore (même ID absent)
   const dbIds = new Set(dbArticles.map(a => a.id));
   const stdArticles = (DEFAULT_ARTICLES[svcId] || [])
     .filter(a => !dbIds.has(a.id))
     .map(a => ({ ...a, _src:'std', stock:'en_stock', actif:true }));
 
+  // 3. Fusion : version DB en priorité, puis standards restants
   let articles = [...dbArticles, ...stdArticles];
+
+  // 4. Cacher les articles masqués par l'admin (actif:false)
   articles = articles.filter(a => a.actif !== false);
+
+  // 5. Tri : ordre croissant puis alpha
   articles.sort((a,b) => (a.ordre ?? 99) - (b.ordre ?? 99) || (a.name||'').localeCompare(b.name||''));
 
   if (!articles.length) {
@@ -992,9 +1070,11 @@ function renderArticleCard(a) {
 // ════════════════════════════════════════
 function addToCart(id, e) {
   if(e) e.stopPropagation();
+  // Chercher dans les standards d'abord, puis lire le DOM comme fallback
   const allDefaults = [...(DEFAULT_ARTICLES[currentService]||[])];
   let art = allDefaults.find(a => a.id === id);
   if (!art) {
+    // Pour les restaurants, chercher via le DOM directement
     const card = document.getElementById(`acard-${id}`);
     if (!card) return;
     const name      = card.querySelector('.art-name')?.textContent || '';
@@ -1050,7 +1130,7 @@ function updateCartBar() {
 }
 
 // ════════════════════════════════════════
-// PAGE LIVRAISON
+// PAGE LIVRAISON (sans champ téléphone)
 // ════════════════════════════════════════
 function setLocMode(mode) {
   locMode = mode;
@@ -1158,14 +1238,13 @@ async function confirmOrder() {
                         ? `Kits/PACKS — ${currentKit.nom}`
                         : svc.name,
       statut:       'En attente',
-      // ── Infos client (collection users — auth par téléphone) ──
+      // Infos client issues du profil (plus de saisie manuelle)
       uid:          currentUser.uid,
       clientNom:    currentUser.nom    || '',
       clientPrenom: currentUser.prenom || '',
       clientGenre:  currentUser.genre  || '',
       phone:        currentUser.phone  || '',
       clientVille:  currentUser.ville  || '',
-      // ── Livraison ──
       adresse:      addr,
       notes,
       modePaiement: selectedPayment,
@@ -1178,7 +1257,7 @@ async function confirmOrder() {
     });
 
     document.getElementById('succ-msg').innerHTML =
-      `Commande <strong style="color:var(--blue)">${svc?.name || currentService}</strong> confirmée !<br/>
+      `Commande <strong style="color:var(--blue)">${svc.name}</strong> confirmée !<br/>
        Référence : <strong>#${docRef.id.slice(0,8).toUpperCase()}</strong><br/>
        ${selectedPayment === 'livraison'
          ? '💵 Paiement à la livraison — notre agent vous contacte bientôt.'
@@ -1197,7 +1276,7 @@ async function confirmOrder() {
 window.confirmOrder = confirmOrder;
 
 // ════════════════════════════════════════
-// FORMULAIRE STANDARD
+// FORMULAIRE STANDARD (sans champ phone)
 // ════════════════════════════════════════
 async function submitStandardForm() {
   if (!currentUser) { openAuthModal('login'); return; }
@@ -1208,6 +1287,7 @@ async function submitStandardForm() {
     service:      currentService,
     serviceName:  svc.name,
     statut:       'En attente',
+    // Infos client issues du profil
     uid:          currentUser.uid,
     clientNom:    currentUser.nom    || '',
     clientPrenom: currentUser.prenom || '',
@@ -1270,6 +1350,7 @@ async function loadMyOrders() {
     </div>`;
 
   try {
+    // Requête par UID — avec fallback si l'index composite n'est pas encore créé
     let snap;
     try {
       const q = query(
@@ -1279,7 +1360,8 @@ async function loadMyOrders() {
       );
       snap = await getDocs(q);
     } catch(indexErr) {
-      console.warn('Index Firestore manquant, tri côté client activé.', indexErr);
+      // Index composite manquant → requête sans orderBy, tri côté client
+      console.warn('Index Firestore manquant, tri côté client activé. Créez l\'index dans la console Firebase.', indexErr);
       const q2 = query(
         collection(db,'commandes'),
         where('uid','==', currentUser.uid)
@@ -1287,6 +1369,7 @@ async function loadMyOrders() {
       snap = await getDocs(q2);
     }
 
+    // Tri côté client (utile si l'index Firebase n'est pas encore créé)
     const allDocs = [];
     snap.forEach(d => allDocs.push({id:d.id,...d.data()}));
     allDocs.sort((a,b) => {
@@ -1310,10 +1393,8 @@ async function loadMyOrders() {
       'En attente':{c:'#F5820A',bg:'#FFF3E0'},
       'Confirmée': {c:'#1E6FBE',bg:'#E3F2FD'},
       'En cours':  {c:'#7B1FA2',bg:'#F3E5F5'},
-      'En route':  {c:'#1565C0',bg:'#E3F2FD'},
       'Terminée':  {c:'#2E7D32',bg:'#E8F5E9'},
-      'Annulée':   {c:'#C62828',bg:'#FFEBEE'},
-      'Problème':  {c:'#E65100',bg:'#FFF3E0'},
+      'Annulée':   {c:'#C62828',bg:'#FFEBEE'}
     };
     const STEPS = ['En attente','Confirmée','En cours','Terminée'];
     let h = `<div style="font-size:12px;color:var(--light);margin-bottom:12px">${allDocs.length} commande${allDocs.length>1?'s':''} trouvée${allDocs.length>1?'s':''}</div>`;
@@ -1331,11 +1412,6 @@ async function loadMyOrders() {
       }).join('');
       const totalStr = o.total ? fmt(o.total) : '';
 
-      // Afficher le livreur si assigné
-      const livreurInfo = o.livreurNom
-        ? `<div class="o-drow"><span class="o-dk">Livreur :</span><span class="o-dv">🛵 ${o.livreurNom}</span></div>`
-        : '';
-
       h += `<div class="o-card">
         <div class="o-head">
           <div style="flex:1;min-width:0">
@@ -1347,7 +1423,6 @@ async function loadMyOrders() {
         <div class="o-detail">
           ${o.adresse?`<div class="o-drow"><span class="o-dk">Adresse :</span><span class="o-dv">${o.adresse}</span></div>`:''}
           ${o.modePaiement?`<div class="o-drow"><span class="o-dk">Paiement :</span><span class="o-dv">${o.modePaiement}</span></div>`:''}
-          ${livreurInfo}
           <div class="o-drow"><span class="o-dk">Réf :</span><span class="o-dv">#${o.id.slice(0,8).toUpperCase()}</span></div>
         </div>
         <div class="prog">${prog}</div>
@@ -1375,156 +1450,104 @@ async function loadMyOrders() {
 }
 window.loadMyOrders = loadMyOrders;
 
-
 // ════════════════════════════════════════
-// BANDEAU PUBLICITAIRE
+// PARTENAIRES → BANDEAU ADCARD
 // ════════════════════════════════════════
 
-const PROMO_LABELS = {
-  partenaire:'PARTENAIRE OFFICIEL', sponsor:'SPONSOR',
-  collaborateur:'COLLABORATEUR', nouveaute:'NOUVEAUTE',
-  promotion:'PROMOTION', evenement:'EVENEMENT'
+// IDs des bandeaux standards (correspondance id Firestore → service onclick)
+const STD_BANNER_IDS = {
+  'std-delivery': 'delivery',
+  'std-restaurant': 'restaurant',
+  'std-food': 'food',
+  'std-cleaning': 'cleaning',
+  'std-clothes': 'clothes',
+  'std-kits': 'kits'
 };
 
-const STD_BANNER_IDS = new Set([
-  'std-delivery','std-restaurant','std-food','std-cleaning','std-clothes','std-kits'
-]);
-
-function startAdband() {
-  const track    = document.getElementById('adband-track');
-  const dotsWrap = document.getElementById('adband-dots');
-  if (!track) return;
-
-  const INTERVAL = 2400;
-  let idx = 0;
-  let originals = Array.from(track.querySelectorAll('.adcard'));
-  let clone = null, timer = null, paused = false, jumping = false;
-
-  if (originals.length < 2) return;
-
-  if (dotsWrap) {
-    dotsWrap.innerHTML = '';
-    originals.forEach(function(_,i) {
-      var d = document.createElement('span');
-      d.className = 'adband-dot' + (i===0?' on':'');
-      dotsWrap.appendChild(d);
-    });
-  }
-
-  function updateDot(i) {
-    if (!dotsWrap) return;
-    dotsWrap.querySelectorAll('.adband-dot').forEach(function(d,j){ d.classList.toggle('on', j===i); });
-  }
-  function scrollTo(el, smooth) {
-    track.scrollTo({ left: el.offsetLeft - track.offsetLeft, behavior: smooth?'smooth':'instant' });
-  }
-  function next() {
-    if (jumping) return;
-    if (idx+1 < originals.length) {
-      scrollTo(originals[++idx], true); updateDot(idx);
-    } else {
-      scrollTo(clone, true); updateDot(0); jumping=true;
-      setTimeout(function(){ idx=0; scrollTo(originals[0],false); jumping=false; }, 420);
-    }
-  }
-  function prev() {
-    idx = (idx-1+originals.length) % originals.length;
-    scrollTo(originals[idx],true); updateDot(idx);
-  }
-
-  clone = originals[0].cloneNode(true);
-  clone.setAttribute('aria-hidden','true');
-  clone.style.pointerEvents = 'none';
-  track.appendChild(clone);
-
-  scrollTo(originals[0], false);
-  updateDot(0);
-  timer = setInterval(function(){ if(!paused && !jumping) next(); }, INTERVAL);
-
-  track.addEventListener('mouseenter', function(){ paused=true; });
-  track.addEventListener('mouseleave', function(){ paused=false; });
-  var tx=0;
-  track.addEventListener('touchstart', function(e){ paused=true; tx=e.touches[0].clientX; }, {passive:true});
-  track.addEventListener('touchend',   function(e){
-    var dx = e.changedTouches[0].clientX - tx;
-    if (Math.abs(dx)>40) { if(dx<0) next(); else prev(); }
-    setTimeout(function(){ paused=false; }, INTERVAL);
-  }, {passive:true});
-}
-
 async function loadPartnerSlides() {
-  const track = document.getElementById('adband-track');
-  if (!track) { startAdband(); return; }
-
   try {
-    const snap = await getDocs(query(collection(db,'partenaires'), orderBy('ordre','asc')));
+    const q = query(collection(db,'partenaires'), orderBy('ordre','asc'));
+    const snap = await getDocs(q);
 
-    snap.forEach(function(d) {
-      const p = Object.assign({ id:d.id }, d.data());
+    const track   = document.getElementById('adband-track');
+    const dotsBox = document.getElementById('adband-dots');
+    if (!track || !dotsBox) return;
 
-      if (STD_BANNER_IDS.has(p.id)) {
-        const service = p.id.replace('std-','');
-        const stdCard = track.querySelector('[data-service="'+service+'"]');
-        if (!stdCard) return;
-        if (p.actif === false) {
-          stdCard.remove();
-        } else {
-          if (p.nom)         { const el=stdCard.querySelector('.adcard-title'); if(el) el.textContent=p.nom; }
-          if (p.badge)       { const el=stdCard.querySelector('.adcard-badge'); if(el) el.textContent=p.badge; }
-          if (p.description) { const el=stdCard.querySelector('.adcard-sub');   if(el) el.textContent=p.description; }
-          if (p.imageUrl) {
-            const zone = stdCard.querySelector('.adcard-img');
-            if (zone) {
-              const img = document.createElement('img');
-              img.src=p.imageUrl; img.alt=p.nom||'';
-              img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1';
-              img.onerror=function(){ img.remove(); };
-              zone.prepend(img);
+    // Traiter les overrides de bandeaux standards
+    snap.forEach(d => {
+      const p = { id: d.id, ...d.data() };
+      const stdService = STD_BANNER_IDS[p.id];
+
+      if (stdService) {
+        // C'est un override de bandeau standard
+        const existingCard = track.querySelector(`[data-service="${stdService}"]`);
+        if (existingCard) {
+          if (p.actif === false) {
+            // Masquer le bandeau standard
+            existingCard.style.display = 'none';
+          } else {
+            // Mettre à jour le contenu si modifié
+            if (p.nom) existingCard.querySelector('.adcard-title') && (existingCard.querySelector('.adcard-title').textContent = p.nom);
+            if (p.badge) existingCard.querySelector('.adcard-badge') && (existingCard.querySelector('.adcard-badge').textContent = p.badge);
+            if (p.description) existingCard.querySelector('.adcard-sub') && (existingCard.querySelector('.adcard-sub').textContent = p.description);
+            if (p.imageUrl) {
+              const imgZone = existingCard.querySelector('.adcard-img');
+              if (imgZone) {
+                const imgEl = document.createElement('img');
+                imgEl.src = p.imageUrl;
+                imgEl.alt = p.nom || '';
+                imgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+                imgEl.onerror = () => imgEl.style.display='none';
+                imgZone.insertBefore(imgEl, imgZone.firstChild);
+              }
             }
           }
         }
-        return;
+        return; // ne pas créer de nouvelle carte pour les standards
       }
 
-      if (p.actif===false || (!p.nom && !p.imageUrl)) return;
-
-      // Vérifier si la date de publication est active
-      const now = new Date();
-      if (p.dateDebut && new Date(p.dateDebut.seconds ? p.dateDebut.seconds*1000 : p.dateDebut) > now) return;
-      if (p.dateFin && new Date(p.dateFin.seconds ? p.dateFin.seconds*1000 : p.dateFin) < now) return;
+      // Bandeau partenaire pur (Firestore uniquement)
+      if (!p.nom && !p.imageUrl) return;
+      if (p.actif === false) return;
 
       const card = document.createElement('div');
       card.className = 'adcard';
-      if (p.lien) { card.style.cursor='pointer'; card.onclick=function(){ window.open(p.lien,'_blank'); }; }
-      const badge = p.badge || (p.nom ? '🤝 '+p.nom : '🤝 Partenaire');
-      const promoTxt = PROMO_LABELS[p.promo] || 'PARTENAIRE OFFICIEL';
-      const imgHtml = p.imageUrl
-        ? '<img src="'+p.imageUrl+'" alt="'+(p.nom||'')+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'"/>'
-        : '<span class="adcard-emoji-bg">🤝</span>';
-      const ctaHtml = p.lien ? '<div class="adcard-cta">Decouvrir</div>' : '';
-      card.innerHTML =
-        '<div class="adcard-img" style="background:linear-gradient(135deg,#1A1A2E 0%,#1E6FBE 100%)">'
-        +'<div class="adcard-gradient"></div>'
-        +imgHtml
-        +'<div class="adcard-badge">'+badge+'</div>'
-        +'</div>'
-        +'<div class="adcard-body">'
-        +'<div class="adcard-promo">'+promoTxt+'</div>'
-        +'<div class="adcard-title">'+(p.nom||'Partenaire')+'</div>'
-        +'<div class="adcard-sub">'+(p.description||'')+'</div>'
-        +ctaHtml
-        +'</div>';
+      if (p.lien) {
+        card.style.cursor = 'pointer';
+        card.onclick = () => window.open(p.lien, '_blank');
+      }
+      const badgeText = p.badge || (p.nom ? '🤝 ' + p.nom : '🤝 Partenaire');
+      card.innerHTML = `
+        <div class="adcard-img" style="background:linear-gradient(135deg,#1A1A2E 0%,#1E6FBE 100%)">
+          <div class="adcard-gradient"></div>
+          ${p.imageUrl
+            ? `<img src="${p.imageUrl}" alt="${p.nom||'Partenaire'}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>`
+            : `<span class="adcard-emoji-bg">🤝</span>`}
+          <div class="adcard-badge">${badgeText}</div>
+        </div>
+        <div class="adcard-body">
+          <div class="adcard-promo">${{partenaire:'PARTENAIRE OFFICIEL',sponsor:'SPONSOR',collaborateur:'COLLABORATEUR',nouveaute:'NOUVEAUTÉ',promotion:'PROMOTION',evenement:'ÉVÉNEMENT'}[p.promo]||'PARTENAIRE OFFICIEL'}</div>
+          <div class="adcard-title">${p.nom||'Partenaire'}</div>
+          <div class="adcard-sub">${p.description||''}</div>
+          ${p.lien ? `<div class="adcard-cta">Découvrir →</div>` : ''}
+        </div>`;
+
       track.appendChild(card);
+
+      const dot = document.createElement('span');
+      dot.className = 'adband-dot';
+      dotsBox.appendChild(dot);
     });
 
   } catch(e) {
-    console.warn('Partenaires Firestore indisponibles :', e.message);
+    console.log('Partenaires non disponibles', e);
   }
-
-  startAdband();
 }
 loadPartnerSlides();
 
+// ════════════════════════════════════════
+// FILTRE RECHERCHE SERVICES
+// ════════════════════════════════════════
 function filterServices(q) {
   if (!document.getElementById('t-services')?.classList.contains('on')) goTab('services');
   document.querySelectorAll('#view-list .svc-row').forEach(r => {
@@ -1532,3 +1555,114 @@ function filterServices(q) {
   });
 }
 window.filterServices = filterServices;
+
+// ════════════════════════════════════════
+// BANDEAU PUBLICITAIRE — BOUCLE INFINIE SANS RETOUR VISIBLE
+// ════════════════════════════════════════
+(function initAdbandLoop() {
+  const track = document.getElementById('adband-track');
+  const dotsWrap = document.getElementById('adband-dots');
+  if (!track) return;
+
+  const INTERVAL = 3200; // ms entre chaque slide
+  let idx = 0;           // index de la carte visible actuelle (parmi les originales)
+  let originals = [];    // cartes d'origine (HTML + Firestore)
+  let clone = null;      // clone de la première carte, placé en fin de track
+  let timer = null;
+  let paused = false;
+  let jumping = false;   // vrai pendant le saut silencieux
+
+  // ── Dots ──
+  function updateDot(i) {
+    if (!dotsWrap) return;
+    dotsWrap.querySelectorAll('.adband-dot').forEach((d, j) => d.classList.toggle('on', j === i));
+  }
+
+  // ── Scroll vers un élément DOM ──
+  function scrollTo(el, smooth) {
+    track.scrollTo({ left: el.offsetLeft - track.offsetLeft, behavior: smooth ? 'smooth' : 'instant' });
+  }
+
+  // ── Avancer d'une carte ──
+  function next() {
+    if (jumping) return;
+    const n = idx + 1;
+
+    if (n < originals.length) {
+      // Cas normal : carte suivante
+      idx = n;
+      scrollTo(originals[idx], true);
+      updateDot(idx);
+    } else {
+      // Dernière → animer vers le CLONE de la première (identique visuellement)
+      scrollTo(clone, true);
+      updateDot(0);
+      jumping = true;
+      // Après l'animation (~420ms), sauter silencieusement à la vraie première
+      setTimeout(() => {
+        idx = 0;
+        scrollTo(originals[0], false);
+        jumping = false;
+      }, 430);
+    }
+  }
+
+  // ── Reculer d'une carte ──
+  function prev() {
+    idx = (idx - 1 + originals.length) % originals.length;
+    scrollTo(originals[idx], true);
+    updateDot(idx);
+  }
+
+  // ── Boucle auto ──
+  function startLoop() {
+    clearInterval(timer);
+    timer = setInterval(() => { if (!paused && !jumping) next(); }, INTERVAL);
+  }
+
+  // ── Pause au survol souris ──
+  track.addEventListener('mouseenter', () => { paused = true; });
+  track.addEventListener('mouseleave', () => { paused = false; });
+
+  // ── Swipe tactile ──
+  let tx = 0;
+  track.addEventListener('touchstart', e => {
+    paused = true;
+    tx = e.touches[0].clientX;
+  }, { passive: true });
+  track.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) dx < 0 ? next() : prev();
+    setTimeout(() => { paused = false; }, INTERVAL);
+  }, { passive: true });
+
+  // ── Init : après que Firestore ait éventuellement ajouté ses cartes ──
+  setTimeout(() => {
+    originals = Array.from(track.querySelectorAll('.adcard'));
+    if (originals.length < 2) { updateDot(0); return; }
+
+    // Cloner la première carte et l'ajouter en fin de track
+    // Elle est identique visuellement → le saut sera invisible
+    clone = originals[0].cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    clone.style.pointerEvents = 'none'; // évite les clics sur le clone
+    track.appendChild(clone);
+
+    // Synchroniser les dots : s'assurer qu'il y en a autant que de vraies cartes
+    if (dotsWrap) {
+      const existingDots = dotsWrap.querySelectorAll('.adband-dot');
+      // Ajouter des dots manquants si Firestore a rajouté des cartes
+      while (dotsWrap.querySelectorAll('.adband-dot').length < originals.length) {
+        const d = document.createElement('span');
+        d.className = 'adband-dot';
+        dotsWrap.appendChild(d);
+      }
+    }
+
+    idx = 0;
+    scrollTo(originals[0], false);
+    updateDot(0);
+    startLoop();
+  }, 1600);
+})();
+
