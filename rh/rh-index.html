@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OmniService TG — Espace RH</title>
+<link rel="icon" href="../assets/logo.png" type="image/png"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1565C0;--blue2:#1E88E5;--blue-d:#0D47A1;--blue-s:rgba(21,101,192,.1);
+  --ora:#F5820A;--ora-d:#E65100;--ora-s:rgba(245,130,10,.1);
+  --dark:#0D2137;--mid:#3A5068;--light:#7A95B0;
+  --border:#D6E4F0;--bg:#F0F4FF;--bg2:#E8F0FE;--bg3:#fff;--bg4:#F4F7FF;
+  --card:#fff;--green:#2E7D32;--green-d:#1B5E20;--green-s:rgba(46,125,50,.1);
+  --red:#C62828;--red-s:rgba(198,40,40,.1);
+  --purple:#6A1B9A;--slate:#7A95B0;--muted:#7A95B0;
+  --ink:#0D2137;--ink2:#1E3A5F;--ink3:#3A5068;
+  --border2:#D6E4F0;
+  --teal:#39D0D8;--teal-s:rgba(57,208,216,.12);
+  --red:#F85149;--red-s:rgba(248,81,73,.12);
+}
+html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--dark)}
+
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#0D2137,#1565C0);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.sp-ring{width:56px;height:56px;border:2px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+.sp-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:.5px}
+.sp-sub{font-size:11px;color:var(--slate);letter-spacing:2px;text-transform:uppercase}
+@keyframes spin{to{transform:rotate(360deg)}}
+#splash.out{animation:fadeOut .4s ease forwards}
+@keyframes fadeOut{to{opacity:0;pointer-events:none}}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0D2137,#1565C0 60%,#0D47A1);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;display:none}
+.login-wrap{width:100%;max-width:400px}
+.login-header{text-align:center;margin-bottom:32px}
+.login-icon{font-size:40px;margin-bottom:12px}
+.login-title{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:var(--dark);margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--slate)}
+.login-card{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:28px}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.field{width:100%;padding:12px 14px;background:#f8faff;border:1.5px solid var(--border);border-radius:10px;color:var(--dark);font-size:14px;font-family:'Poppins',sans-serif;outline:none;transition:.2s;margin-bottom:16px}
+.field:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--green-s)}
+.btn-primary{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s;letter-spacing:.3px}
+.btn-primary:hover{background:#2EA043;transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.login-err{color:var(--red);font-size:12px;margin-top:10px;min-height:18px;text-align:center}
+
+/* ── APP LAYOUT ── */
+#app{display:none;min-height:100vh;display:grid;grid-template-rows:auto 1fr;display:none}
+.topbar{background:linear-gradient(135deg,#0D2137,#1565C0);border-bottom:none;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.tb-left{display:flex;align-items:center;gap:14px}
+.tb-logo{font-size:22px}
+.tb-brand{font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;color:#fff}
+.tb-badge{font-size:10px;background:var(--green-s);color:var(--blue);border:1px solid var(--green-d);border-radius:99px;padding:2px 10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-user{font-size:13px;color:rgba(255,255,255,.7)}
+.btn-sm{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s}
+.btn-sm:hover{background:var(--bg4);color:var(--dark)}
+
+/* ── MAIN ── */
+.main{padding:24px;max-width:1100px;margin:0 auto;width:100%}
+
+/* ── HEADER SECTION ── */
+.page-header{margin-bottom:28px}
+.page-title{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--dark);margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--slate)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:4px}
+.tab-btn{flex:1;padding:9px;border:none;background:transparent;color:var(--slate);font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:7px;transition:.2s;letter-spacing:.3px;text-transform:uppercase}
+.tab-btn.on{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+
+/* ── STATS STRIP ── */
+.stats-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:24px}
+.stat-pill{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.stat-ico{font-size:20px}
+.stat-info{}
+.stat-val{font-family:'Playfair Display',serif;font-size:20px;color:var(--dark);line-height:1}
+.stat-lbl{font-size:10px;color:var(--slate);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-box{flex:1;min-width:200px;padding:9px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--dark);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:.2s}
+.search-box:focus{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-s)}
+.filter-select{padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--dark);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
+.btn-add{padding:9px 18px;background:linear-gradient(135deg,var(--ora),var(--ora-d));color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;white-space:nowrap}
+.btn-add:hover{background:#2EA043}
+
+/* ── AGENTS GRID ── */
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.agent-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;transition:.2s}
+.agent-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.ac-top{padding:16px;display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid var(--border)}
+.ac-avatar{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ac-info{flex:1;min-width:0}
+.ac-name{font-size:14px;font-weight:700;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-code{font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--ora-d);background:var(--ora-s);border:1px solid rgba(245,130,10,.3);letter-spacing:1px;border-radius:4px;padding:2px 7px;margin-top:3px;display:inline-block;letter-spacing:.5px}
+.ac-body{padding:12px 16px}
+.ac-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ac-row:last-child{margin-bottom:0}
+.ac-ico{font-size:13px;width:18px;text-align:center;flex-shrink:0}
+.ac-val{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-foot{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.role-badge{font-size:10px;font-weight:700;border-radius:99px;padding:3px 10px;text-transform:uppercase;letter-spacing:.5px}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+.ac-actions{display:flex;gap:6px}
+.btn-icon{padding:5px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:.2s;font-family:'DM Mono',monospace}
+.btn-icon:hover{background:var(--bg4);color:var(--dark)}
+.btn-del{border-color:rgba(248,81,73,.3);color:var(--red)}
+.btn-del:hover{background:var(--red-s)}
+
+/* ── ROLE COLORS ── */
+.role-livreur{background:var(--blue-s);color:var(--blue)}
+.role-agent{background:var(--orange-s);color:var(--orange)}
+.role-rh{background:var(--purple-s);color:var(--purple)}
+.role-comm{background:var(--teal-s);color:var(--teal)}
+.role-stats{background:var(--yellow-s);color:var(--yellow)}
+.role-comptable{background:var(--green-s);color:var(--blue)}
+.role-admin{background:rgba(248,81,73,.15);color:var(--red)}
+
+.av-livreur{background:var(--blue-s)}
+.av-agent{background:var(--orange-s)}
+.av-rh{background:var(--purple-s)}
+.av-comm{background:var(--teal-s)}
+.av-stats{background:var(--yellow-s)}
+.av-comptable{background:var(--green-s)}
+.av-admin{background:rgba(248,81,73,.1)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(1,4,9,.8);backdrop-filter:blur(4px);z-index:500;display:none;align-items:flex-end;justify-content:center;padding:0}
+.modal-bg.open{display:flex}
+@media(min-width:600px){.modal-bg{align-items:center;padding:20px}}
+.modal{background:var(--bg3);border:1px solid var(--border2);border-radius:16px 16px 0 0;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1)}
+@media(min-width:600px){.modal{border-radius:16px;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}}
+@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+@keyframes popIn{from{transform:scale(.93);opacity:0}to{transform:none;opacity:1}}
+.modal-head{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--dark)}
+.modal-close{width:30px;height:30px;background:var(--bg4);border:none;border-radius:6px;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:0 20px 20px}
+.form-row{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+.form-input{width:100%;padding:10px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--dark);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:.2s}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 2px var(--green-s)}
+.form-select{width:100%;padding:10px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--dark);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.code-preview{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.code-preview-label{font-size:11px;color:var(--slate);text-transform:uppercase;letter-spacing:.5px}
+.code-preview-val{font-family:'DM Mono',monospace;font-size:16px;color:var(--blue);font-weight:600;letter-spacing:1px}
+.modal-footer{padding:0 20px 20px;display:flex;gap:10px}
+.btn-cancel{flex:1;padding:11px;background:transparent;border:1px solid var(--border2);border-radius:8px;color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s}
+.btn-cancel:hover{background:var(--bg4)}
+.btn-save{flex:2;padding:11px;background:linear-gradient(135deg,var(--blue),var(--blue-d));border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s}
+.btn-save:hover{background:#2EA043}
+
+/* ── CODE REVEAL MODAL ── */
+.code-reveal{text-align:center;padding:10px 0 20px}
+.code-reveal-ico{font-size:48px;margin-bottom:12px}
+.code-reveal-title{font-size:14px;color:var(--muted);margin-bottom:16px}
+.code-big{font-family:'DM Mono',monospace;font-size:36px;font-weight:500;color:var(--blue);background:var(--green-s);border:2px solid rgba(63,185,80,.3);border-radius:12px;padding:16px 24px;letter-spacing:4px;display:inline-block;margin-bottom:8px}
+.code-reveal-note{font-size:11px;color:var(--slate);line-height:1.5;max-width:280px;margin:0 auto 20px}
+.btn-copy{padding:10px 24px;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;color:var(--dark);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s}
+.btn-copy:hover{background:var(--bg2)}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:60px 20px;color:var(--slate)}
+.empty-ico{font-size:48px;margin-bottom:12px;opacity:.5}
+.empty-title{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.empty-sub{font-size:12px}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg4);color:var(--dark);border:1px solid var(--border2);padding:11px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9998;transition:.3s;opacity:0;max-width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .main{padding:16px}
+  .tb-brand{display:none}
+  .stats-strip{grid-template-columns:repeat(3,1fr)}
+  .agents-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-ring"></div>
+  <div class="sp-title">OmniService TG</div>
+  <div class="sp-sub">Espace Ressources Humaines</div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-header">
+      <div class="login-icon">👥</div>
+      <div class="login-title">Espace RH</div>
+      <div class="login-sub">OmniService TG · Gestion des agents</div>
+    </div>
+    <div class="login-card">
+      <div class="form-label">🔑 Votre code d'accès RH</div>
+      <input class="field" type="text" id="login-code" placeholder="RH0001" maxlength="10"
+        autocomplete="off" spellcheck="false"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter') doLogin()"
+        style="font-size:22px;font-weight:900;font-family:'Nunito',sans-serif;text-align:center;letter-spacing:4px;text-transform:uppercase"/>
+      <button class="btn-primary" onclick="doLogin()" id="btn-login">🚀 Se connecter</button>
+      <div class="login-err" id="login-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="tb-left">
+      <div class="tb-logo">👥</div>
+      <div class="tb-brand">OmniService TG</div>
+      <div class="tb-badge">Espace RH</div>
+    </div>
+    <div class="tb-right">
+      <span class="tb-user" id="tb-user-name"></span>
+      <button class="btn-sm" onclick="doLogout()">↩ Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="page-header">
+      <div class="page-title">Gestion des agents</div>
+      <div class="page-sub">Ajoutez, modifiez et gérez les comptes de votre équipe</div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-strip" id="stats-strip">
+      <div class="stat-pill"><div class="stat-ico">👥</div><div class="stat-info"><div class="stat-val" id="s-total">—</div><div class="stat-lbl">Total</div></div></div>
+      <div class="stat-pill"><div class="stat-ico">🛵</div><div class="stat-info"><div class="stat-val" id="s-livreur">—</div><div class="stat-lbl">Livreurs</div></div></div>
+      <div class="stat-pill"><div class="stat-ico">🦺</div><div class="stat-info"><div class="stat-val" id="s-agent">—</div><div class="stat-lbl">Terrain</div></div></div>
+      <div class="stat-pill"><div class="stat-ico">📣</div><div class="stat-info"><div class="stat-val" id="s-comm">—</div><div class="stat-lbl">Comm</div></div></div>
+      <div class="stat-pill"><div class="stat-ico">📊</div><div class="stat-info"><div class="stat-val" id="s-stats">—</div><div class="stat-lbl">Stats</div></div></div>
+      <div class="stat-pill"><div class="stat-ico">🧾</div><div class="stat-info"><div class="stat-val" id="s-comptable">—</div><div class="stat-lbl">Compta</div></div></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs" id="role-tabs">
+      <button class="tab-btn on" onclick="filterRole('all',this)">Tous</button>
+      <button class="tab-btn" onclick="filterRole('livreur',this)">🛵 Livreurs</button>
+      <button class="tab-btn" onclick="filterRole('agent',this)">🦺 Terrain</button>
+      <button class="tab-btn" onclick="filterRole('comm',this)">📣 Comm</button>
+      <button class="tab-btn" onclick="filterRole('stats',this)">📊 Stats</button>
+      <button class="tab-btn" onclick="filterRole('comptable',this)">🧾 Compta</button>
+      <button class="tab-btn" onclick="filterRole('rh',this)">👔 RH</button>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <input class="search-box" type="text" placeholder="🔍 Rechercher un agent..." oninput="searchAgents(this.value)" id="search-input"/>
+      <select class="filter-select" onchange="filterStatut(this.value)">
+        <option value="">Tous les statuts</option>
+        <option value="active">Actifs seulement</option>
+        <option value="inactive">Inactifs</option>
+      </select>
+      <button class="btn-add" onclick="openAddModal()">＋ Nouvel agent</button>
+    </div>
+
+    <!-- AGENTS GRID -->
+    <div class="agents-grid" id="agents-grid">
+      <div class="empty"><div class="empty-ico">⏳</div><div class="empty-title">Chargement...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AJOUT/ÉDITION -->
+<div class="modal-bg" id="modal-agent">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">Nouvel agent</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-uid"/>
+      <div class="form-row">
+        <div class="form-label">Rôle *</div>
+        <select class="form-select" id="f-role" onchange="onRoleChange()">
+          <option value="">-- Choisir un rôle --</option>
+          <option value="livreur">🛵 Livreur</option>
+          <option value="agent">🦺 Agent de terrain</option>
+          <option value="comm">📣 Communication</option>
+          <option value="stats">📊 Statisticien</option>
+          <option value="comptable">🧾 Comptable</option>
+        </select>
+      </div>
+
+      <!-- Code auto-généré (affiché si rôle = livreur ou agent) -->
+      <div id="code-preview-block" style="display:none">
+        <div class="code-preview">
+          <div>
+            <div class="code-preview-label">Code d'accès généré</div>
+            <div class="code-preview-val" id="code-preview-val">—</div>
+          </div>
+          <div style="font-size:20px">🔑</div>
+        </div>
+      </div>
+
+      <div class="form-2col">
+        <div class="form-row">
+          <div class="form-label">Prénom *</div>
+          <input class="form-input" type="text" id="f-prenom" placeholder="Jean"/>
+        </div>
+        <div class="form-row">
+          <div class="form-label">Nom *</div>
+          <input class="form-input" type="text" id="f-nom" placeholder="Kodjo"/>
+        </div>
+      </div>
+
+      <!-- Email & mot de passe (pour rôles avec connexion email) -->
+      <div id="email-fields">
+        <div class="form-row">
+          <div class="form-label">Email *</div>
+          <input class="form-input" type="email" id="f-email" placeholder="jean@omniservicetg.com"/>
+        </div>
+        <div class="form-row" id="password-field-row">
+          <div class="form-label">Mot de passe *</div>
+          <input class="form-input" type="password" id="f-password" placeholder="Minimum 6 caractères"/>
+        </div>
+      </div>
+
+      <div class="form-2col">
+        <div class="form-row">
+          <div class="form-label">Téléphone</div>
+          <input class="form-input" type="tel" id="f-telephone" placeholder="+228 XX XX XX XX"/>
+        </div>
+        <div class="form-row">
+          <div class="form-label">Zone</div>
+          <input class="form-input" type="text" id="f-zone" placeholder="Adidogomé"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-save" onclick="saveAgent()" id="btn-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CODE REVEAL -->
+<div class="modal-bg" id="modal-code">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head">
+      <div class="modal-title">Agent créé ✓</div>
+      <button class="modal-close" onclick="closeCodeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="code-reveal">
+        <div class="code-reveal-ico">🎉</div>
+        <div class="code-reveal-title">Transmettez ce code à l'agent</div>
+        <div class="code-big" id="reveal-code">—</div>
+        <div class="code-reveal-note">Ce code lui permettra de se connecter à son espace. Conservez-le en sécurité et ne le partagez qu'avec l'intéressé(e).</div>
+        <button class="btn-copy" onclick="copyCode()">📋 Copier le code</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc,
+  query, orderBy, where, getDoc, serverTimestamp, writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getAuth, signInAnonymously, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",
+  authDomain: "omniservicetg-59df3.firebaseapp.com",
+  projectId: "omniservicetg-59df3",
+  storageBucket: "omniservicetg-59df3.firebasestorage.app",
+  messagingSenderId: "196278567761",
+  appId: "1:196278567761:web:4f6416acaab58b67bf4970"
+};
+const fbApp  = initializeApp(firebaseConfig);
+const db     = getFirestore(fbApp);
+const auth   = getAuth(fbApp);
+
+// ── Préfixes de codes par rôle ──
+const CODE_PREFIX = {
+  livreur:    'Li',
+  agent:      'Agt',
+  comm:       'Cm',
+  stats:      'St',
+  comptable:  'Cpt',
+  rh:         'RH',
+  admin:      'Adm'
+};
+
+const ROLE_LABELS = {
+  livreur:'Livreur', agent:'Agent terrain', comm:'Communication',
+  stats:'Statisticien', comptable:'Comptable', rh:'RH', admin:'Admin'
+};
+
+const ROLE_ICONS = {
+  livreur:'🛵', agent:'🦺', comm:'📣', stats:'📊',
+  comptable:'🧾', rh:'👔', admin:'🔴'
+};
+
+// Les rôles qui se connectent par code (pas email)
+const CODE_LOGIN_ROLES = new Set(['livreur','agent','comm','stats','comptable','rh','admin']);
+
+let allAgents = [];
+let activeRole = 'all';
+let searchQ = '';
+let statutFilter = '';
+
+// ── Splash → Login ──
+setTimeout(() => {
+  const s = document.getElementById('splash');
+  s.classList.add('out');
+  setTimeout(() => s.style.display='none', 400);
+}, 2200);
+
+// ── Auth ──
+onAuthStateChanged(auth, async user => {
+  // Ignorer les sessions anonymes (livreurs/agents) — le RH se connecte par email
+  if (user && user.isAnonymous) return;
+  if (user) {
+    const snap = await getDoc(doc(db,'agents',user.uid));
+    if (!snap.exists() || !['rh','admin'].includes(snap.data().role)) {
+      await signOut(auth);
+      showLogin('❌ Accès non autorisé pour ce compte.');
+      return;
+    }
+    document.getElementById('tb-user-name').textContent = snap.data().nom || user.email;
+    showApp();
+    loadAgents();
+  } else {
+    showLogin();
+  }
+});
+
+function showLogin(err='') {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  if (err) document.getElementById('login-err').textContent = err;
+}
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'grid';
+}
+
+window.doLogin = async function() {
+  const code = document.getElementById('login-code').value.trim().toUpperCase();
+  const btn  = document.getElementById('btn-login');
+  const err  = document.getElementById('login-err');
+  if (!code) { err.textContent = '⚠️ Saisissez votre code'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Vérification...';
+  err.textContent = '';
+  try {
+    // Vérifier dans agents_login (collection publique)
+    const ls = await getDoc(doc(db,'agents_login',code));
+    if (!ls.exists()) { err.textContent = '❌ Code inconnu.'; return; }
+    const ld = ls.data();
+    if (!['rh','admin'].includes(ld.role)) { err.textContent = '❌ Ce code n\'est pas un code RH.'; return; }
+    if (ld.actif === false) { err.textContent = '⛔ Compte désactivé.'; return; }
+    btn.innerHTML = '<span class="spinner"></span> Connexion...';
+    const cred = await signInAnonymously(auth);
+    const aUid = cred.user.uid;
+    const ps = await getDoc(doc(db,'agents',ld.agentUid));
+    const pd = ps.exists() ? ps.data() : { code, role: ld.role, actif: true };
+    await setDoc(doc(db,'agents',aUid), { ...pd, uid:aUid, codeRef:ld.agentUid, derniere_connexion:serverTimestamp() });
+    // onAuthStateChanged prend le relais — mais il ignore isAnonymous !
+    // On déclenche manuellement l'init pour le RH anonyme
+    document.getElementById('tb-user-name').textContent = pd.prenom || pd.nom || code;
+    showApp(); loadAgents();
+  } catch(e) {
+    console.error(e);
+    err.textContent = '❌ Erreur réseau. Réessayez.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 Se connecter';
+  }
+};
+
+window.doLogout = async function() {
+  await signOut(auth);
+};
+
+// ── Load agents ──
+async function loadAgents() {
+  try {
+    const snap = await getDocs(query(collection(db,'agents'), orderBy('nom','asc')));
+    allAgents = snap.docs.map(d => ({uid:d.id, ...d.data()}));
+    renderStats();
+    renderAgents();
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Erreur lors du chargement des agents');
+  }
+}
+
+function renderStats() {
+  const count = r => allAgents.filter(a=>a.role===r).length;
+  document.getElementById('s-total').textContent     = allAgents.length;
+  document.getElementById('s-livreur').textContent   = count('livreur');
+  document.getElementById('s-agent').textContent     = count('agent');
+  document.getElementById('s-comm').textContent      = count('comm');
+  document.getElementById('s-stats').textContent     = count('stats');
+  document.getElementById('s-comptable').textContent = count('comptable');
+}
+
+function renderAgents() {
+  let list = allAgents;
+  if (activeRole !== 'all') list = list.filter(a=>a.role===activeRole);
+  if (searchQ) {
+    const q = searchQ.toLowerCase();
+    list = list.filter(a =>
+      (a.nom||'').toLowerCase().includes(q) ||
+      (a.prenom||'').toLowerCase().includes(q) ||
+      (a.code||'').toLowerCase().includes(q) ||
+      (a.email||'').toLowerCase().includes(q) ||
+      (a.zone||'').toLowerCase().includes(q)
+    );
+  }
+  if (statutFilter === 'active')   list = list.filter(a=>a.actif!==false);
+  if (statutFilter === 'inactive') list = list.filter(a=>a.actif===false);
+
+  const grid = document.getElementById('agents-grid');
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-ico">🔍</div><div class="empty-title">Aucun agent trouvé</div><div class="empty-sub">Modifiez vos filtres ou ajoutez un agent</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(a => {
+    const role    = a.role || 'agent';
+    const icon    = ROLE_ICONS[role] || '👤';
+    const label   = ROLE_LABELS[role] || role;
+    const actif   = a.actif !== false;
+    const dotClr  = actif ? '#3FB950' : '#6E7681';
+    const nom     = `${a.prenom||''} ${a.nom||''}`.trim() || 'Agent';
+    const codeHtml = a.code ? `<div class="ac-code">${a.code}</div>` : '';
+    return `
+    <div class="agent-card" id="card-${a.uid}">
+      <div class="ac-top">
+        <div class="ac-avatar av-${role}">${icon}</div>
+        <div class="ac-info">
+          <div class="ac-name">${nom}</div>
+          ${codeHtml}
+        </div>
+        <span class="role-badge role-${role}">${label}</span>
+      </div>
+      <div class="ac-body">
+        ${a.email ? `<div class="ac-row"><div class="ac-ico">✉️</div><div class="ac-val">${a.email}</div></div>` : ''}
+        ${a.telephone ? `<div class="ac-row"><div class="ac-ico">📞</div><div class="ac-val">${a.telephone}</div></div>` : ''}
+        ${a.zone ? `<div class="ac-row"><div class="ac-ico">📍</div><div class="ac-val">${a.zone}</div></div>` : ''}
+        <div class="ac-row"><div class="ac-ico">⚡</div><div class="ac-val"><span class="status-dot" style="background:${dotClr}"></span>${actif?'Actif':'Inactif'} · ${a.statut||'indisponible'}</div></div>
+      </div>
+      <div class="ac-foot">
+        <div class="ac-actions">
+          <button class="btn-icon" onclick="toggleActif('${a.uid}',${actif})">${actif?'⏸ Désactiver':'▶ Activer'}</button>
+          ${a.code ? `<button class="btn-icon" onclick="showCode('${a.code}')">🔑</button>` : ''}
+          <button class="btn-icon" onclick="openEditModal('${a.uid}')">✏️</button>
+          <button class="btn-icon btn-del" onclick="deleteAgent('${a.uid}','${nom}')">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Filtres ──
+window.filterRole = function(role, btn) {
+  activeRole = role;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderAgents();
+};
+window.searchAgents = function(q) { searchQ=q; renderAgents(); };
+window.filterStatut = function(v) { statutFilter=v; renderAgents(); };
+
+// ── Générer le prochain code ──
+async function generateCode(role) {
+  const prefix = CODE_PREFIX[role] || 'Ag';
+  const snap = await getDocs(query(collection(db,'agents'), where('role','==',role)));
+  const nums = snap.docs
+    .map(d => d.data().code)
+    .filter(c => c && c.startsWith(prefix))
+    .map(c => parseInt(c.replace(prefix,''),10))
+    .filter(n => !isNaN(n));
+  const next = nums.length ? Math.max(...nums)+1 : 1;
+  return `${prefix}${String(next).padStart(4,'0')}`;
+}
+
+// ── Modal ajout/édition ──
+let currentCode = '';
+
+window.openAddModal = function() {
+  document.getElementById('modal-title').textContent = 'Nouvel agent';
+  document.getElementById('edit-uid').value = '';
+  document.getElementById('f-role').value = '';
+  document.getElementById('f-prenom').value = '';
+  document.getElementById('f-nom').value = '';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-password').value = '';
+  document.getElementById('f-telephone').value = '';
+  document.getElementById('f-zone').value = '';
+  document.getElementById('code-preview-block').style.display = 'none';
+  document.getElementById('email-fields').style.display = 'block';
+  document.getElementById('password-field-row').style.display = 'block';
+  document.getElementById('modal-agent').classList.add('open');
+  currentCode = '';
+};
+
+window.openEditModal = function(uid) {
+  const a = allAgents.find(x=>x.uid===uid);
+  if (!a) return;
+  document.getElementById('modal-title').textContent = 'Modifier l\'agent';
+  document.getElementById('edit-uid').value = uid;
+  document.getElementById('f-role').value = a.role||'';
+  document.getElementById('f-prenom').value = a.prenom||'';
+  document.getElementById('f-nom').value = a.nom||'';
+  document.getElementById('f-email').value = a.email||'';
+  document.getElementById('f-password').value = '';
+  document.getElementById('f-telephone').value = a.telephone||'';
+  document.getElementById('f-zone').value = a.zone||'';
+  // Cacher le champ mdp en mode édition
+  document.getElementById('password-field-row').style.display = 'none';
+  if (a.code) {
+    document.getElementById('code-preview-block').style.display = 'block';
+    document.getElementById('code-preview-val').textContent = a.code;
+  } else {
+    document.getElementById('code-preview-block').style.display = 'none';
+  }
+  const isCodeRole = true; // Tous les rôles utilisent un code
+  document.getElementById('email-fields').style.display = isCodeRole ? 'none' : 'block';
+  document.getElementById('modal-agent').classList.add('open');
+};
+
+window.onRoleChange = async function() {
+  const role = document.getElementById('f-role').value;
+  const isEditMode = !!document.getElementById('edit-uid').value;
+  // TOUS les rôles se connectent par code désormais
+  document.getElementById('email-fields').style.display = 'none';
+
+  if (role && !isEditMode) {
+    currentCode = await generateCode(role);
+    document.getElementById('code-preview-val').textContent = currentCode;
+    document.getElementById('code-preview-block').style.display = 'block';
+  } else if (!role) {
+    document.getElementById('code-preview-block').style.display = 'none';
+  }
+};
+
+window.closeModal = function() {
+  document.getElementById('modal-agent').classList.remove('open');
+};
+
+// ── Sauvegarder agent ──
+window.saveAgent = async function() {
+  const uid    = document.getElementById('edit-uid').value;
+  const role   = document.getElementById('f-role').value;
+  const prenom = document.getElementById('f-prenom').value.trim();
+  const nom    = document.getElementById('f-nom').value.trim();
+  const email  = document.getElementById('f-email').value.trim();
+  const pass   = document.getElementById('f-password').value;
+  const phone  = document.getElementById('f-telephone').value.trim();
+  const zone   = document.getElementById('f-zone').value.trim();
+
+  if (!role || !prenom || !nom) { showToast('⚠️ Rôle, prénom et nom sont requis'); return; }
+
+  // TOUS les rôles se connectent par code — plus d'email/password
+  const btn = document.getElementById('btn-save');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Enregistrement...';
+
+  try {
+    if (uid) {
+      // ── ÉDITION ──
+      const data = { nom, prenom, role, telephone:phone, zone, updatedAt:serverTimestamp() };
+
+      const batch = writeBatch(db);
+      batch.update(doc(db,'agents',uid), data);
+
+      // Mettre à jour agents_login si l'agent a un code
+      const existing = allAgents.find(a=>a.uid===uid);
+      if (existing?.code) {
+        batch.set(doc(db,'agents_login',existing.code), {
+          code: existing.code, role, actif: existing.actif !== false, agentUid: uid
+        });
+      }
+      await batch.commit();
+      showToast('✅ Agent mis à jour');
+      closeModal();
+      await loadAgents();
+    } else {
+      // ── CRÉATION — TOUS les rôles par code ──
+      const code = currentCode || await generateCode(role);
+      const newUid = `code_${code}`;
+      const data = {
+        uid: newUid, nom, prenom, role, telephone:phone, zone,
+        code, actif:true, statut:'indisponible',
+        createdAt: serverTimestamp()
+      };
+
+      // Écriture atomique : agents/ + agents_login/
+      const batch = writeBatch(db);
+      batch.set(doc(db,'agents',newUid), data);
+      batch.set(doc(db,'agents_login',code), { code, role, actif:true, agentUid:newUid });
+      await batch.commit();
+
+      closeModal();
+      document.getElementById('reveal-code').textContent = code;
+      document.getElementById('modal-code').classList.add('open');
+      await loadAgents();
+    }
+  } catch(e) {
+    console.error(e);
+    let msg = '❌ Erreur lors de l\'enregistrement';
+    if (e.code === 'auth/email-already-in-use') msg = '❌ Cet email est déjà utilisé';
+    if (e.code === 'auth/weak-password') msg = '❌ Mot de passe trop faible (min. 6 caractères)';
+    showToast(msg);
+  } finally {
+    btn.disabled=false; btn.textContent='Enregistrer';
+  }
+};
+
+// ── Toggle actif ──
+window.toggleActif = async function(uid, isActif) {
+  try {
+    const agent = allAgents.find(a=>a.uid===uid);
+    const batch = writeBatch(db);
+    batch.update(doc(db,'agents',uid), { actif: !isActif });
+    // Synchroniser agents_login si l'agent a un code
+    if (agent?.code) {
+      batch.update(doc(db,'agents_login',agent.code), { actif: !isActif });
+    }
+    await batch.commit();
+    showToast(isActif ? '⏸ Agent désactivé' : '▶ Agent activé');
+    await loadAgents();
+  } catch(e) { showToast('❌ Erreur'); }
+};
+
+// ── Supprimer ──
+window.deleteAgent = async function(uid, nom) {
+  if (!confirm(`Supprimer l'agent "${nom}" ? Cette action est irréversible.`)) return;
+  try {
+    const agent = allAgents.find(a=>a.uid===uid);
+    const batch = writeBatch(db);
+    batch.delete(doc(db,'agents',uid));
+    // Supprimer aussi de agents_login
+    if (agent?.code) {
+      batch.delete(doc(db,'agents_login',agent.code));
+    }
+    await batch.commit();
+    showToast('🗑 Agent supprimé');
+    await loadAgents();
+  } catch(e) { showToast('❌ Erreur suppression'); }
+};
+
+// ── Code reveal ──
+window.showCode = function(code) {
+  document.getElementById('reveal-code').textContent = code;
+  document.getElementById('modal-code').classList.add('open');
+};
+window.closeCodeModal = function() {
+  document.getElementById('modal-code').classList.remove('open');
+};
+window.copyCode = function() {
+  const code = document.getElementById('reveal-code').textContent;
+  navigator.clipboard.writeText(code).then(()=>showToast('📋 Code copié !'));
+};
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
