@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>OmniService TG — Services professionnels à Lomé</title>
+<meta name="description" content="OmniService TG — Alimentation, livraison, nettoyage, restauration et plus à Lomé, Togo."/>
+<meta name="theme-color" content="#1E6FBE"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="OmniService TG"/>
+<meta name="msapplication-TileColor" content="#1E6FBE"/>
+<meta property="og:title" content="OmniService TG"/>
+<meta property="og:description" content="Alimentation, livraison, nettoyage, restauration et plus à Lomé, Togo."/>
+<meta property="og:type" content="website"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="assets/logo.png" type="image/png"/>
+<link rel="apple-touch-icon" href="assets/logo.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<style>
+/* ══ RESTAURANTS VIEW ══ */
+#view-restaurants { padding-bottom: 20px; }
+
+/* ══ KITS VIEW ══ */
+#view-kits { padding-bottom: 20px; }
+#view-kit-detail { padding-bottom: 20px; }
+
+.kit-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 14px 16px;
+  margin: 0 16px 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  position: relative;
+  overflow: hidden;
+}
+.kit-card:active { transform: scale(.98); }
+.kit-card:hover { box-shadow: 0 4px 20px rgba(30,111,190,.15); }
+.kit-img-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.kit-body { flex: 1; min-width: 0; }
+.kit-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  color: #1E6FBE;
+  background: #E3F2FD;
+  border-radius: 999px;
+  padding: 3px 9px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  margin-bottom: 5px;
+}
+.kit-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A2E;
+  margin-bottom: 3px;
+}
+.kit-desc {
+  font-size: 11px;
+  color: #4A4A6A;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.kit-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.kit-price {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1E6FBE;
+}
+.kit-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: #9999BB;
+  background: #F4F6FA;
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+.kit-arrow { font-size: 22px; color: #E8EAF0; flex-shrink: 0; align-self: center; }
+
+/* ══ KIT DETAIL ══ */
+.kit-detail-hero {
+  margin: 0 16px 14px;
+  background: linear-gradient(135deg, #1E6FBE, #155A9C);
+  border-radius: 20px;
+  padding: 22px 20px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.kit-detail-hero::before {
+  content: attr(data-emoji);
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 70px;
+  opacity: .2;
+}
+.kit-detail-hero-name {
+  font-size: 18px;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+  margin-bottom: 5px;
+}
+.kit-detail-hero-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,.75);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.kit-detail-hero-price {
+  font-size: 22px;
+  font-weight: 900;
+  font-family: 'Nunito', sans-serif;
+  color: #fff;
+}
+.kit-detail-hero-price-label {
+  font-size: 10px;
+  color: rgba(255,255,255,.55);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 3px;
+}
+
+.kit-articles-card {
+  margin: 0 16px 14px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.07);
+  overflow: hidden;
+}
+.kit-articles-title {
+  padding: 14px 18px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1A2E;
+  border-bottom: 1px solid #F0F0F8;
+}
+.kit-article-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 18px;
+  border-bottom: 1px solid #F4F6FA;
+}
+.kit-article-row:last-child { border-bottom: none; }
+.kit-article-emoji {
+  font-size: 22px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F4F6FA;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.kit-article-info { flex: 1; min-width: 0; }
+.kit-article-name { font-size: 13px; font-weight: 600; color: #1A1A2E; }
+.kit-article-qty { font-size: 11px; color: #9999BB; margin-top: 2px; }
+.kit-article-price { font-size: 12px; font-weight: 700; color: #1E6FBE; }
+
+.kit-order-btn {
+  display: block;
+  margin: 0 16px 16px;
+  width: calc(100% - 32px);
+  background: linear-gradient(135deg, #1E6FBE, #155A9C);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 4px 18px rgba(30,111,190,.35);
+  transition: all .2s;
+}
+.kit-order-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(30,111,190,.45); }
+
+.kits-section-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #9999BB;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  padding: 16px 16px 8px;
+}
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 14px 16px;
+  margin: 0 16px 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  position: relative;
+  overflow: hidden;
+}
+.restaurant-card:active { transform: scale(.98); }
+.restaurant-card:hover { box-shadow: 0 4px 20px rgba(30,111,190,.15); }
+.rst-img-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  background: linear-gradient(135deg,#E3F2FD,#BBDEFB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.rst-body { flex: 1; min-width: 0; }
+.rst-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A2E;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rst-spec { font-size: 11px; color: #1E6FBE; font-weight: 600; margin-bottom: 2px; }
+.rst-loc  { font-size: 10px; color: #9999BB; }
+.rst-desc { font-size: 11px; color: #4A4A6A; margin-top: 4px; line-height: 1.4; }
+.rst-arrow { font-size: 22px; color: #E8EAF0; flex-shrink: 0; }
+.rst-section-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #9999BB;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  padding: 16px 16px 8px;
+}
+
+#auth-modal{
+  display:none;position:fixed;inset:0;z-index:2000;
+  background:rgba(10,18,32,.75);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:16px;
+}
+.auth-box{
+  background:#fff;border-radius:24px;width:100%;max-width:420px;
+  box-shadow:0 30px 80px rgba(0,0,0,.35);overflow:hidden;
+  max-height:92vh;overflow-y:auto;
+}
+.auth-header{
+  background:linear-gradient(135deg,#1E6FBE,#155A9C);
+  padding:24px 24px 20px;text-align:center;position:relative;
+}
+.auth-header-logo{
+  display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;
+}
+.auth-header-logo img{width:36px;height:36px;object-fit:contain;border-radius:9px}
+.auth-header-brand{
+  font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:#fff;
+}
+.auth-header-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+.auth-close{
+  position:absolute;top:14px;right:14px;
+  background:rgba(255,255,255,.15);border:none;color:#fff;
+  width:30px;height:30px;border-radius:50%;cursor:pointer;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+}
+.auth-tabs{
+  display:flex;border-bottom:1.5px solid #E8EAF0;
+}
+.auth-tab{
+  flex:1;padding:14px;text-align:center;font-size:13px;font-weight:700;
+  cursor:pointer;color:#9999BB;border:none;background:transparent;
+  font-family:'Poppins',sans-serif;transition:all .2s;
+  border-bottom:2.5px solid transparent;margin-bottom:-1.5px;
+}
+.auth-tab.on{color:#1E6FBE;border-bottom-color:#1E6FBE}
+.auth-panel{padding:22px 24px 28px}
+.auth-field{margin-bottom:14px}
+.auth-label{
+  display:block;font-size:11px;font-weight:700;color:#4A4A6A;
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;
+}
+.auth-inp{
+  width:100%;padding:11px 13px;border:1.5px solid #E8EAF0;border-radius:11px;
+  font-size:13px;font-family:'Poppins',sans-serif;background:#F4F6FA;outline:none;
+  color:#1A1A2E;transition:border-color .2s,background .2s;
+}
+.auth-inp:focus{border-color:#1E6FBE;background:#fff}
+.auth-inp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.auth-btn{
+  width:100%;background:linear-gradient(135deg,#1E6FBE,#155A9C);color:#fff;
+  border:none;border-radius:999px;padding:14px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Poppins',sans-serif;margin-top:6px;
+  box-shadow:0 4px 18px rgba(30,111,190,.35);transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(30,111,190,.45)}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.auth-err{
+  min-height:18px;font-size:12px;font-weight:600;color:#C62828;
+  text-align:center;margin-top:10px;
+}
+.auth-sep{
+  text-align:center;font-size:11px;color:#9999BB;
+  margin:14px 0 10px;display:flex;align-items:center;gap:10px;
+}
+.auth-sep::before,.auth-sep::after{content:'';flex:1;height:1px;background:#E8EAF0}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══ PROFIL REFACTO ══ */
+#prof-auth-card{
+  background:#fff;border-radius:16px;padding:22px;text-align:center;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:16px;
+}
+#prof-auth-card .auth-card-title{
+  font-size:15px;font-weight:700;color:#1A1A2E;margin-bottom:6px;
+}
+#prof-auth-card .auth-card-sub{
+  font-size:12px;color:#9999BB;margin-bottom:16px;line-height:1.6;
+}
+#prof-auth-card .btn-row{display:flex;gap:10px}
+#prof-auth-card .btn-login{
+  flex:1;background:linear-gradient(135deg,#1E6FBE,#155A9C);color:#fff;
+  border:none;border-radius:999px;padding:12px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:'Poppins',sans-serif;
+}
+#prof-auth-card .btn-signup{
+  flex:1;background:#fff;color:#1E6FBE;border:1.5px solid #1E6FBE;
+  border-radius:999px;padding:12px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:'Poppins',sans-serif;
+}
+
+/* ══ SECTION COMMANDES PAGE ══ */
+.orders-user-info{
+  background:#fff;border-radius:16px;padding:14px 18px;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:18px;
+  display:flex;align-items:center;gap:12px;
+}
+.orders-user-avatar{
+  font-size:32px;width:48px;height:48px;display:flex;
+  align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1E6FBE,#155A9C);
+  border-radius:50%;
+}
+.orders-user-name{font-size:13px;font-weight:700;color:#1A1A2E}
+.orders-user-phone{font-size:11px;color:#9999BB;margin-top:2px}
+.orders-refresh-btn{
+  margin-left:auto;background:#F4F6FA;border:1.5px solid #E8EAF0;
+  border-radius:999px;padding:8px 14px;font-size:11px;font-weight:700;
+  cursor:pointer;color:#4A4A6A;font-family:'Poppins',sans-serif;white-space:nowrap;
+}
+.orders-refresh-btn:hover{background:#E3F2FD;border-color:#1E6FBE;color:#1E6FBE}
+
+/* ══ BOUTON ANNULATION COMMANDE ══ */
+.o-cancel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 8px;
+  background: #FFF5F5;
+  border: 1.5px solid #FFCDD2;
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #C62828;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all .15s;
+}
+.o-cancel-btn:hover {
+  background: #FFEBEE;
+  border-color: #C62828;
+  box-shadow: 0 2px 10px rgba(198,40,40,.15);
+}
+
+/* ══ CONTENEUR DES ACTIONS COMMANDE ══ */
+.o-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ══ BOUTON VOIR ARTICLES COMMANDÉS ══ */
+.o-articles-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  background: #EEF4FF;
+  border: 1.5px solid #C5D8FF;
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1E6FBE;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all .15s;
+}
+.o-articles-btn:hover {
+  background: #E3F2FD;
+  border-color: #1E6FBE;
+  box-shadow: 0 2px 10px rgba(30,111,190,.15);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* ══ NOTIFICATION PANEL ══ */
+@keyframes notifSlideIn {
+  from { opacity:0; transform:translateY(-10px) scale(.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ══ PRIVACY MODAL ══ */
+#privacy-modal {
+  display:none;position:fixed;inset:0;z-index:4000;
+  background:rgba(10,18,32,.75);backdrop-filter:blur(6px);
+  align-items:flex-end;justify-content:center;padding:0;
+}
+#privacy-modal.open { display:flex; }
+.privacy-box {
+  background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:600px;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 -8px 40px rgba(0,0,0,.2);
+  animation:privacyUp .3s cubic-bezier(.16,1,.3,1);
+}
+@keyframes privacyUp {
+  from { transform:translateY(100%); opacity:0; }
+  to   { transform:translateY(0); opacity:1; }
+}
+.privacy-header {
+  position:sticky;top:0;background:#fff;padding:20px 22px 14px;
+  border-bottom:1px solid #F0F0F8;display:flex;align-items:center;
+  justify-content:space-between;z-index:1;
+}
+.privacy-title { font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:#1A1A2E; }
+.privacy-close { background:none;border:none;font-size:22px;color:#9999BB;cursor:pointer;padding:4px; }
+.privacy-body { padding:20px 22px 40px; }
+.privacy-section { margin-bottom:22px; }
+.privacy-section-title { font-size:13px;font-weight:800;color:#1E6FBE;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px; }
+.privacy-section p { font-size:13px;color:#4A4A6A;line-height:1.7;margin:0; }
+.privacy-trust-badges { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px; }
+.privacy-badge { background:#F4F6FA;border-radius:14px;padding:14px;text-align:center; }
+.privacy-badge-ico { font-size:24px;margin-bottom:6px; }
+.privacy-badge-label { font-size:11px;font-weight:700;color:#1A1A2E; }
+.privacy-badge-sub { font-size:10px;color:#9999BB;margin-top:2px; }
+</style>
+</head>
+<body>
+
+<!-- ══ SPLASH SCREEN ══ -->
+<div id="splash-screen">
+  <div class="splash-bg"></div>
+  <div class="splash-content">
+    <div class="splash-logo-wrap">
+      <div class="splash-logo-ring"></div>
+      <div class="splash-logo-box">
+        <img src="assets/logo.png" alt="OmniService TG" id="splash-img"
+             onerror="this.outerHTML='<div class=splash-fallback>🛡️</div>'"/>
+      </div>
+    </div>
+    <div class="splash-brand">
+      <span class="splash-blue">Omni</span><span class="splash-ora">Service</span> <span class="splash-blue">TG</span>
+    </div>
+    <div class="splash-tagline">Appelez, on s'en charge</div>
+    <div class="splash-loader">
+      <div class="splash-loader-bar"></div>
+    </div>
+    <div class="splash-footer">🇹🇬 Basé à Lomé, Togo</div>
+  </div>
+</div>
+
+<!-- ══ MODAL AUTH (Connexion / Inscription) ══ -->
+<div id="auth-modal" onclick="if(event.target===this)closeAuthModal()">
+  <div class="auth-box">
+    <!-- Header avec logo + nom -->
+    <div class="auth-header">
+      <div class="auth-header-logo">
+        <img src="assets/logo.png" alt="OmniService TG" onerror="this.outerHTML='🛡️'"/>
+        <div class="auth-header-brand">
+          <span style="color:#fff">Omni</span><span style="color:#F5820A">Service</span> <span style="color:#fff">TG</span>
+        </div>
+      </div>
+      <div class="auth-header-sub">Votre espace personnel OmniService</div>
+      <button class="auth-close" onclick="closeAuthModal()">✕</button>
+    </div>
+    <!-- Onglets -->
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="auth-tab-login"  onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab"    id="auth-tab-signup" onclick="switchAuthTab('signup')">Inscription</button>
+    </div>
+    <!-- Panneau Connexion (par téléphone) -->
+    <div id="auth-login-panel" class="auth-panel">
+      <div class="auth-field">
+        <label class="auth-label">Numéro de téléphone</label>
+        <input type="tel" class="auth-inp" id="login-phone" placeholder="+228 XX XX XX XX" autocomplete="tel"
+               onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="auth-btn" id="login-btn" onclick="doLogin()">Se connecter →</button>
+      <div class="auth-err" id="auth-err"></div>
+      <div class="auth-sep">Pas encore de compte ?</div>
+      <button style="width:100%;background:transparent;border:1.5px solid #1E6FBE;color:#1E6FBE;border-radius:999px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="switchAuthTab('signup')">Créer mon compte →</button>
+    </div>
+    <!-- Panneau Inscription (téléphone uniquement) -->
+    <div id="auth-signup-panel" class="auth-panel" style="display:none">
+      <div class="auth-inp-row">
+        <div class="auth-field">
+          <label class="auth-label">Prénom *</label>
+          <input type="text" class="auth-inp" id="signup-prenom" placeholder="Ex : Kofi" autocomplete="given-name"/>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Nom *</label>
+          <input type="text" class="auth-inp" id="signup-nom" placeholder="Ex : Mensah" autocomplete="family-name"/>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Genre *</label>
+        <select class="auth-inp" id="signup-genre">
+          <option value="">— Sélectionner —</option>
+          <option value="homme">👨 Homme</option>
+          <option value="femme">👩 Femme</option>
+        </select>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Téléphone * <span style="font-size:10px;color:var(--light);font-weight:400">(identifiant unique)</span></label>
+        <input type="tel" class="auth-inp" id="signup-phone" placeholder="+228 XX XX XX XX" autocomplete="tel"
+               onkeydown="if(event.key==='Enter')doSignup()"/>
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Ville de résidence *</label>
+        <input type="text" class="auth-inp" id="signup-ville" placeholder="Ex : Lomé, Kpalimé, Kara..." autocomplete="address-level2"/>
+      </div>
+      <button class="auth-btn" id="signup-btn" onclick="doSignup()">S'inscrire →</button>
+      <div class="auth-err" id="auth-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BANNIÈRE PWA ══ -->
+<div id="pwa-banner" style="display:none">
+  <div class="pwa-inner">
+    <div class="pwa-logo">
+      <img src="assets/logo.png" alt="" onerror="this.outerHTML='🛡️'"/>
+    </div>
+    <div class="pwa-text">
+      <div class="pwa-title">Installer l'application</div>
+      <div class="pwa-sub">Accédez rapidement à OmniService TG</div>
+    </div>
+    <button class="pwa-btn" id="pwa-install-btn">Installer</button>
+    <button class="pwa-close" onclick="dismissPWA()">✕</button>
+  </div>
+</div>
+
+<!-- ══ TOP NAV ══ -->
+<header class="topnav">
+  <div class="topnav-inner">
+    <div class="topnav-row1">
+      <div class="logo-area">
+        <!-- Logo + Nom -->
+        <div class="logo-box">
+          <img src="assets/logo.png" alt="OmniService TG" onerror="this.parentElement.innerHTML='🛡️'"/>
+        </div>
+        <div>
+          <div class="brand-name">
+            <span class="brand-blue">Omni</span><span class="brand-ora">Service</span> <span class="brand-blue">TG</span>
+          </div>
+          <div class="brand-sub">Appelez, on s'en charge</div>
+        </div>
+        <nav class="nav-links">
+          <button class="nav-link on"  id="nl-home"     onclick="goTab('home')">🏠 Accueil</button>
+          <button class="nav-link"     id="nl-services" onclick="goTab('services')">🛠️ Services</button>
+          <button class="nav-link"     id="nl-orders"   onclick="goTab('orders')">📦 Commandes</button>
+          <button class="nav-link"     id="nl-about"    onclick="goTab('about')">ℹ️ À propos</button>
+        </nav>
+      </div>
+      <div class="nav-right">
+        <button class="nav-btn" onclick="goTab('orders')" title="Mes commandes">
+          🛒<span class="cart-badge" id="cart-count" style="display:none">0</span>
+        </button>
+        <!-- Cloche notifications -->
+        <button class="nav-btn" id="notif-btn" onclick="openNotifPanel()" title="Notifications" style="position:relative">
+          🔔<span id="notif-badge" style="display:none;position:absolute;top:4px;right:4px;background:#C62828;color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:999px;display:none;align-items:center;justify-content:center;padding:0 3px;line-height:1"></span>
+        </button>
+        <!-- Bouton profil — devient avatar homme/femme après connexion -->
+        <button class="nav-btn" id="nav-btn-profile" onclick="goTab('profile')" title="Mon profil">👤</button>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-ico">🔍</span>
+      <input type="text" placeholder="Rechercher un service..." id="search-input" oninput="filterServices(this.value)"/>
+    </div>
+  </div>
+</header>
+
+<div class="app-body">
+
+  <!-- ══════════════════════════════════
+       PAGE : ACCUEIL
+  ══════════════════════════════════ -->
+  <div class="page on" id="p-home">
+    <div class="marquee-wrap">
+      <div class="mtrack">
+        <span class="mtext">✔ Professionnalisme &nbsp;✔ Fiabilité &nbsp;✔ Excellence &nbsp;✔ Respect &nbsp;— &nbsp;<b>OmniService TG</b> &nbsp;— Simplifiez votre quotidien ! &nbsp;&nbsp;&nbsp;</span>
+        <span class="mtext">✔ Professionnalisme &nbsp;✔ Fiabilité &nbsp;✔ Excellence &nbsp;✔ Respect &nbsp;— &nbsp;<b>OmniService TG</b> &nbsp;— Simplifiez votre quotidien ! &nbsp;&nbsp;&nbsp;</span>
+      </div>
+    </div>
+    <!-- ══ BANDEAU PUBLICITAIRE (style Gozem / Yas / Flooz) ══ -->
+    <div class="adband-wrap">
+      <div class="adband-track" id="adband-track">
+
+        <!-- Pub 1 — Livraison Express -->
+        <div class="adcard" data-service="delivery" onclick="openService('delivery')">
+          <div class="adcard-img" style="background:linear-gradient(135deg,#1E6FBE 0%,#0d3d6e 100%)">
+            <div class="adcard-gradient"></div>
+            <span class="adcard-emoji-bg">🚀</span>
+          </div>
+          <div class="adcard-badge">⚡ Express</div>
+          <div class="adcard-body">
+            <div class="adcard-promo">LIVRAISON RAPIDE</div>
+            <div class="adcard-title">Courses livrées
+à domicile</div>
+            <div class="adcard-sub">Partout à Lomé</div>
+            <div class="adcard-cta">Commander →</div>
+          </div>
+        </div>
+
+        <!-- Pub 2 — Restauration -->
+        <div class="adcard" data-service="restaurant" onclick="openService('restaurant')">
+          <div class="adcard-img" style="background:linear-gradient(135deg,#F5820A 0%,#8B3A00 100%)">
+            <div class="adcard-gradient"></div>
+            <span class="adcard-emoji-bg">🍽️</span>
+          </div>
+          <div class="adcard-badge adcard-badge--orange">🍴 Restauration</div>
+          <div class="adcard-body">
+            <div class="adcard-promo">PLATS & TRAITEUR</div>
+            <div class="adcard-title">Restaurants
+partenaires</div>
+            <div class="adcard-sub">Livraison & événements</div>
+            <div class="adcard-cta">Découvrir →</div>
+          </div>
+        </div>
+
+        <!-- Pub 3 — Alimentation -->
+        <div class="adcard" data-service="food" onclick="openService('food')">
+          <div class="adcard-img" style="background:linear-gradient(135deg,#1a7a35 0%,#0a3d18 100%)">
+            <div class="adcard-gradient"></div>
+            <span class="adcard-emoji-bg">🥘</span>
+          </div>
+          <div class="adcard-badge adcard-badge--green">🌿 Produits frais</div>
+          <div class="adcard-body">
+            <div class="adcard-promo">MARCHÉ LOCAL</div>
+            <div class="adcard-title">Tilapia, volailles
+& légumes</div>
+            <div class="adcard-sub">Qualité locale garantie</div>
+            <div class="adcard-cta">Commander →</div>
+          </div>
+        </div>
+
+        <!-- Pub 4 — Nettoyage -->
+        <div class="adcard" data-service="cleaning" onclick="openService('cleaning')">
+          <div class="adcard-img" style="background:linear-gradient(135deg,#7B1FA2 0%,#3a0a5e 100%)">
+            <div class="adcard-gradient"></div>
+            <span class="adcard-emoji-bg">✨</span>
+          </div>
+          <div class="adcard-badge adcard-badge--purple">🧹 Nettoyage</div>
+          <div class="adcard-body">
+            <div class="adcard-promo">MAISON PROPRE</div>
+            <div class="adcard-title">Nettoyage
+professionnel</div>
+            <div class="adcard-sub">Résidentiel & bureaux</div>
+            <div class="adcard-cta">Réserver →</div>
+          </div>
+        </div>
+
+        <!-- Pub 5 — Prêt-à-porter -->
+        <div class="adcard" data-service="clothes" onclick="openService('clothes')">
+          <div class="adcard-img" style="background:linear-gradient(135deg,#C2185B 0%,#5c0a28 100%)">
+            <div class="adcard-gradient"></div>
+            <span class="adcard-emoji-bg">👗</span>
+          </div>
+          <div class="adcard-badge adcard-badge--pink">👗 Mode</div>
+          <div class="adcard-body">
+            <div class="adcard-promo">TENDANCE TOGO</div>
+            <div class="adcard-title">Mode wax
+& accessoires</div>
+            <div class="adcard-sub">Livré chez vous</div>
+            <div class="adcard-cta">Voir →</div>
+          </div>
+        </div>
+
+        <!-- Pub 6 — Kits & PACKS -->
+        <div class="adcard" data-service="kits" onclick="openService('kits')">
+          <div class="adcard-img" style="background:linear-gradient(135deg,#2E7D32 0%,#1b5e20 100%)">
+            <div class="adcard-gradient"></div>
+            <span class="adcard-emoji-bg">🎁</span>
+          </div>
+          <div class="adcard-badge adcard-badge--green">📦 Kits</div>
+          <div class="adcard-body">
+            <div class="adcard-promo">OFFRES GROUPÉES</div>
+            <div class="adcard-title">Kits &amp; PACKS
+prêts à commander</div>
+            <div class="adcard-sub">Repas, Mode, Événement...</div>
+            <div class="adcard-cta">Découvrir →</div>
+          </div>
+        </div>
+
+      </div>
+      <!-- Indicateurs dots -->
+      <div class="adband-dots" id="adband-dots">
+        <span class="adband-dot on"></span>
+        <span class="adband-dot"></span>
+        <span class="adband-dot"></span>
+        <span class="adband-dot"></span>
+        <span class="adband-dot"></span>
+        <span class="adband-dot"></span>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-head">
+        <div><div class="sec-title">Services disponibles</div><div class="sec-sub">Choisissez ce dont vous avez besoin</div></div>
+        <button class="see-all" onclick="goTab('services')">Tous ›</button>
+      </div>
+      <div class="svc-grid">
+        <button class="svc-btn" onclick="openService('food')"><span class="svc-soon">16 Mars</span><div class="svc-ico" style="background:#FFF3E0">🛒</div><span class="svc-lbl">Alimentation</span></button>
+        <button class="svc-btn" onclick="openService('restaurant')"><span class="svc-soon">16 Mars</span><div class="svc-ico" style="background:#E3F2FD">🍽️</div><span class="svc-lbl">Restaurants</span></button>
+        <button class="svc-btn" onclick="openService('delivery')"><span class="svc-soon">16 Mars</span><div class="svc-ico" style="background:#FFF3E0">🚗</div><span class="svc-lbl">Livraison</span></button>
+        <button class="svc-btn" onclick="openService('maintenance')"><span class="svc-soon">16 Mars</span><div class="svc-ico" style="background:#E3F2FD">🔧</div><span class="svc-lbl">Dépannage</span></button>
+        <button class="svc-btn" onclick="openService('kits')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#E8F5E9">📦</div><span class="svc-lbl">Kits/PACKS</span></button>
+        <button class="svc-btn" onclick="openService('cleaning')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#E3F2FD">✨</div><span class="svc-lbl">Nettoyage</span></button>
+        <button class="svc-btn" onclick="openService('clothes')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#FFF3E0">👗</div><span class="svc-lbl">Prêt-à-porter</span></button>
+        <button class="svc-btn" onclick="openService('togo_expertise')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#EDE7F6">🏆</div><span class="svc-lbl">TOGO Expertise</span></button>
+        <button class="svc-btn" onclick="openService('immobilier')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#E8F5E9">🏢</div><span class="svc-lbl">Immobilier</span></button>
+        <button class="svc-btn" onclick="openService('security')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#E3F2FD">🛡️</div><span class="svc-lbl">Gardiennage</span></button>
+        <button class="svc-btn" onclick="openService('traiteur')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#FFF8E1">🍽️</div><span class="svc-lbl">Traiteur</span></button>
+        <button class="svc-btn" onclick="openService('omni_drink')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#E0F7FA">🍾</div><span class="svc-lbl">Omni Drink</span></button>
+        <button class="svc-btn" onclick="openService('marketplace')"><span class="svc-soon">7 Avr</span><div class="svc-ico" style="background:#FCE4EC">🛍️</div><span class="svc-lbl">Marketplace</span></button>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title" style="margin-bottom:14px">Pourquoi nous choisir ?</div>
+      <div class="why-grid">
+        <div class="why-card"><div class="why-ico" style="background:#E3F2FD">🛡️</div><div><div class="why-title">Organisation structurée</div><div class="why-desc">Chaque intervention planifiée et encadrée.</div></div></div>
+        <div class="why-card"><div class="why-ico" style="background:#FFF3E0">⭐</div><div><div class="why-title">Équipe identifiable</div><div class="why-desc">Personnel formé, professionnel et fiable.</div></div></div>
+        <div class="why-card"><div class="why-ico" style="background:#E3F2FD">⚡</div><div><div class="why-title">Service moderne</div><div class="why-desc">Communication claire et suivi efficace.</div></div></div>
+        <div class="why-card"><div class="why-ico" style="background:#FFF3E0">🕐</div><div><div class="why-title">Engagement qualité</div><div class="why-desc">Délais et standards toujours respectés.</div></div></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="cta-banner">
+        <div class="cta-title">Prêt à travailler avec des professionnels ?</div>
+        <div class="cta-sub">Contactez OmniService TG et découvrez une nouvelle manière de gérer vos services au quotidien.</div>
+        <div class="cta-btns">
+          <a href="tel:+22870652222" class="cta-btn">📞 Nous appeler</a>
+          <a href="https://wa.me/22870652222" class="cta-btn cta-wa">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div><!-- /home -->
+
+  <!-- ══════════════════════════════════
+       PAGE : SERVICES
+  ══════════════════════════════════ -->
+  <div class="page" id="p-services">
+    <!-- VUE 1 : Liste -->
+    <div id="view-list">
+      <div class="sec" style="padding-top:20px">
+        <div class="sec-title">Nos Services</div>
+        <div class="sec-sub" style="margin-bottom:16px">Une solution intégrée pour tous vos besoins</div>
+        <div class="svc-list">
+          <button class="svc-row" onclick="openService('food')"><div class="svc-row-ico" style="background:#FFF3E0">🛒</div><div style="flex:1"><div class="svc-row-name">Alimentation générale et produits locaux <span class="tag-soon">16 Mars</span></div><div class="svc-row-desc">Kits alimentaires, produits frais (Tilapia, Volailles, Légumes), Néré, Vin de palme.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('restaurant')"><div class="svc-row-ico" style="background:#E3F2FD">🍽️</div><div style="flex:1"><div class="svc-row-name">Restaurants <span class="tag-soon">16 Mars</span></div><div class="svc-row-desc">Découvrez nos restaurants partenaires et commandez vos plats préférés.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('delivery')"><div class="svc-row-ico" style="background:#FFF3E0">🚗</div><div style="flex:1"><div class="svc-row-name">Livraison et courses <span class="tag-soon">16 Mars</span></div><div class="svc-row-desc">Livraison express, courses personnalisées, livraison entreprise et de plats.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('maintenance')"><div class="svc-row-ico" style="background:#E3F2FD">🔧</div><div style="flex:1"><div class="svc-row-name">Dépannage <span class="tag-soon">16 Mars</span></div><div class="svc-row-desc">Électricité, plomberie, climatisation, électroménager, informatique, pose TV/antenne.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('kits')"><div class="svc-row-ico" style="background:#E8F5E9">📦</div><div style="flex:1"><div class="svc-row-name">Kits &amp; Packs <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Associations d'articles préparés par notre équipe : kits repas, packs événement, mode, nettoyage et plus.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('cleaning')"><div class="svc-row-ico" style="background:#E3F2FD">✨</div><div style="flex:1"><div class="svc-row-name">Nettoyage professionnel <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Nettoyage résidentiel, bureaux, entretien régulier et industriel.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('clothes')"><div class="svc-row-ico" style="background:#FFF3E0">👗</div><div style="flex:1"><div class="svc-row-name">Prêt-à-porter <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Vêtements africains, boubous, robes, ensembles, accessoires de mode.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('togo_expertise')"><div class="svc-row-ico" style="background:#EDE7F6">🏆</div><div style="flex:1"><div class="svc-row-name">TOGO Expertise <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Formation commerciale (Mathivick) et financement de projets (Omega Conseils) — deux expertises, un seul pôle.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('immobilier')"><div class="svc-row-ico" style="background:#E8F5E9">🏢</div><div style="flex:1"><div class="svc-row-name">Service Immobilier <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Location, vente, gestion locative, assistance diaspora pour l'investissement immobilier.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('security')"><div class="svc-row-ico" style="background:#E3F2FD">🛡️</div><div style="flex:1"><div class="svc-row-name">Gardiennage &amp; Sécurité <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Gardiennage résidentiel/boutique/bureau, sécurité événementielle.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('traiteur')"><div class="svc-row-ico" style="background:#FFF8E1">🍽️</div><div style="flex:1"><div class="svc-row-name">Service Traiteur <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Anniversaires, fêtes, événements — repas préparés et servis sur mesure.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('omni_drink')"><div class="svc-row-ico" style="background:#E0F7FA">🍾</div><div style="flex:1"><div class="svc-row-name">Omni Drink TG <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Boissons fraîches, jus naturels, eau minérale et softs livrés chez vous.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+          <button class="svc-row" onclick="openService('marketplace')"><div class="svc-row-ico" style="background:#FCE4EC">🛍️</div><div style="flex:1"><div class="svc-row-name">Marketplace — Articles divers <span class="tag-soon">7 Avril</span></div><div class="svc-row-desc">Trouvez tout ce dont vous avez besoin : articles ménagers, électronique, fournitures et plus.</div></div><span style="font-size:20px;color:#E8EAF0">›</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VUE 1b : Liste des Restaurants -->
+    <div id="view-restaurants" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" onclick="showView('list')">←</button>
+        <div id="rest-svc-ico" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#E3F2FD">🍽️</div>
+        <div>
+          <div id="rest-svc-title" style="font-size:14px;font-weight:700;color:#1A1A2E">Restaurants</div>
+          <div style="font-size:11px;color:#9999BB">Choisissez un restaurant</div>
+        </div>
+      </div>
+      <div class="rst-section-title">🏪 Nos restaurants partenaires</div>
+      <div id="restaurants-list"></div>
+    </div>
+
+    <!-- VUE 1c : Liste des Kits/PACKS -->
+    <div id="view-kits" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" onclick="showView('list')">←</button>
+        <div id="kits-svc-ico" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#E8F5E9">🎁</div>
+        <div>
+          <div id="kits-svc-title" style="font-size:14px;font-weight:700;color:#1A1A2E">Kits &amp; PACKS</div>
+          <div style="font-size:11px;color:#9999BB">Des ensembles prêts à commander</div>
+        </div>
+      </div>
+      <div class="kits-section-title" id="kits-section-title">📦 Nos kits disponibles</div>
+      <div id="kits-list"></div>
+    </div>
+
+    <!-- VUE 1d : Détail d'un Kit -->
+    <div id="view-kit-detail" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" onclick="showView('kits')">←</button>
+        <div id="kit-detail-ico" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#E8F5E9">🎁</div>
+        <div>
+          <div id="kit-detail-name" style="font-size:14px;font-weight:700;color:#1A1A2E">Kit</div>
+          <div style="font-size:11px;color:#9999BB">Détail du kit</div>
+        </div>
+      </div>
+      <!-- Hero du kit -->
+      <div class="kit-detail-hero" id="kit-hero">
+        <div class="kit-detail-hero-name" id="kit-hero-name">—</div>
+        <div class="kit-detail-hero-desc" id="kit-detail-desc"></div>
+        <div class="kit-detail-hero-price-label">Prix total du kit</div>
+        <div class="kit-detail-hero-price" id="kit-detail-price">—</div>
+      </div>
+      <!-- Articles du kit -->
+      <div class="kit-articles-card">
+        <div class="kit-articles-title">📋 Articles inclus dans ce kit</div>
+        <div id="kit-detail-items"></div>
+      </div>
+      <!-- Bouton commander -->
+      <button class="kit-order-btn" onclick="commanderKit()">🛒 Commander ce kit</button>
+    </div>
+
+    <!-- VUE 1e : Options d'une catégorie Immobilier -->
+    <div id="view-immo-options" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" id="immo-options-back-btn" onclick="showView('list')">←</button>
+        <div id="immo-options-ico" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#E8F5E9">🏢</div>
+        <div>
+          <div id="immo-options-title" style="font-size:14px;font-weight:700;color:#1A1A2E">Catégorie</div>
+          <div style="font-size:11px;color:#9999BB">Choisissez une prestation</div>
+        </div>
+      </div>
+      <div style="padding:8px 16px 4px;font-size:12px;font-weight:800;color:#9999BB;text-transform:uppercase;letter-spacing:.5px">🏡 Nos prestations disponibles</div>
+      <div id="immo-options-list"></div>
+    </div>
+
+    <!-- VUE 1f : Formulaire d'une prestation Immobilier -->
+    <div id="view-immo-form" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" id="immo-form-back-btn" onclick="immoFormGoBack()">←</button>
+        <div id="immo-form-ico" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#E8F5E9">🏢</div>
+        <div>
+          <div id="immo-form-title" style="font-size:14px;font-weight:700;color:#1A1A2E">Demande</div>
+          <div style="font-size:11px;color:#9999BB">Formulaire de demande</div>
+        </div>
+      </div>
+      <div id="immo-form-soon" style="display:none" class="warn-box">
+        <div style="font-weight:700;font-size:13px;margin-bottom:3px">⏳ Bientôt disponible</div>
+        <div style="font-size:12px;opacity:.92">Opérationnel le 07 Avril 2026. Vous pouvez déjà pré-enregistrer votre demande.</div>
+      </div>
+      <!-- Hero de la prestation -->
+      <div style="margin:0 16px 14px;background:linear-gradient(135deg,#1E6FBE,#155A9C);border-radius:20px;padding:20px 20px;color:#fff;position:relative;overflow:hidden">
+        <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:60px;opacity:.18" id="immo-form-hero-emoji">🏢</div>
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px" id="immo-form-category">Service Immobilier</div>
+        <div style="font-size:17px;font-weight:800;font-family:'Nunito',sans-serif;margin-bottom:4px" id="immo-form-prestation-name">Prestation</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.75);line-height:1.5" id="immo-form-prestation-desc"></div>
+      </div>
+      <div class="order-card">
+        <div class="order-card-title">📋 Votre demande</div>
+        <div id="immo-form-fields">
+          <label class="f-label">Description de votre besoin</label>
+          <textarea class="f-textarea" rows="4" id="immo-ff-besoin" placeholder="Décrivez votre besoin en détail : superficie, budget, localisation souhaitée, délai..."></textarea>
+          <label class="f-label" data-immo-loc>Localisation / Quartier souhaité</label>
+          <input type="text" class="f-input" id="immo-ff-localisation" placeholder="Ex : Adidogomé, Bè, Tokoin, Agoè..."/>
+          <label class="f-label" data-immo-budget>Budget estimé <span style="font-weight:400;font-size:10px;color:#C5C5D8;text-transform:none">(optionnel)</span></label>
+          <input type="text" class="f-input" id="immo-ff-budget" placeholder="Ex : 500 000 FCFA/mois ou 15 000 000 FCFA"/>
+
+          <label class="f-label">Date souhaitée <span style="font-weight:400;font-size:10px;color:#C5C5D8;text-transform:none">(optionnel)</span></label>
+          <input type="date" class="f-input" id="immo-ff-date"/>
+          <label class="f-label">Remarques supplémentaires <span style="font-weight:400;font-size:10px;color:#C5C5D8;text-transform:none">(optionnel)</span></label>
+          <textarea class="f-textarea" rows="2" id="immo-ff-notes" placeholder="Précisions additionnelles..."></textarea>
+        </div>
+        <button class="btn-primary" id="immo-form-submit-btn" onclick="submitImmoForm()">📨 Envoyer ma demande</button>
+      </div>
+    </div>
+
+    <!-- VUE 2 : Catalogue -->
+    <div id="view-catalogue" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" id="catalogue-back-btn" onclick="showView('list')">←</button>
+        <div id="cat-ico" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0"></div>
+        <div>
+          <div id="cat-title" style="font-size:14px;font-weight:700;color:#1A1A2E"></div>
+          <div style="font-size:11px;color:#9999BB">Sélectionnez vos articles</div>
+        </div>
+      </div>
+      <div id="catalogue-items" class="catalogue-grid"></div>
+      <div class="cart-bar" id="cart-bar" style="display:none" onclick="showView('delivery')">
+        <div class="cart-bar-left">
+          <span class="cart-bar-count" id="cb-count">0 article</span>
+          <span class="cart-bar-text">Voir ma commande</span>
+        </div>
+        <span class="cart-bar-total" id="cb-total">0 FCFA</span>
+      </div>
+    </div>
+
+    <!-- VUE 3 : Formulaire standard -->
+    <div id="view-form" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" onclick="showView('list')">←</button>
+        <div id="form-ico" style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0"></div>
+        <div>
+          <div id="form-title" style="font-size:14px;font-weight:700;color:#1A1A2E"></div>
+          <div style="font-size:11px;color:#9999BB">Formulaire de demande</div>
+        </div>
+      </div>
+      <div id="form-soon" style="display:none" class="warn-box">
+        <div style="font-weight:700;font-size:13px;margin-bottom:3px">⏳ Bientôt disponible</div>
+        <div style="font-size:12px;opacity:.92" id="form-soon-date"></div>
+      </div>
+      <div class="order-card">
+        <div id="form-fields"></div>
+        <button class="btn-primary" id="form-submit-btn" onclick="submitStandardForm()">📨 Envoyer ma demande</button>
+      </div>
+    </div>
+
+    <!-- VUE 4 : Livraison (sans champ téléphone) -->
+    <div id="view-delivery" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" id="delivery-back-btn" onclick="showView('catalogue')">←</button>
+        <div style="font-size:22px">📍</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#1A1A2E">Informations de livraison</div>
+          <div style="font-size:11px;color:#9999BB">Étape 1 sur 2</div>
+        </div>
+      </div>
+      <div class="step-bar">
+        <div class="step active"><div class="step-num">1</div><span>Livraison</span></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">2</div><span>Paiement</span></div>
+      </div>
+      <div class="order-card">
+        <div class="order-card-title">📍 Votre position</div>
+        <div class="loc-toggle">
+          <button class="loc-btn on" id="loc-btn-gps"  onclick="setLocMode('gps')">📡 Par localisation GPS</button>
+          <button class="loc-btn"    id="loc-btn-desc" onclick="setLocMode('desc')">✍️ Par description</button>
+        </div>
+        <div id="loc-gps-panel">
+          <button class="btn-secondary" id="gps-btn" onclick="getGPS()">📡 Obtenir ma position</button>
+          <div id="gps-result" style="margin-top:10px;font-size:12px;color:#4A4A6A;display:none"></div>
+        </div>
+        <div id="loc-desc-panel" style="display:none">
+          <label class="f-label">Description de votre position</label>
+          <textarea class="f-textarea" id="del-desc" rows="3" placeholder="Ex : Quartier Adidogomé, derrière le marché, maison bleue avec portail noir..."></textarea>
+        </div>
+      </div>
+      <div class="order-card">
+        <div class="order-card-title">🏠 Adresse de livraison</div>
+        <label class="f-label">Rue / quartier / repère</label>
+        <input type="text" class="f-input" id="del-address" placeholder="Ex : Adidogomé, rue des Cocotiers"/>
+        <label class="f-label">Notes supplémentaires (optionnel)</label>
+        <textarea class="f-textarea" id="del-notes" rows="2" placeholder="Étage, couleur de la maison..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="goToPayment()">Continuer → Paiement</button>
+    </div>
+
+    <!-- VUE 5 : Paiement -->
+    <div id="view-payment" style="display:none">
+      <div class="cat-hdr">
+        <button class="back-btn" onclick="showView('delivery')">←</button>
+        <div style="font-size:22px">💳</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#1A1A2E">Confirmation &amp; Paiement</div>
+          <div style="font-size:11px;color:#9999BB">Étape 2 sur 2</div>
+        </div>
+      </div>
+      <div class="step-bar">
+        <div class="step done"><div class="step-num">✓</div><span>Livraison</span></div>
+        <div class="step-line done"></div>
+        <div class="step active"><div class="step-num">2</div><span>Paiement</span></div>
+      </div>
+      <div class="order-card">
+        <div class="order-card-title">🛒 Votre commande</div>
+        <div id="recap-items"></div>
+        <div class="recap-total">
+          <span class="recap-total-label">Total</span>
+          <span class="recap-total-val" id="recap-total-val">0 FCFA</span>
+        </div>
+      </div>
+      <div class="order-card" style="padding:0;overflow:hidden">
+        <div style="padding:16px 18px 12px;font-size:15px;font-weight:700;color:#1A1A2E">💳 Mode de paiement</div>
+        <button class="pay-opt" id="pay-mixx" onclick="selectPay('mixx')">
+          <div class="pay-ico" style="background:#E8F5E9">💚</div>
+          <div><div class="pay-name">Mixx By Yas</div><div class="pay-sub">Paiement mobile sécurisé</div></div>
+          <span class="pay-soon">Bientôt</span>
+          <div class="pay-radio"></div>
+        </button>
+        <button class="pay-opt" id="pay-flooz" onclick="selectPay('flooz')">
+          <div class="pay-ico" style="background:#FFF3E0">🧡</div>
+          <div><div class="pay-name">Flooz</div><div class="pay-sub">Paiement mobile Moov</div></div>
+          <span class="pay-soon">Bientôt</span>
+          <div class="pay-radio"></div>
+        </button>
+        <button class="pay-opt selected" id="pay-livraison" onclick="selectPay('livraison')">
+          <div class="pay-ico" style="background:#F3E5F5">🏠</div>
+          <div><div class="pay-name">Payer à la livraison</div><div class="pay-sub">Espèces ou mobile à la réception</div></div>
+          <div class="pay-radio"></div>
+        </button>
+      </div>
+      <button class="btn-primary" id="confirm-btn" onclick="confirmOrder()">✅ Confirmer la commande</button>
+    </div>
+
+    <!-- VUE 6 : Succès -->
+    <div id="view-success" style="display:none">
+      <div class="success">
+        <div class="succ-emoji">✅</div>
+        <div class="succ-title">Commande confirmée !</div>
+        <div class="succ-desc" id="succ-msg">Votre commande a été reçue.<br/>Notre équipe vous contactera très bientôt.</div>
+        <div id="succ-redirect-msg" style="font-size:11px;color:#9999BB;margin:8px 0 14px;text-align:center">Redirection vers vos commandes dans <strong id="succ-countdown">3</strong>s...</div>
+        <!-- Bouton "Voir mes commandes" — affiché après confirmation -->
+        <button id="succ-view-orders-btn" class="btn-primary" style="max-width:300px;margin:0 auto 10px;background:linear-gradient(135deg,#2E7D32,#1B5E20)" onclick="goTab('orders')">📦 Voir mes commandes →</button>
+        <button class="btn-primary" style="max-width:300px;margin:0 auto;background:#F4F6FA;color:#4A4A6A;box-shadow:none;border:1.5px solid #E8EAF0" onclick="showView('list')">← Retour aux services</button>
+      </div>
+    </div>
+  </div><!-- /services -->
+
+  <!-- ══════════════════════════════════
+       PAGE : COMMANDES (suivi)
+  ══════════════════════════════════ -->
+  <div class="page" id="p-orders">
+    <div class="orders-page">
+      <div class="orders-header">
+        <div class="sec-title">Mes Commandes</div>
+        <div class="sec-sub">Suivez l'état de vos demandes en temps réel</div>
+      </div>
+      <!-- Info utilisateur connecté + bouton actualiser -->
+      <div class="orders-user-info" id="orders-user-bar" style="display:none">
+        <div class="orders-user-avatar" id="orders-user-avatar">👤</div>
+        <div>
+          <div class="orders-user-name" id="orders-user-name">—</div>
+          <div class="orders-user-phone" id="orders-user-phone">—</div>
+        </div>
+        <button class="orders-refresh-btn" onclick="loadMyOrders()">🔄 Actualiser</button>
+      </div>
+      <div id="orders-out">
+        <div class="orders-empty">
+          <div class="orders-empty-ico">🔐</div>
+          <div class="orders-empty-title">Connexion requise</div>
+          <div class="orders-empty-sub">Connectez-vous pour voir vos commandes et leur historique.</div>
+          <button class="btn-primary" style="max-width:220px;margin:20px auto 0" onclick="openAuthModal('login')">Se connecter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       PAGE : À PROPOS
+  ══════════════════════════════════ -->
+  <div class="page" id="p-about">
+    <div style="padding-top:20px">
+      <div class="about-hero">
+        <div class="about-logo">
+          <img src="assets/logo.png" alt="OmniService TG" onerror="this.parentElement.innerHTML='<div style=font-size:50px>🛡️</div>'"/>
+        </div>
+        <div class="about-name"><span class="brand-blue">Omni</span><span class="brand-ora">Service</span> <span class="brand-blue">TG</span></div>
+        <div style="font-size:12px;color:var(--light);margin-top:4px">Appelez, on s'en charge</div>
+        <div style="overflow:hidden;width:100%;margin-top:6px">
+          <div style="display:inline-block;white-space:nowrap;animation:marquee-about 12s linear infinite;font-size:12px;color:var(--mid);font-weight:700">
+            🏛️ Entreprise promotrice : Sté. ASSISTANCE GLOBALE &nbsp;•&nbsp; 14 ans d'expérience &nbsp;•&nbsp; 🏛️ Entreprise promotrice : Sté. ASSISTANCE GLOBALE &nbsp;•&nbsp; 14 ans d'expérience &nbsp;•&nbsp;
+          </div>
+        </div>
+        <style>@keyframes marquee-about{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}</style>
+        <div class="about-flag">🇹🇬 Entreprise togolaise</div>
+      </div>
+      <div class="a-card" style="background:linear-gradient(135deg,rgba(30,111,190,.03),rgba(245,130,10,.03));border:1px solid rgba(30,111,190,.1)">
+        <div class="a-card-title">🚀 Notre Vision</div>
+        <p>Construire un Togo où chaque foyer accède à des services fiables, modernes et dignes des standards internationaux. OmniService TG vise à devenir une <strong style="color:var(--blue)">référence nationale</strong> dans le secteur des services professionnels.</p>
+      </div>
+      <div class="a-card">
+        <div class="a-card-title">🎯 Notre Mission</div>
+        <p>Offrir aux ménages et entreprises togolais des services multisectoriels professionnels, accessibles et structurés, qui simplifient leur quotidien et valorisent leur cadre de vie.</p>
+      </div>
+      <div class="sec-title" style="margin-bottom:12px">Nos Valeurs</div>
+      <div class="val-row"><div class="val-ico">🎯</div><div><div class="val-name">Professionnalisme</div><div class="val-desc">Standards élevés à chaque intervention.</div></div></div>
+      <div class="val-row"><div class="val-ico">🔒</div><div><div class="val-name">Fiabilité</div><div class="val-desc">Vous pouvez compter sur nous.</div></div></div>
+      <div class="val-row"><div class="val-ico">🤝</div><div><div class="val-name">Respect</div><div class="val-desc">De nos clients, équipes et partenaires.</div></div></div>
+      <div class="val-row"><div class="val-ico">🔍</div><div><div class="val-name">Transparence</div><div class="val-desc">Tarifs clairs, pas de surprises.</div></div></div>
+      <div class="val-row" style="margin-bottom:18px"><div class="val-ico">⭐</div><div><div class="val-name">Excellence</div><div class="val-desc">Toujours le meilleur résultat.</div></div></div>
+      <div class="who-grid">
+        <div class="who-card"><div style="font-size:30px;margin-bottom:9px">👨‍👩‍👧‍👦</div><div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:5px">Particuliers</div><div style="font-size:11px;color:var(--light);line-height:1.5">Familles et propriétaires cherchant un service organisé.</div></div>
+        <div class="who-card"><div style="font-size:30px;margin-bottom:9px">🏢</div><div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:5px">Entreprises</div><div style="font-size:11px;color:var(--light);line-height:1.5">Bureaux, commerces, sociétés en croissance.</div></div>
+      </div>
+      <div class="a-card">
+        <div class="a-card-title">📞 Contact</div>
+        <div class="ct-row"><div class="ct-ico">📍</div><span style="font-size:13px;color:var(--mid)">Basé à Lomé, Togo</span></div>
+        <div class="ct-row"><div class="ct-ico">📞</div><a href="tel:+22870652222" style="font-size:13px;color:var(--blue);font-weight:600;text-decoration:none">+228 70 65 22 22</a></div>
+        <div class="ct-row"><div class="ct-ico">📧</div><a href="/cdn-cgi/l/email-protection#3c5f5352485d5f487c535152554f594e4a555f59485b125f5351" style="font-size:13px;color:var(--blue);font-weight:600;text-decoration:none"><span class="__cf_email__" data-cfemail="7f1c10110b1e1c0b3f101211160c1a0d09161c1a0b18511c1012">[email&#160;protected]</span></a></div>
+        <div class="ct-row"><div class="ct-ico">🌐</div><span style="font-size:13px;color:var(--mid)">www.omniservicetg.com</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       PAGE : PROFIL
+  ══════════════════════════════════ -->
+  <div class="page" id="p-profile">
+    <div style="padding-top:20px">
+      <div class="prof-hero">
+        <!-- Avatar dynamique homme/femme -->
+        <div class="avatar" id="prof-avatar">👤</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:#fff" id="prof-name-disp">Mon Profil</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:5px" id="prof-phone-disp">Connectez-vous pour accéder à votre compte</div>
+      </div>
+
+      <!-- Carte si NON connecté -->
+      <div id="prof-auth-card">
+        <div class="auth-card-title">Bienvenue sur OmniService TG !</div>
+        <div class="auth-card-sub">Connectez-vous ou créez un compte pour passer des commandes, suivre leur statut et gérer votre profil.</div>
+        <div class="btn-row">
+          <button class="btn-login" onclick="openAuthModal('login')">Se connecter</button>
+          <button class="btn-signup" onclick="openAuthModal('signup')">S'inscrire</button>
+        </div>
+      </div>
+
+      <!-- Carte si connecté -->
+      <div id="prof-logged-card" style="display:none">
+        <div class="prof-card">
+          <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:14px">✏️ Modifier mes informations</div>
+          <div class="p-inw"><span class="p-pfx">👤</span><input type="text" class="p-inp" placeholder="Prénom" id="pf-prenom"/></div>
+          <div class="p-inw"><span class="p-pfx">👤</span><input type="text" class="p-inp" placeholder="Nom" id="pf-nom"/></div>
+          <div class="p-inw"><span class="p-pfx">📞</span><input type="tel" class="p-inp" placeholder="+228 XX XX XX XX" id="pf-phone"/></div>
+          <div class="p-inw"><span class="p-pfx">📍</span><input type="text" class="p-inp" placeholder="Ville de résidence" id="pf-ville"/></div>
+          <div class="p-inw" style="margin-bottom:16px"><span class="p-pfx">📧</span><input type="email" class="p-inp" placeholder="Email" id="pf-email" readonly style="opacity:.6"/></div>
+          <button class="p-save" onclick="saveProfile()">💾 Enregistrer</button>
+        </div>
+        <div class="menu-list">
+          <div class="menu-row" onclick="goTab('orders')"><div class="menu-ico" style="background:#E3F2FD">📦</div><span style="flex:1;font-size:13px;font-weight:600;color:var(--dark)">Mes commandes</span><span style="color:var(--border);font-size:18px">›</span></div>
+          <div class="menu-row" onclick="openNotifPanel()" style="cursor:pointer"><div class="menu-ico" style="background:#FFF3E0">🔔</div><span style="flex:1;font-size:13px;font-weight:600;color:var(--dark)">Notifications</span><span style="color:var(--border);font-size:18px">›</span></div>
+          <div class="menu-row" onclick="openPrivacyModal()"><div class="menu-ico" style="background:#E3F2FD">🔒</div><span style="flex:1;font-size:13px;font-weight:600;color:var(--dark)">Confidentialité</span><span style="color:var(--border);font-size:18px">›</span></div>
+          <div class="menu-row" onclick="doLogout()"><div class="menu-ico" style="background:#FFEBEE">🚪</div><span style="flex:1;font-size:13px;font-weight:600;color:#C62828">Se déconnecter</span><span style="color:var(--border);font-size:18px">›</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /app-body -->
+
+<!-- ══ MODAL POLITIQUE DE CONFIDENTIALITÉ ══ -->
+<div id="privacy-modal" onclick="if(event.target===this)closePrivacyModal()">
+  <div class="privacy-box">
+    <div class="privacy-header">
+      <div class="privacy-title">🔒 Politique de Confidentialité</div>
+      <button class="privacy-close" onclick="closePrivacyModal()">✕</button>
+    </div>
+    <div class="privacy-body">
+
+      <!-- Intro -->
+      <div style="background:linear-gradient(135deg,#1E6FBE,#155A9C);border-radius:18px;padding:20px;color:#fff;margin-bottom:22px">
+        <div style="font-size:28px;margin-bottom:8px">🛡️</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px">Vos données sont en sécurité</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.6">Chez OmniService TG, la protection de votre vie privée est une priorité absolue. Nous nous engageons à ne jamais vendre, louer ou compromettre vos informations personnelles.</div>
+      </div>
+
+      <!-- Badges de confiance -->
+      <div class="privacy-trust-badges" style="margin-bottom:22px">
+        <div class="privacy-badge"><div class="privacy-badge-ico">🔐</div><div class="privacy-badge-label">Données chiffrées</div><div class="privacy-badge-sub">Stockage sécurisé Firebase</div></div>
+        <div class="privacy-badge"><div class="privacy-badge-ico">🚫</div><div class="privacy-badge-label">Jamais revendues</div><div class="privacy-badge-sub">Aucun partage à des tiers</div></div>
+        <div class="privacy-badge"><div class="privacy-badge-ico">👁️‍🗨️</div><div class="privacy-badge-label">Transparence totale</div><div class="privacy-badge-sub">Vous contrôlez vos données</div></div>
+        <div class="privacy-badge"><div class="privacy-badge-ico">🇹🇬</div><div class="privacy-badge-label">Entreprise togolaise</div><div class="privacy-badge-sub">Sté. ASSISTANCE GLOBALE</div></div>
+      </div>
+
+      <div class="privacy-section">
+        <div class="privacy-section-title">📋 1. Qui sommes-nous ?</div>
+        <p>OmniService TG est un service développé et opéré par la <strong>Sté. ASSISTANCE GLOBALE</strong>, entreprise togolaise forte de 14 ans d'expérience dans les services aux particuliers et aux entreprises. Nous sommes basés à Lomé, Togo.</p>
+      </div>
+
+      <div class="privacy-section">
+        <div class="privacy-section-title">📦 2. Données collectées</div>
+        <p>Nous collectons uniquement les informations nécessaires à la fourniture de nos services : <strong>votre prénom et nom</strong> pour personnaliser votre expérience, <strong>votre numéro de téléphone</strong> comme identifiant unique de compte, <strong>votre ville de résidence</strong> pour adapter notre offre, et <strong>vos adresses de livraison</strong> pour exécuter vos commandes. Nous ne collectons jamais de données de paiement directement — les transactions sont gérées par des opérateurs certifiés (Flooz, Mixx by Yas).</p>
+      </div>
+
+      <div class="privacy-section">
+        <div class="privacy-section-title">🎯 3. Utilisation de vos données</div>
+        <p>Vos données sont utilisées exclusivement pour : traiter et suivre vos commandes, vous contacter concernant l'exécution de vos services, améliorer la qualité de nos prestations et, avec votre accord, vous informer de nos nouvelles offres. <strong>Nous n'utilisons jamais vos données à des fins publicitaires ou de profilage commercial.</strong></p>
+      </div>
+
+      <div class="privacy-section">
+        <div class="privacy-section-title">🔒 4. Sécurité & Stockage</div>
+        <p>Toutes vos données sont stockées sur <strong>Firebase (Google Cloud)</strong>, une infrastructure certifiée et chiffrée de bout en bout. L'accès à vos données est strictement limité aux membres autorisés de l'équipe OmniService TG, qui sont soumis à une obligation de confidentialité. Aucun tiers commercial n'a accès à vos informations personnelles.</p>
+      </div>
+
+      <div class="privacy-section">
+        <div class="privacy-section-title">⚖️ 5. Vos droits</div>
+        <p>Conformément aux principes de protection des données, vous disposez à tout moment du droit de <strong>consulter, modifier ou supprimer</strong> vos informations personnelles depuis votre profil dans l'application. Pour toute demande concernant vos données, contactez-nous directement via WhatsApp ou par e-mail.</p>
+      </div>
+
+      <div class="privacy-section">
+        <div class="privacy-section-title">🍪 6. Données locales (cookies)</div>
+        <p>L'application utilise le stockage local de votre navigateur (<em>localStorage</em>) uniquement pour maintenir votre session ouverte entre les visites, évitant ainsi que vous ayez à vous reconnectez à chaque fois. Aucun cookie tiers ni outil de tracking publicitaire n'est utilisé.</p>
+      </div>
+
+      <div class="privacy-section">
+        <div class="privacy-section-title">🔔 7. Notifications</div>
+        <p>Si vous acceptez les notifications dans votre navigateur, OmniService TG vous envoie uniquement des alertes utiles concernant l'état de vos commandes (passage en cours, commande terminée). Ces notifications sont gérées localement et ne nécessitent aucun service tiers de tracking.</p>
+      </div>
+
+      <div class="privacy-section">
+        <div class="privacy-section-title">📞 8. Contact & Réclamations</div>
+        <p>Pour toute question relative à la confidentialité de vos données, notre équipe est disponible 7j/7 :</p>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+          <a href="tel:+22870652222" style="display:flex;align-items:center;gap:10px;background:#E3F2FD;border-radius:12px;padding:12px;text-decoration:none">
+            <span style="font-size:20px">📞</span>
+            <div><div style="font-size:13px;font-weight:700;color:#1E6FBE">+228 70 65 22 22</div><div style="font-size:11px;color:#9999BB">Appel / WhatsApp</div></div>
+          </a>
+          <a href="/cdn-cgi/l/email-protection#8fece0e1fbeeecfbcfe0e2e1e6fceafdf9e6eceafbe8a1ece0e2" style="display:flex;align-items:center;gap:10px;background:#FFF3E0;border-radius:12px;padding:12px;text-decoration:none">
+            <span style="font-size:20px">📧</span>
+            <div><div style="font-size:13px;font-weight:700;color:#F5820A"><span class="__cf_email__" data-cfemail="a4c7cbcad0c5c7d0e4cbc9cacdd7c1d6d2cdc7c1d0c38ac7cbc9">[email&#160;protected]</span></div><div style="font-size:11px;color:#9999BB">E-mail</div></div>
+          </a>
+        </div>
+      </div>
+
+      <div style="margin-top:22px;padding:16px;background:#F4F6FA;border-radius:14px;text-align:center">
+        <div style="font-size:20px;margin-bottom:6px">🏛️</div>
+        <div style="font-size:12px;color:#9999BB;line-height:1.6"><strong style="color:#1A1A2E">Sté. ASSISTANCE GLOBALE</strong><br/>14 ans d'expérience · Lomé, Togo 🇹🇬<br/>Politique en vigueur depuis le 07 Avril 2026</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CONFIRMATION D'ANNULATION ══ -->
+<div id="cancel-order-modal" style="display:none;position:fixed;inset:0;z-index:3500;background:rgba(10,18,32,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeCancelModal()">
+  <div style="background:#fff;border-radius:24px;width:100%;max-width:360px;padding:28px 24px;box-shadow:0 30px 80px rgba(0,0,0,.3);text-align:center">
+    <div style="width:64px;height:64px;background:#FFEBEE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px">🗑️</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;color:#1A1A2E;margin-bottom:8px">Annuler la commande ?</div>
+    <div style="font-size:13px;color:#4A4A6A;line-height:1.6;margin-bottom:6px">
+      Vous êtes sur le point d'annuler et de supprimer :<br/>
+      <strong id="cancel-order-name" style="color:#1A1A2E"></strong>
+    </div>
+    <div style="font-size:11px;color:#9999BB;margin-bottom:22px">Réf : <strong id="cancel-order-ref"></strong></div>
+    <div style="background:#FFF3E0;border-radius:12px;padding:12px;font-size:12px;color:#B45309;margin-bottom:22px;text-align:left">
+      ⚠️ Cette action est <strong>irréversible</strong>. La suppression n'est possible que si la commande est encore <strong>En attente</strong>.
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeCancelModal()" style="flex:1;background:#F4F6FA;border:1.5px solid #E8EAF0;border-radius:14px;padding:14px;font-size:13px;font-weight:700;color:#4A4A6A;cursor:pointer;font-family:'Poppins',sans-serif">Garder</button>
+      <button onclick="confirmCancelOrder()" style="flex:1;background:linear-gradient(135deg,#C62828,#B71C1C);border:none;border-radius:14px;padding:14px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'Poppins',sans-serif;box-shadow:0 4px 16px rgba(198,40,40,.35)">🗑️ Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PANNEAU NOTIFICATIONS ══ -->
+<div id="notif-panel" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,18,32,.65);backdrop-filter:blur(4px)" onclick="if(event.target===this)closeNotifPanel()">
+  <div style="position:absolute;top:0;right:0;width:min(100vw,380px);height:100%;background:#fff;box-shadow:-8px 0 40px rgba(0,0,0,.18);display:flex;flex-direction:column;animation:slideInRight .25s cubic-bezier(.4,0,.2,1)">
+    <div style="background:linear-gradient(135deg,#1E6FBE,#155A9C);padding:20px 20px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <div style="font-size:24px">🔔</div>
+      <div style="flex:1">
+        <div style="font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;color:#fff">Notifications</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:2px">Suivi de vos commandes en temps réel</div>
+      </div>
+      <button onclick="closeNotifPanel()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div id="notif-list" style="flex:1;overflow-y:auto;padding:16px">
+      <div id="notif-empty" style="text-align:center;padding:60px 20px;color:#9999BB">
+        <div style="font-size:48px;margin-bottom:14px">🔔</div>
+        <div style="font-size:15px;font-weight:700;color:#1A1A2E;margin-bottom:6px">Aucune notification</div>
+        <div style="font-size:12px;line-height:1.6">Vous recevrez des alertes ici dès que le statut de vos commandes changera.</div>
+      </div>
+    </div>
+    <div style="padding:14px 16px;border-top:1px solid #F0F0F8;flex-shrink:0">
+      <button onclick="clearAllNotifs()" style="width:100%;background:#F4F6FA;border:1.5px solid #E8EAF0;border-radius:12px;padding:12px;font-size:12px;font-weight:700;color:#4A4A6A;cursor:pointer;font-family:'Poppins',sans-serif">🗑️ Effacer toutes les notifications</button>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+/* Notification item */
+.notif-item {
+  background: #fff;
+  border: 1.5px solid #F0F0F8;
+  border-radius: 14px;
+  padding: 14px 15px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all .15s;
+}
+.notif-item:hover { box-shadow: 0 4px 16px rgba(30,111,190,.1); border-color: #1E6FBE; }
+.notif-item.unread { border-color: #1E6FBE; background: #F0F7FF; }
+.notif-item.unread::before { content:''; position:absolute; top:12px; right:12px; width:8px; height:8px; background:#1E6FBE; border-radius:50%; }
+.notif-ico { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.notif-title { font-size:13px; font-weight:700; color:#1A1A2E; margin-bottom:3px; }
+.notif-sub { font-size:11px; color:#4A4A6A; line-height:1.5; }
+.notif-time { font-size:10px; color:#9999BB; margin-top:4px; }
+/* Cloche badge */
+#notif-badge {
+  position:absolute;top:4px;right:4px;
+  background:#C62828;color:#fff;
+  font-size:9px;font-weight:800;
+  min-width:16px;height:16px;
+  border-radius:999px;
+  align-items:center;justify-content:center;
+  padding:0 3px;line-height:1;
+}
+/* Bouton suppression commande */
+.o-delete-btn {
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid #FFCDD2;
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #C62828;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all .2s;
+}
+.o-delete-btn:hover {
+  background: #FFEBEE;
+  border-color: #C62828;
+  box-shadow: 0 2px 12px rgba(198,40,40,.15);
+}
+/* Privacy modal */
+#privacy-modal{
+  display:none;position:fixed;inset:0;z-index:2500;
+  background:rgba(10,18,32,.75);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:16px;overflow-y:auto;
+}
+.privacy-box{
+  background:#fff;border-radius:24px;width:100%;max-width:520px;
+  box-shadow:0 30px 80px rgba(0,0,0,.3);max-height:90vh;
+  display:flex;flex-direction:column;
+}
+.privacy-header{
+  background:linear-gradient(135deg,#1E6FBE,#155A9C);
+  padding:20px 22px;display:flex;align-items:center;justify-content:space-between;
+  border-radius:24px 24px 0 0;flex-shrink:0;
+}
+.privacy-title{font-family:'Nunito',sans-serif;font-size:17px;font-weight:800;color:#fff}
+.privacy-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.privacy-body{padding:20px 22px;overflow-y:auto;flex:1}
+.privacy-section{margin-bottom:18px}
+.privacy-section-title{font-size:13px;font-weight:800;color:#1A1A2E;margin-bottom:8px}
+.privacy-section p{font-size:12px;color:#4A4A6A;line-height:1.7;margin:0}
+.privacy-trust-badges{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.privacy-badge{background:#F4F6FA;border-radius:14px;padding:12px;text-align:center}
+.privacy-badge-ico{font-size:22px;margin-bottom:4px}
+.privacy-badge-label{font-size:11px;font-weight:700;color:#1A1A2E}
+.privacy-badge-sub{font-size:10px;color:#9999BB;margin-top:2px}
+</style>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Bottom Nav -->
+<nav class="botnav">
+  <button class="btab on" id="t-home"     onclick="goTab('home')">    <div class="btab-ico">🏠</div><span class="btab-lbl">Accueil</span></button>
+  <button class="btab"    id="t-services" onclick="goTab('services')"><div class="btab-ico">🛠️</div><span class="btab-lbl">Services</span></button>
+  <button class="btab"    id="t-orders"   onclick="goTab('orders')">  <div class="btab-ico">📦</div><span class="btab-lbl">Commandes</span></button>
+  <button class="btab"    id="t-about"    onclick="goTab('about')">   <div class="btab-ico">ℹ️</div><span class="btab-lbl">À propos</span></button>
+</nav>
+
+<!-- Script principal -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module" src="app.js"></script>
+<script>
+/* ══ PATCH : Nouveaux services + Immobilier restructuré ══ */
+
+// Données Immobilier — 4 sous-services
+const IMMO_ENVELOPE = {
+  id: 'immobilier',
+  name: 'Service Immobilier',
+  emoji: '🏢',
+  color: '#E8F5E9',
+  subServices: [
+    {
+      id: 'immo_vendre',
+      name: 'À Vendre',
+      emoji: '🏡',
+      color: '#E8F5E9',
+      type: 'catalogue', // comme Alimentation : grille d'articles
+      desc: 'Biens immobiliers disponibles à la vente',
+      items: [
+        { name: 'Villa 4 ch + S à Agoè', price: 200000000, unit: 'FCFA', emoji: '🏡', desc: '4 chambres, salon, cuisine équipée, clôturée' },
+        { name: 'Terrain 600m² (1 lot) à Bè', price: 100000000, unit: 'FCFA', emoji: '🌍', desc: 'Titre foncier disponible, bien localisé' },
+      ]
+    },
+    {
+      id: 'immo_louer',
+      name: 'À Louer',
+      emoji: '🔑',
+      color: '#E3F2FD',
+      type: 'catalogue', // comme Alimentation : grille d'articles
+      desc: 'Biens immobiliers disponibles à la location',
+      items: [
+        { name: 'Appartement 2 Ch + S à Sagbado', price: 65000, unit: 'FCFA/mois', emoji: '🏠', desc: '2 chambres, salon, sanitaires' },
+        { name: 'Villa 4 Ch + S à Agoè', price: 200000, unit: 'FCFA/mois', emoji: '🏡', desc: '4 chambres, salon, cuisine, garage' },
+        { name: 'Bureau', price: 0, unit: 'Sur devis', emoji: '🏢', desc: 'Espaces bureaux professionnels disponibles' },
+        { name: 'Espace commercial', price: 0, unit: 'Sur devis', emoji: '🏪', desc: 'Boutiques et locaux commerciaux' },
+        { name: 'Entrepôt', price: 0, unit: 'Sur devis', emoji: '🏭', desc: 'Entrepôts de diverses capacités' },
+      ]
+    },
+    {
+      id: 'immo_assistance',
+      name: 'Assistance Immobilière',
+      emoji: '🤝',
+      color: '#EDE7F6',
+      type: 'kits', // comme Mathivik : liste puis commander
+      desc: 'Services d\'assistance et d\'accompagnement immobilier',
+      options: [
+        { name: 'Recherche de terrain sécurisé', emoji: '🌍', desc: 'Identification et vérification de terrains selon vos critères' },
+        { name: 'Recherche de Villa / Appartement / Bureau / Magasin', emoji: '🔍', desc: 'Recherche personnalisée du bien adapté à vos besoins' },
+        { name: 'Vérification de titres fonciers', emoji: '📜', desc: 'Contrôle et validation des documents de propriété' },
+        { name: 'Supervision de construction', emoji: '🏗️', desc: 'Suivi et supervision de vos travaux de construction' },
+        { name: 'Suivi de chantier', emoji: '👷', desc: 'Reporting régulier de l\'avancement du chantier' },
+        { name: 'Vérification administrative', emoji: '📋', desc: 'Contrôle de la conformité administrative du bien' },
+        { name: 'Accompagnement juridique', emoji: '⚖️', desc: 'Aide aux démarches légales et contrats immobiliers' },
+        { name: 'Négociation encadrée', emoji: '🤝', desc: 'Assistance à la négociation du prix d\'achat ou de location' },
+        { name: 'Rapports réguliers', emoji: '📊', desc: 'Compte-rendus périodiques sur l\'état de votre dossier' },
+      ]
+    },
+    {
+      id: 'immo_gestion',
+      name: 'Votre Propriété, Notre Gestion',
+      emoji: '🏛️',
+      color: '#FFF3E0',
+      type: 'form', // comme Gardiennage : choisir un type puis formulaire
+      desc: 'Gestion locative complète de votre bien immobilier',
+      options: [
+        { id: 'villa', label: 'Villa', emoji: '🏡' },
+        { id: 'appartement', label: 'Appartement', emoji: '🏠' },
+        { id: 'bureau', label: 'Bureau / Local', emoji: '🏢' },
+        { id: 'magasin', label: 'Magasin / Commerce', emoji: '🏪' },
+        { id: 'entrepot', label: 'Entrepôt', emoji: '🏭' },
+        { id: 'terrain', label: 'Terrain', emoji: '🌍' },
+      ]
+    },
+  ]
+};
+
+// Données Traiteur
+const TRAITEUR_DATA = {
+  id: 'traiteur',
+  name: 'Service Traiteur',
+  emoji: '🍽️',
+  color: '#FFF8E1',
+  type: 'form',
+  desc: 'Repas préparés pour vos événements',
+  options: [
+    { id: 'anniversaire', label: 'Anniversaire', emoji: '🎂' },
+    { id: 'fete_famille', label: 'Fête de famille', emoji: '👨‍👩‍👧‍👦' },
+    { id: 'mariage', label: 'Mariage / Cérémonie', emoji: '💍' },
+    { id: 'bapteme', label: 'Baptême / Communion', emoji: '🕊️' },
+    { id: 'evenement_entreprise', label: 'Événement d\'entreprise', emoji: '🏢' },
+    { id: 'fete_nationale', label: 'Fête nationale / Culturelle', emoji: '🎉' },
+    { id: 'autre', label: 'Autre événement', emoji: '🎊' },
+  ]
+};
+
+// Données Omni Drink TG
+const OMNI_DRINK_DATA = {
+  id: 'omni_drink',
+  name: 'Omni Drink TG',
+  emoji: '🍾',
+  color: '#E0F7FA',
+  type: 'catalogue',
+  desc: 'Boissons fraîches livrées chez vous',
+  items: [
+    { name: 'Eau minérale (casier 24×50cl)', price: 3500, unit: 'FCFA', emoji: '💧', desc: 'Eau minérale pure, casier de 24 bouteilles' },
+    { name: 'Jus de fruits naturels (1L)', price: 1500, unit: 'FCFA', emoji: '🍊', desc: 'Jus frais sans conservateurs : orange, ananas, bissap...' },
+    { name: 'Sodas assortis (casier 24)', price: 9000, unit: 'FCFA', emoji: '🥤', desc: 'Coca-Cola, Fanta, Sprite et autres' },
+    { name: 'Bières locales (casier 24)', price: 14000, unit: 'FCFA', emoji: '🍺', desc: 'Awooyo, Castel, Flag et autres bières du Togo' },
+    { name: 'Vin de palme (5L)', price: 4000, unit: 'FCFA', emoji: '🌴', desc: 'Vin de palme artisanal frais, production locale' },
+    { name: 'Pack événement boissons', price: 45000, unit: 'FCFA', emoji: '🎉', desc: 'Assortiment complet pour 50 personnes' },
+  ]
+};
+
+// Données Marketplace
+const MARKETPLACE_DATA = {
+  id: 'marketplace',
+  name: 'Marketplace — Articles divers',
+  emoji: '🛍️',
+  color: '#FCE4EC',
+  type: 'catalogue',
+  desc: 'Tous vos articles livrés à domicile',
+  items: [
+    { name: 'Articles ménagers', price: 0, unit: 'Sur devis', emoji: '🏠', desc: 'Ustensiles, vaisselle, electroménager petit format' },
+    { name: 'Fournitures de bureau', price: 0, unit: 'Sur devis', emoji: '✏️', desc: 'Papeterie, classeurs, stylos, cartouches...' },
+    { name: 'Produits d\'hygiène & beauté', price: 0, unit: 'Sur devis', emoji: '🧴', desc: 'Savons, shampooings, produits de soin' },
+    { name: 'Électronique & Accessoires', price: 0, unit: 'Sur devis', emoji: '📱', desc: 'Câbles, batteries, accessoires informatiques' },
+    { name: 'Jouets & Articles enfants', price: 0, unit: 'Sur devis', emoji: '🧸', desc: 'Jouets, fournitures scolaires, articles bébé' },
+    { name: 'Article personnalisé', price: 0, unit: 'Sur devis', emoji: '🛒', desc: 'Dites-nous ce que vous cherchez, on le trouve!' },
+  ]
+};
+
+// ══ VUE IMMO ENVELOPE ══ 
+// Nouvelle vue : enveloppe Immobilier avec 4 options (style service principal)
+function renderImmoEnvelope() {
+  const container = document.getElementById('immo-options-list');
+  if (!container) return;
+  
+  // Mettre à jour le header
+  const titleEl = document.getElementById('immo-options-title');
+  const icoEl = document.getElementById('immo-options-ico');
+  if (titleEl) titleEl.textContent = 'Service Immobilier';
+  if (icoEl) icoEl.textContent = '🏢';
+
+  container.innerHTML = IMMO_ENVELOPE.subServices.map(sub => `
+    <button class="svc-row" style="margin:0 16px 12px;display:flex;align-items:center;gap:14px;background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 2px 12px rgba(0,0,0,.08);cursor:pointer;border:none;width:calc(100% - 32px);transition:transform .15s;" 
+      onclick="openImmoSubService('${sub.id}')">
+      <div style="width:44px;height:44px;border-radius:12px;background:${sub.color};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${sub.emoji}</div>
+      <div style="flex:1;text-align:left">
+        <div style="font-size:14px;font-weight:700;color:#1A1A2E;margin-bottom:3px">${sub.name}</div>
+        <div style="font-size:11px;color:#9999BB">${sub.desc}</div>
+      </div>
+      <span style="font-size:20px;color:#E8EAF0">›</span>
+    </button>
+  `).join('');
+}
+
+// Ouvrir un sous-service immobilier
+function openImmoSubService(subId) {
+  const sub = IMMO_ENVELOPE.subServices.find(s => s.id === subId);
+  if (!sub) return;
+  
+  if (sub.type === 'catalogue') {
+    // Afficher comme catalogue (alimentation/prêt-à-porter)
+    renderImmoSubCatalogue(sub);
+  } else if (sub.type === 'kits') {
+    // Afficher comme liste Mathivik
+    renderImmoAssistance(sub);
+  } else if (sub.type === 'form') {
+    // Afficher comme gardiennage : liste de types puis formulaire
+    renderImmoGestion(sub);
+  }
+}
+
+// ══ Catalogue Immobilier (À Vendre / À Louer) — même design qu'Alimentation ══
+let _immoCartItems = [];
+let _immoCurrentSub = null;
+
+function renderImmoSubCatalogue(sub) {
+  _immoCurrentSub = sub;
+
+  // Utiliser view-catalogue existant comme Alimentation
+  const catTitle = document.getElementById('cat-title');
+  const catIco = document.getElementById('cat-ico');
+  const catItems = document.getElementById('catalogue-items');
+  const backBtn = document.getElementById('catalogue-back-btn');
+  const cartBar = document.getElementById('cart-bar');
+
+  if (catTitle) catTitle.textContent = sub.name;
+  if (catIco) { catIco.textContent = sub.emoji; catIco.style.background = sub.color; }
+  if (backBtn) backBtn.onclick = () => showView('immo-options');
+
+  // Convertir les items en format article compatible avec renderArticleCard
+  // Pour immo : le "+" ouvre le formulaire immo au lieu de la livraison
+  if (catItems) {
+    catItems.innerHTML = sub.items.map((item, i) => {
+      const id = `immo_${sub.id}_${i}`;
+      const priceStr = item.price > 0
+        ? Number(item.price).toLocaleString('fr-FR') + ' FCFA'
+        : item.unit;
+      const unitStr = item.price > 0 ? '' : '';
+      return `
+      <div class="article-card" id="acard-${id}">
+        <div class="art-img-wrap" style="background:${sub.color};display:flex;align-items:center;justify-content:center;font-size:44px">
+          ${item.emoji}
+        </div>
+        <div class="art-check">✓</div>
+        <div class="art-body">
+          <div class="art-name">${item.name}</div>
+          <div class="art-desc">${item.desc}</div>
+          <div class="art-footer">
+            <div>
+              <span class="art-price">${priceStr}</span>
+              ${item.price > 0 ? `<span class="art-price-unit">/ ${item.unit}</span>` : ''}
+            </div>
+            <button class="art-add" onclick="addImmoItem(${i})" title="Faire une demande">→</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Cacher la cart-bar (immo va vers formulaire, pas livraison)
+  if (cartBar) cartBar.style.display = 'none';
+  showView('catalogue');
+}
+
+function addImmoItem(idx) {
+  const item = _immoCurrentSub.items[idx];
+  const subId = _immoCurrentSub.id;
+  
+  // Pour À vendre (immo_vendre) et À Louer (immo_louer) : masquer localisation et budget
+  const isVenteOuLocation = subId === 'immo_vendre' || subId === 'immo_louer';
+  
+  const nameEl = document.getElementById('immo-form-prestation-name');
+  const descEl = document.getElementById('immo-form-prestation-desc');
+  const catEl = document.getElementById('immo-form-category');
+  const heroEmoji = document.getElementById('immo-form-hero-emoji');
+  const formTitle = document.getElementById('immo-form-title');
+  const backBtn2 = document.getElementById('immo-form-back-btn');
+  const besoin = document.getElementById('immo-ff-besoin');
+  
+  // Masquer/afficher les champs selon le sous-service
+  const locRow = document.getElementById('immo-ff-localisation')?.closest('.f-row') || 
+                  (() => {
+                    const el = document.getElementById('immo-ff-localisation');
+                    return el ? el.parentNode.querySelector('label[for="immo-ff-localisation"], label + #immo-ff-localisation') : null;
+                  })();
+  
+  setImmoFormFieldsVisibility(isVenteOuLocation ? 'vente-location' : 'default');
+  
+  if (nameEl) nameEl.textContent = item.name;
+  if (descEl) descEl.textContent = item.desc;
+  if (catEl) catEl.textContent = _immoCurrentSub.name;
+  if (heroEmoji) heroEmoji.textContent = item.emoji;
+  if (formTitle) formTitle.textContent = item.name;
+  if (backBtn2) backBtn2.onclick = () => showView('catalogue');
+  if (besoin) besoin.placeholder = `Je suis intéressé(e) par : ${item.name}. Précisez vos souhaits...`;
+  
+  const soonBox = document.getElementById('immo-form-soon');
+  if (soonBox) soonBox.style.display = 'block';
+  
+  showView('immo-form');
+}
+
+// ══ Assistance Immobilière (style Mathivik — liste puis commander) ══
+function renderImmoAssistance(sub) {
+  const catView = document.getElementById('view-immo-options');
+  const container = document.getElementById('immo-options-list');
+  const titleEl = document.getElementById('immo-options-title');
+  const icoEl = document.getElementById('immo-options-ico');
+  const backBtn = document.getElementById('immo-options-back-btn');
+  
+  if (titleEl) titleEl.textContent = sub.name;
+  if (icoEl) { icoEl.textContent = sub.emoji; icoEl.style.background = sub.color; }
+  if (backBtn) backBtn.onclick = () => { renderImmoEnvelope(); };
+  
+  const labelEl = catView ? catView.querySelector('[style*="Nos prestations disponibles"]') : null;
+  
+  if (container) {
+    container.innerHTML = sub.options.map((opt, i) => `
+      <div class="kit-card" onclick="openImmoAssistanceOption('${sub.id}', ${i})">
+        <div class="kit-img-wrap" style="background:#EDE7F6;font-size:28px;display:flex;align-items:center;justify-content:center">${opt.emoji}</div>
+        <div class="kit-body">
+          <div class="kit-name">${opt.name}</div>
+          <div class="kit-desc">${opt.desc}</div>
+          <div class="kit-footer">
+            <span class="kit-price">Sur devis</span>
+          </div>
+        </div>
+        <span class="kit-arrow">›</span>
+      </div>
+    `).join('');
+  }
+  
+  showView('immo-options');
+}
+
+function openImmoAssistanceOption(subId, optIdx) {
+  const sub = IMMO_ENVELOPE.subServices.find(s => s.id === subId);
+  if (!sub) return;
+  const opt = sub.options[optIdx];
+  
+  const nameEl = document.getElementById('immo-form-prestation-name');
+  const descEl = document.getElementById('immo-form-prestation-desc');
+  const catEl = document.getElementById('immo-form-category');
+  const heroEmoji = document.getElementById('immo-form-hero-emoji');
+  const formTitle = document.getElementById('immo-form-title');
+  const backBtn = document.getElementById('immo-form-back-btn');
+  const besoin = document.getElementById('immo-ff-besoin');
+  
+  if (nameEl) nameEl.textContent = opt.name;
+  if (descEl) descEl.textContent = opt.desc;
+  if (catEl) catEl.textContent = sub.name;
+  if (heroEmoji) heroEmoji.textContent = opt.emoji;
+  if (formTitle) formTitle.textContent = opt.name;
+  if (backBtn) backBtn.onclick = () => renderImmoAssistance(sub);
+  if (besoin) besoin.placeholder = `Décrivez votre besoin pour : ${opt.name}...`;
+  
+  setImmoFormFieldsVisibility('default');
+  
+  const soonBox = document.getElementById('immo-form-soon');
+  if (soonBox) soonBox.style.display = 'block';
+  
+  showView('immo-form');
+}
+
+// ══ Votre Propriété Notre Gestion (style Gardiennage) ══
+function renderImmoGestion(sub) {
+  const container = document.getElementById('immo-options-list');
+  const titleEl = document.getElementById('immo-options-title');
+  const icoEl = document.getElementById('immo-options-ico');
+  const backBtn = document.getElementById('immo-options-back-btn');
+  
+  if (titleEl) titleEl.textContent = sub.name;
+  if (icoEl) { icoEl.textContent = sub.emoji; icoEl.style.background = sub.color; }
+  if (backBtn) backBtn.onclick = () => renderImmoEnvelope();
+  
+  if (container) {
+    container.innerHTML = `
+      <div style="padding:0 16px 8px;font-size:12px;color:#9999BB">Quel type de bien souhaitez-vous confier à notre gestion ?</div>
+      ${sub.options.map((opt, i) => `
+        <button class="svc-row" style="margin:0 16px 10px;display:flex;align-items:center;gap:14px;background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 2px 12px rgba(0,0,0,.08);cursor:pointer;border:none;width:calc(100% - 32px);" 
+          onclick="openImmoGestionForm('${sub.id}', ${i})">
+          <div style="width:44px;height:44px;border-radius:12px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;font-size:22px">${opt.emoji}</div>
+          <div style="flex:1;text-align:left;font-size:14px;font-weight:700;color:#1A1A2E">${opt.label}</div>
+          <span style="font-size:20px;color:#E8EAF0">›</span>
+        </button>
+      `).join('')}
+    `;
+  }
+  showView('immo-options');
+}
+
+function openImmoGestionForm(subId, optIdx) {
+  const sub = IMMO_ENVELOPE.subServices.find(s => s.id === subId);
+  if (!sub) return;
+  const opt = sub.options[optIdx];
+  
+  const nameEl = document.getElementById('immo-form-prestation-name');
+  const descEl = document.getElementById('immo-form-prestation-desc');
+  const catEl = document.getElementById('immo-form-category');
+  const heroEmoji = document.getElementById('immo-form-hero-emoji');
+  const formTitle = document.getElementById('immo-form-title');
+  const backBtn = document.getElementById('immo-form-back-btn');
+  const besoin = document.getElementById('immo-ff-besoin');
+  
+  if (nameEl) nameEl.textContent = 'Gestion de : ' + opt.label;
+  if (descEl) descEl.textContent = sub.desc;
+  if (catEl) catEl.textContent = sub.name;
+  if (heroEmoji) heroEmoji.textContent = opt.emoji;
+  if (formTitle) formTitle.textContent = opt.label;
+  if (backBtn) backBtn.onclick = () => renderImmoGestion(sub);
+  if (besoin) besoin.placeholder = `Décrivez votre ${opt.label.toLowerCase()} : adresse, nombre de pièces, loyer actuel, vos attentes...`;
+  
+  setImmoFormFieldsVisibility('gestion');
+  
+  const soonBox = document.getElementById('immo-form-soon');
+  if (soonBox) soonBox.style.display = 'block';
+  
+  showView('immo-form');
+}
+
+// ══ Helper : contrôle visibilité champs formulaire immo ══
+function setImmoFormFieldsVisibility(mode) {
+  // mode: 'vente-location' | 'gestion' | 'default'
+  const locLabel  = document.querySelector('label[data-immo-loc]');
+  const locInput  = document.getElementById('immo-ff-localisation');
+  const budgetLabel = document.querySelector('label[data-immo-budget]');
+  const budgetInput = document.getElementById('immo-ff-budget');
+  
+  if (!locLabel || !locInput) return;
+  
+  if (mode === 'vente-location') {
+    // À vendre / À Louer : masquer localisation ET budget
+    locLabel.style.display = 'none';
+    locInput.style.display = 'none';
+    if (budgetLabel) budgetLabel.style.display = 'none';
+    if (budgetInput) budgetInput.style.display = 'none';
+  } else if (mode === 'gestion') {
+    // Votre Propriété Notre Gestion : label "Quartier de votre propriété", budget visible
+    locLabel.style.display = '';
+    locInput.style.display = '';
+    locLabel.childNodes[0].textContent = 'Quartier de votre propriété';
+    locInput.placeholder = 'Ex : Adidogomé, Bè, Tokoin, Agoè...';
+    if (budgetLabel) budgetLabel.style.display = '';
+    if (budgetInput) budgetInput.style.display = '';
+  } else {
+    // Default (Assistance) : tout visible
+    locLabel.style.display = '';
+    locInput.style.display = '';
+    locLabel.childNodes[0].textContent = 'Localisation / Quartier souhaité';
+    locInput.placeholder = 'Ex : Adidogomé, Bè, Tokoin, Agoè...';
+    if (budgetLabel) budgetLabel.style.display = '';
+    if (budgetInput) budgetInput.style.display = '';
+  }
+}
+window.setImmoFormFieldsVisibility = setImmoFormFieldsVisibility;
+window.addEventListener('load', () => {
+  // Patcher openService après chargement de app.js
+  setTimeout(() => {
+    const _origOpen = window.openService;
+    window.openService = function(id) {
+      if (id === 'immobilier') {
+        // Aller vers la vue immo-options et rendre l'enveloppe
+        goTab('services');
+        setTimeout(() => {
+          renderImmoEnvelope();
+          showView('immo-options');
+        }, 50);
+        return;
+      }
+      if (id === 'traiteur') {
+        openTraiteur();
+        return;
+      }
+      // omni_drink et marketplace sont gérés nativement par app.js (CATALOGUE_SERVICES)
+      if (_origOpen) _origOpen(id);
+    };
+  }, 500);
+});
+
+// ══ Service Traiteur ══
+function openTraiteur() {
+  goTab('services');
+  setTimeout(() => {
+    // Utiliser view-form avec champs personnalisés
+    const titleEl = document.getElementById('form-title');
+    const icoEl = document.getElementById('form-ico');
+    const fieldsEl = document.getElementById('form-fields');
+    const soonEl = document.getElementById('form-soon');
+    const soonDate = document.getElementById('form-soon-date');
+    
+    if (titleEl) titleEl.textContent = 'Service Traiteur';
+    if (icoEl) { icoEl.textContent = '🍽️'; icoEl.style.background = '#FFF8E1'; }
+    if (soonEl) soonEl.style.display = 'block';
+    if (soonDate) soonDate.textContent = 'Opérationnel le 07 Avril 2026. Pré-enregistrez votre demande dès maintenant.';
+    
+    if (fieldsEl) {
+      fieldsEl.innerHTML = `
+        <div class="order-card-title">🍽️ Votre événement</div>
+        <label class="f-label">Type d'événement *</label>
+        <select class="f-input" id="traiteur-type">
+          <option value="">— Sélectionnez —</option>
+          ${TRAITEUR_DATA.options.map(o => `<option value="${o.id}">${o.emoji} ${o.label}</option>`).join('')}
+        </select>
+        <label class="f-label">Description de l'événement *</label>
+        <textarea class="f-textarea" rows="4" id="traiteur-desc" placeholder="Date, heure, lieu, thème, nombre de personnes attendues, type de repas souhaité..."></textarea>
+        <label class="f-label">Nombre de personnes *</label>
+        <input type="number" class="f-input" id="traiteur-nb" placeholder="Ex : 50"/>
+        <label class="f-label">Date de l'événement *</label>
+        <input type="date" class="f-input" id="traiteur-date"/>
+        <label class="f-label">Budget estimé <span style="font-weight:400;font-size:10px;color:#C5C5D8">(optionnel)</span></label>
+        <input type="text" class="f-input" id="traiteur-budget" placeholder="Ex : 150 000 FCFA"/>
+        <label class="f-label">Remarques <span style="font-weight:400;font-size:10px;color:#C5C5D8">(optionnel)</span></label>
+        <textarea class="f-textarea" rows="2" id="traiteur-notes" placeholder="Allergies, restrictions alimentaires, spécialités souhaitées..."></textarea>
+      `;
+    }
+    showView('form');
+  }, 50);
+}
+
+
+</script>
+<script>
+// Mettre à jour aussi l'icône du bas nav après connexion
+const _origUpdateNav = window.updateNavForAuth;
+window.addEventListener('auth-changed', () => {});
+// Patch pour l'icône bottom nav - profil supprimé du bas nav, rien à patcher
+function patchBottomNavAvatar(genre) {
+  // Profil est uniquement en haut nav, plus besoin de patch bottom nav
+}
+
+// ══ POLITIQUE DE CONFIDENTIALITÉ ══
+function openPrivacyModal() {
+  const m = document.getElementById('privacy-modal');
+  if (m) { m.style.display = 'flex'; }
+}
+function closePrivacyModal() {
+  const m = document.getElementById('privacy-modal');
+  if (m) { m.style.display = 'none'; }
+}
+window.openPrivacyModal = openPrivacyModal;
+window.closePrivacyModal = closePrivacyModal;
+
+// ══ SYSTÈME DE NOTIFICATIONS ══
+let _notifList = JSON.parse(localStorage.getItem('omni_notifs') || '[]');
+
+function saveNotifs() {
+  localStorage.setItem('omni_notifs', JSON.stringify(_notifList.slice(0, 50)));
+}
+
+function addNotification(title, message, type = 'info', orderId = null) {
+  const notif = {
+    id: Date.now(),
+    title,
+    message,
+    type, // 'en_cours' | 'terminee' | 'info'
+    orderId,
+    time: new Date().toISOString(),
+    read: false
+  };
+  _notifList.unshift(notif);
+  saveNotifs();
+  updateNotifBadge();
+  renderNotifList();
+  // Notification navigateur si autorisé
+  if (Notification.permission === 'granted') {
+    const ico = type === 'en_cours' ? '🚀' : type === 'terminee' ? '✅' : '🔔';
+    try {
+      new Notification(`${ico} OmniService TG`, { body: `${title}\n${message}`, icon: 'assets/logo.png' });
+    } catch(e) {}
+  }
+}
+window.addNotification = addNotification;
+
+function updateNotifBadge() {
+  const badge = document.getElementById('notif-badge');
+  const unread = _notifList.filter(n => !n.read).length;
+  if (!badge) return;
+  if (unread > 0) {
+    badge.textContent = unread > 9 ? '9+' : unread;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ── Notifications broadcast admin (Firestore → tous les clients) ──
+let _lastBroadcastCheck = parseInt(localStorage.getItem('omni_last_broadcast') || '0');
+
+async function checkBroadcastNotifications() {
+  try {
+    const { getDocs: gD, collection: col, query: q, where: w, orderBy: ob } =
+      await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const fsApp = (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js")).getApps()[0];
+    if (!fsApp) return;
+    const fsDb = (await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js")).getFirestore(fsApp);
+
+    let snap;
+    try {
+      snap = await gD(q(col(fsDb,'notifications_broadcast'), ob('sentAt','desc')));
+    } catch(_) {
+      snap = await gD(col(fsDb,'notifications_broadcast'));
+    }
+
+    let newCount = 0;
+    snap.docs.forEach(docSnap => {
+      const n = docSnap.data();
+      const sentTs = n.sentAt ? n.sentAt.seconds * 1000 : 0;
+      if (sentTs <= _lastBroadcastCheck) return;
+
+      // Eviter les doublons
+      const broadcastId = 'broadcast_' + docSnap.id;
+      if (_notifList.find(x => x.id === broadcastId)) return;
+
+      _notifList.unshift({
+        id: broadcastId,
+        title: n.titre || 'Message de OmniService TG',
+        message: n.contenu || '',
+        type: n.type || 'info',
+        lien: n.lien || null,
+        time: sentTs ? new Date(sentTs).toISOString() : new Date().toISOString(),
+        read: false,
+        broadcast: true
+      });
+      newCount++;
+    });
+
+    if (newCount > 0) {
+      const maxTs = Math.max(...snap.docs.map(d => d.data().sentAt ? d.data().sentAt.seconds * 1000 : 0));
+      if (maxTs > _lastBroadcastCheck) {
+        _lastBroadcastCheck = maxTs;
+        localStorage.setItem('omni_last_broadcast', String(maxTs));
+      }
+      saveNotifs();
+      updateNotifBadge();
+      renderNotifList();
+    }
+  } catch(e) { /* silencieux */ }
+}
+
+// Vérifier au chargement et toutes les 2 minutes
+window.addEventListener('load', () => setTimeout(checkBroadcastNotifications, 3000));
+setInterval(checkBroadcastNotifications, 120000);
+
+function renderNotifList() {
+  const list = document.getElementById('notif-list');
+  const empty = document.getElementById('notif-empty');
+  if (!list) return;
+
+  if (!_notifList.length) {
+    if (empty) empty.style.display = 'block';
+    list.querySelectorAll('.notif-item').forEach(n => n.remove());
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  // Remove old items (keep empty div)
+  list.querySelectorAll('.notif-item').forEach(n => n.remove());
+
+  const typeConfig = {
+    en_cours:   { ico: '🚀', bg: '#E3F2FD', color: '#1E6FBE' },
+    terminee:   { ico: '✅', bg: '#E8F5E9', color: '#2E7D32' },
+    info:       { ico: 'ℹ️', bg: '#FFF3E0', color: '#F5820A' },
+    promo:      { ico: '🏷️', bg: '#FFF3E0', color: '#E65100' },
+    alerte:     { ico: '⚠️', bg: '#FFEBEE', color: '#C62828' },
+    nouveaute:  { ico: '✨', bg: '#F3E5F5', color: '#7B1FA2' },
+    evenement:  { ico: '🎉', bg: '#E8F5E9', color: '#2E7D32' },
+  };
+
+  _notifList.forEach(n => {
+    const cfg = typeConfig[n.type] || typeConfig.info;
+    const timeAgo = formatTimeAgo(n.time);
+    const el = document.createElement('div');
+    el.className = `notif-item${n.read ? '' : ' unread'}`;
+    el.dataset.id = n.id;
+    el.innerHTML = `
+      <div class="notif-ico" style="background:${cfg.bg}">
+        ${cfg.ico}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-sub">${n.message}</div>
+        <div class="notif-time">🕐 ${timeAgo}</div>
+      </div>
+    `;
+    el.onclick = () => markNotifRead(n.id);
+    list.insertBefore(el, list.querySelector('.notif-item'));
+    if (!list.querySelector('.notif-item')) list.appendChild(el);
+    else list.insertBefore(el, list.firstChild);
+  });
+}
+
+function markNotifRead(id) {
+  const n = _notifList.find(x => x.id === id);
+  if (n) { n.read = true; saveNotifs(); updateNotifBadge(); renderNotifList(); }
+}
+
+function clearAllNotifs() {
+  _notifList = [];
+  saveNotifs();
+  updateNotifBadge();
+  renderNotifList();
+}
+window.clearAllNotifs = clearAllNotifs;
+
+function formatTimeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "À l'instant";
+  if (mins < 60) return `Il y a ${mins} min`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `Il y a ${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  return `Il y a ${days} jour${days > 1 ? 's' : ''}`;
+}
+
+function openNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  if (panel) {
+    panel.style.display = 'flex';
+    // Mark all as read after 2s
+    renderNotifList();
+    setTimeout(() => {
+      _notifList.forEach(n => n.read = true);
+      saveNotifs();
+      updateNotifBadge();
+    }, 2000);
+  }
+}
+function closeNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  if (panel) panel.style.display = 'none';
+}
+window.openNotifPanel = openNotifPanel;
+window.closeNotifPanel = closeNotifPanel;
+
+// ══ DEMANDE DE PERMISSION NOTIFICATION NAVIGATEUR ══
+function requestNotifPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(perm => {
+      if (perm === 'granted') {
+        addNotification('Notifications activées !', 'Vous recevrez des alertes sur vos commandes.', 'info');
+      }
+    });
+  }
+}
+
+// ══ SURVEILLANCE DES CHANGEMENTS DE STATUT ══
+// Polling Firestore toutes les 30s pour détecter les changements de statut
+let _lastOrderStatuts = {};
+let _pollingInterval = null;
+
+async function pollOrderStatuses() {
+  // On a besoin de Firebase — attendre que app.js l'ait initialisé
+  if (typeof window._firestoreDb === 'undefined' || !window._currentUser) return;
+
+  try {
+    const { collection, query, where, getDocs } = window._firestoreUtils || {};
+    if (!getDocs) return;
+    const db = window._firestoreDb;
+    const user = window._currentUser;
+    const q = query(collection(db, 'commandes'), where('uid', '==', user.uid));
+    const snap = await getDocs(q);
+    snap.forEach(d => {
+      const data = d.data();
+      const id = d.id;
+      const statut = data.statut || '';
+      const prev = _lastOrderStatuts[id];
+
+      if (prev !== undefined && prev !== statut) {
+        // Statut changé !
+        const ref = '#' + id.slice(0, 8).toUpperCase();
+        const svcName = data.serviceName || data.service || 'votre service';
+
+        if (statut === 'En cours') {
+          addNotification(
+            '🚀 Commande en cours !',
+            `Votre commande ${ref} (${svcName}) est maintenant prise en charge par notre équipe.`,
+            'en_cours', id
+          );
+        } else if (statut === 'Terminée') {
+          addNotification(
+            '✅ Commande terminée !',
+            `Votre commande ${ref} (${svcName}) est terminée. Merci de votre confiance — OmniService TG 🙏`,
+            'terminee', id
+          );
+        }
+      }
+      _lastOrderStatuts[id] = statut;
+    });
+  } catch(e) {
+    // Silencieux en cas d'erreur
+  }
+}
+
+// Exposer les utils Firestore depuis app.js via window
+// (app.js doit exposer window._firestoreDb, window._firestoreUtils, window._currentUser)
+
+// ══ COMPTE À REBOURS PAGE SUCCÈS ══
+let _succCountdownTimer = null;
+// Patch showView pour démarrer le compte à rebours quand on arrive sur 'success'
+const _origShowView = window.showView;
+window.showView = function(v) {
+  if (_origShowView) _origShowView(v);
+  if (v === 'success') {
+    startSuccessCountdown();
+  } else {
+    stopSuccessCountdown();
+  }
+};
+
+function startSuccessCountdown() {
+  stopSuccessCountdown();
+  let count = 3;
+  const el = document.getElementById('succ-countdown');
+  const msgEl = document.getElementById('succ-redirect-msg');
+  if (el) el.textContent = count;
+  if (msgEl) msgEl.style.display = 'block';
+
+  _succCountdownTimer = setInterval(() => {
+    count--;
+    if (el) el.textContent = count;
+    if (count <= 0) {
+      stopSuccessCountdown();
+      if (typeof goTab === 'function') goTab('orders');
+    }
+  }, 1000);
+}
+
+function stopSuccessCountdown() {
+  if (_succCountdownTimer) {
+    clearInterval(_succCountdownTimer);
+    _succCountdownTimer = null;
+  }
+}
+
+// Démarrer le polling et les initialisations
+window.addEventListener('DOMContentLoaded', () => {
+  updateNotifBadge();
+  renderNotifList();
+
+  // Demander permission notification après 5s
+  setTimeout(requestNotifPermission, 5000);
+
+  // Polling toutes les 30s
+  _pollingInterval = setInterval(pollOrderStatuses, 30000);
+});
+
+</script>
+</body>
+</html>
