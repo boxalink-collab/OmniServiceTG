@@ -618,7 +618,7 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
         <div class="pg-sub">Gérez les articles affichés dans le catalogue client</div>
         <div class="articles-panel">
           <div class="svc-tabs">
-            <button class="svc-tab on" onclick="loadArticles('food',this)">🥘 Alimentation</button>
+            <button class="svc-tab on" onclick="loadArticles('food',this)">🥘 Produits Locaux/Frais</button>
             <button class="svc-tab" onclick="loadArticles('clothes',this)">👗 Prêt-à-porter</button>
             <button class="svc-tab" onclick="loadArticles('traiteur',this)">🍽️ Service Traiteur</button>
             <button class="svc-tab" onclick="loadArticles('omni_drink',this)">🍾 Omni Drink TG</button>
@@ -627,7 +627,7 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
             <button class="svc-tab" onclick="loadArticles('marketplace',this)">🛍️ Marketplace</button>
           </div>
           <div class="panel-hdr" style="margin-top:0;border-top:1px solid var(--border)">
-            <div class="panel-title" id="art-panel-title">Alimentation</div>
+            <div class="panel-title" id="art-panel-title">Produits Locaux/Frais</div>
             <button class="add-btn" onclick="openArticleModal()">+ Ajouter un article</button>
           </div>
           <div id="articles-table">
@@ -1072,7 +1072,7 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
       <div>
         <label class="f-label">Categorie</label>
         <select class="f-sel" id="kit-categorie">
-          <option value="Alimentation">&#129374; Alimentation</option>
+          <option value="Produits Locaux/Frais">&#129374; Produits Locaux/Frais</option>
           <option value="Restauration">&#127869;&#65039; Restauration</option>
           <option value="Pret-a-porter">&#128161; Pret-a-porter</option>
           <option value="Nettoyage">&#129529; Nettoyage</option>
@@ -1860,7 +1860,7 @@ let articlesCache=[];
 window.loadArticles=async function(svc,btn){
   currentArtSvc=svc;
   if(btn){document.querySelectorAll(".svc-tab").forEach(b=>b.classList.remove("on"));btn.classList.add("on");}
-  const titles={'food':'Alimentation','restaurant':'Restauration','clothes':'Prêt-à-porter','mathivick':'Mathivick','omega_conseil':'Omega Conseils'};
+  const titles={'food':'Produits Locaux/Frais','restaurant':'Restauration','clothes':'Prêt-à-porter','mathivick':'Mathivick','omega_conseil':'Omega Conseils'};
   document.getElementById("art-panel-title").textContent=titles[svc]||svc;
   document.getElementById("articles-table").innerHTML=`<div style="text-align:center;padding:30px;color:var(--light)"><div class="spinner"></div></div>`;
   try{
@@ -2695,7 +2695,7 @@ window.setPartnerActif = async function(id, actif) {
 
 const DEFAULT_KITS_ADMIN = [
   { id:'kit1', nom:'Kit Repas Semaine', emoji:'🍱', description:"Tout ce qu'il faut pour nourrir votre famille pendant 7 jours",
-    prix_total:28500, categorie:'Alimentation', ordre:1,
+    prix_total:28500, categorie:'Produits Locaux/Frais', ordre:1,
     articles:[
       {emoji:'🐟', name:'Tilapia frais',      qty:2, unit:'kg',        prix:3500},
       {emoji:'🐔', name:'Poulet fermier',      qty:2, unit:'pièces',    prix:5500},
@@ -2729,7 +2729,7 @@ const DEFAULT_KITS_ADMIN = [
 ];
 
 const KIT_CAT_COLORS = {
-  'Alimentation':'#FFF3E0','Restauration':'#E3F2FD','Pret-a-porter':'#FFF0F5',
+  'Produits Locaux/Frais':'#FFF3E0','Restauration':'#E3F2FD','Pret-a-porter':'#FFF0F5',
   'Nettoyage':'#F3E5F5','Événement':'#E8F5E9','Mixte':'#E8EAF0'
 };
 
@@ -2921,7 +2921,7 @@ window.openKitModal = function() {
   document.getElementById('kit-prix').value      = '';
   document.getElementById('kit-ordre').value     = '1';
   document.getElementById('kit-actif').value     = '1';
-  document.getElementById('kit-categorie').value = 'Alimentation';
+  document.getElementById('kit-categorie').value = 'Produits Locaux/Frais';
   document.getElementById('kit-modal').classList.add('show');
 };
 
@@ -2942,7 +2942,7 @@ window.editKit = function(id) {
   document.getElementById('kit-prix').value        = k.prix_total    || '';
   document.getElementById('kit-ordre').value       = k.ordre         || 1;
   document.getElementById('kit-actif').value       = k.actif===false ? '0' : '1';
-  document.getElementById('kit-categorie').value   = k.categorie     || 'Alimentation';
+  document.getElementById('kit-categorie').value   = k.categorie     || 'Produits Locaux/Frais';
   document.getElementById('kit-modal').classList.add('show');
 };
 
@@ -3695,7 +3695,7 @@ const DEFAULT_BANDEAUX = [
     bg:'linear-gradient(135deg,#F5820A 0%,#8B3A00 100%)', label:'Restaurants' },
   { id:'food', emoji:'🥘', badge:'🌿 Produits frais', promo:'MARCHÉ LOCAL',
     titre1:'Tilapia, volailles', titre2:'& légumes', sub:'Qualité locale garantie', cta:'Commander →',
-    bg:'linear-gradient(135deg,#1a7a35 0%,#0a3d18 100%)', label:'Alimentation' },
+    bg:'linear-gradient(135deg,#1a7a35 0%,#0a3d18 100%)', label:'Produits Locaux/Frais' },
   { id:'cleaning', emoji:'✨', badge:'🧹 Nettoyage', promo:'MAISON PROPRE',
     titre1:'Nettoyage', titre2:'professionnel', sub:'Résidentiel & bureaux', cta:'Réserver →',
     bg:'linear-gradient(135deg,#7B1FA2 0%,#3a0a5e 100%)', label:'Nettoyage' },
