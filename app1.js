@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════
-   OmniService TG — app.js v4.0
+   OmniService TG — app.js
    + Authentification complète (Inscription/Connexion)
    + Commandes liées au compte utilisateur (UID)
    + Avatars homme/femme
