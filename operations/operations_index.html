@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>OmniService TG — Opérations</title>
+<meta name="theme-color" content="#E65100"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Ops OmniTG"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="../assets/logo.png" type="image/png"/>
+<link rel="apple-touch-icon" href="../assets/logo.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<!-- ══ SPLASH FAILSAFE ══ -->
+<script>
+(function(){
+  function _hs(){
+    var s=document.getElementById('splash');
+    if(!s||s._g)return;s._g=true;
+    s.style.transition='opacity .5s,transform .5s';
+    s.style.opacity='0';s.style.transform='scale(1.03)';s.style.pointerEvents='none';
+    setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},520);
+  }
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(_hs,2800);setTimeout(_hs,6000);});
+  if(document.readyState!=='loading'){setTimeout(_hs,2800);setTimeout(_hs,6000);}
+  window._hideSplash=_hs;
+})();
+</script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --acc:#E65100;--acc-d:#BF360C;--acc-s:rgba(230,81,0,.1);
+  --acc2:#1E6FBE;--acc2-s:rgba(30,111,190,.1);
+  --ora:#F5820A;--dark:#1A1A2E;--mid:#4A4A6A;--light:#9999BB;
+  --border:#E8EAF0;--bg:#F4F6FA;--green:#2E7D32;--red:#C62828;
+  --sh:0 2px 12px rgba(0,0,0,.07);
+}
+html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--dark);overflow:hidden}
+
+/* ══ SPLASH ══ */
+#splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#1a0800,#BF360C 55%,#1a0800);}
+#splash::before{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:40px 40px;}
+.sp-o{position:absolute;border-radius:50%;pointer-events:none;}
+.sp-o1{width:400px;height:400px;top:-100px;right:-90px;
+  background:radial-gradient(circle,rgba(245,130,10,.15) 0%,transparent 70%);
+  animation:spO 4s ease-in-out infinite alternate;}
+.sp-o2{width:300px;height:300px;bottom:-80px;left:-70px;
+  background:radial-gradient(circle,rgba(230,81,0,.25) 0%,transparent 70%);
+  animation:spO 4s ease-in-out infinite alternate-reverse;}
+@keyframes spO{from{transform:scale(1)}to{transform:scale(1.18) translate(8px,-8px)}}
+.sp-c{position:relative;z-index:2;text-align:center;padding:32px;}
+.sp-badge{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:999px;padding:5px 16px;font-size:10px;font-weight:800;letter-spacing:1.5px;
+  color:rgba(255,255,255,.8);text-transform:uppercase;margin-bottom:20px;animation:spFu .5s .3s both;}
+.sp-logo{width:100px;height:100px;border-radius:26px;margin:0 auto 20px;
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;animation:spPi .8s .4s both;}
+.sp-logo img{width:76px;height:76px;object-fit:contain;}
+.sp-title{font-family:'Nunito',sans-serif;font-size:30px;font-weight:900;color:#fff;
+  margin-bottom:4px;animation:spFu .6s .8s both;}
+.sp-title .o{color:var(--ora)}
+.sp-tag{font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;animation:spFu .6s 1s both;}
+.sp-bar{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;
+  margin:24px auto 0;animation:spFu .5s 1.2s both;}
+.sp-bar-f{height:100%;background:linear-gradient(90deg,rgba(230,81,0,.7),#FFCC80,var(--ora));
+  animation:spBl 1.8s 1.3s both;}
+@keyframes spBl{0%{width:0}100%{width:100%}}
+@keyframes spFu{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes spPi{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ══ LOGIN — écran double (Responsable / Agent) ══ */
+#login-screen{position:fixed;inset:0;
+  background:linear-gradient(145deg,#1a0800,#BF360C 55%,#1a0800);
+  display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+.lbox{background:#fff;border-radius:24px;padding:36px 32px;width:100%;max-width:400px;
+  text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.45);}
+.l-logo{width:72px;height:72px;background:linear-gradient(135deg,var(--acc),var(--acc-d));
+  border-radius:18px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.l-logo img{width:56px;height:56px;object-fit:contain;}
+.l-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--dark);margin-bottom:2px;}
+.l-role{display:inline-block;background:#FBE9E7;color:var(--acc);font-size:11px;font-weight:700;
+  padding:3px 12px;border-radius:999px;margin-bottom:18px;}
+/* Tabs de sélection de mode connexion */
+.l-tabs{display:flex;gap:0;margin-bottom:20px;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;}
+.l-tab{flex:1;padding:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#fff;
+  color:var(--mid);font-family:'Poppins',sans-serif;transition:all .2s;}
+.l-tab.on{background:var(--acc);color:#fff;}
+.l-label{display:block;font-size:11px;font-weight:700;color:var(--mid);text-align:left;
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.l-inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:11px;
+  font-size:13px;font-family:'Poppins',sans-serif;margin-bottom:13px;outline:none;
+  background:var(--bg);transition:border-color .2s;}
+.l-inp:focus{border-color:var(--acc);background:#fff;}
+.l-btn{width:100%;background:linear-gradient(135deg,var(--acc),var(--acc-d));color:#fff;border:none;
+  border-radius:999px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Poppins',sans-serif;box-shadow:0 4px 16px var(--acc-s);transition:opacity .2s;}
+.l-btn:hover{opacity:.9;}
+.l-err{color:var(--red);font-size:12px;font-weight:600;margin-top:10px;min-height:18px;}
+.l-info{margin-top:14px;font-size:11px;color:var(--light);background:var(--bg);
+  border-radius:9px;padding:10px 12px;text-align:left;line-height:1.7;}
+
+/* Saisie code RH — 6 cases */
+.code-inp-row{display:flex;gap:8px;justify-content:center;margin-bottom:16px;}
+.code-digit{width:46px;height:52px;border:1.5px solid var(--border);border-radius:11px;
+  text-align:center;font-size:22px;font-weight:800;font-family:'Nunito',sans-serif;color:var(--acc);
+  background:var(--bg);outline:none;text-transform:uppercase;transition:border-color .2s;}
+.code-digit:focus{border-color:var(--acc);background:#fff;}
+
+/* ══ LAYOUT ══ */
+.layout{display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:252px;background:#1A1A2E;flex-shrink:0;display:flex;flex-direction:column;transition:transform .3s;z-index:100;}
+.sb-brand{padding:20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:12px;}
+.sb-lg{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(230,81,0,.4),rgba(191,54,12,.2));
+  border:1px solid rgba(230,81,0,.5);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+.sb-lg img{width:32px;height:32px;object-fit:contain;}
+.sb-nm{font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;}
+.sb-nm .b{color:#90CAF9}.sb-nm .o{color:var(--ora)}
+.sb-su{font-size:10px;color:rgba(255,255,255,.3);margin-top:2px;}
+.sb-nav{padding:16px 12px;flex:1;overflow-y:auto;}
+.sb-sec{font-size:9px;font-weight:800;color:rgba(255,255,255,.2);text-transform:uppercase;
+  letter-spacing:1px;padding:0 10px;margin:14px 0 6px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;
+  cursor:pointer;margin-bottom:3px;transition:background .15s;font-size:13px;font-weight:600;
+  color:rgba(255,255,255,.5);border:none;background:transparent;width:100%;text-align:left;font-family:'Poppins',sans-serif;}
+.sb-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+.sb-item.on{background:rgba(230,81,0,.3);color:#fff;}
+.sb-ico{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
+.sb-badge{margin-left:auto;background:var(--ora);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;}
+.sb-footer{padding:14px;border-top:1px solid rgba(255,255,255,.07);}
+.sb-ai{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sb-av{width:38px;height:38px;border-radius:10px;background:rgba(230,81,0,.25);
+  border:1px solid rgba(230,81,0,.4);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.sb-an{font-size:12px;font-weight:700;color:rgba(255,255,255,.8);}
+.sb-ae{font-size:10px;color:rgba(255,255,255,.3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.logout-btn{width:100%;background:rgba(198,40,40,.2);color:#ff8a80;border:none;border-radius:9px;
+  padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;}
+.logout-btn:hover{background:rgba(198,40,40,.35);}
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--acc);color:#fff;
+  border:none;border-radius:10px;width:40px;height:40px;font-size:18px;cursor:pointer;align-items:center;justify-content:center;}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;background:var(--bg);}
+.main-inner{max-width:1100px;margin:0 auto;padding:28px 24px 56px;}
+.pg-title{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--dark);margin-bottom:4px;}
+.pg-sub{font-size:12px;color:var(--light);margin-bottom:24px;}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px;}
+.kpi-card{background:#fff;border-radius:16px;padding:20px;box-shadow:var(--sh);position:relative;overflow:hidden;}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--acc);}
+.kpi-card.blue::after{background:var(--acc2);}
+.kpi-card.green::after{background:var(--green);}
+.kpi-card.red::after{background:var(--red);}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.kpi-ico-wrap{width:42px;height:42px;border-radius:12px;background:var(--acc-s);
+  display:flex;align-items:center;justify-content:center;font-size:20px;}
+.kpi-card.blue .kpi-ico-wrap{background:var(--acc2-s);}
+.kpi-card.green .kpi-ico-wrap{background:rgba(46,125,50,.1);}
+.kpi-card.red .kpi-ico-wrap{background:rgba(198,40,40,.1);}
+.kpi-val{font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:var(--dark);}
+.kpi-lbl{font-size:11px;color:var(--light);font-weight:600;margin-top:2px;}
+
+/* PILLS */
+.pill{font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;display:inline-block;}
+.p-att{background:#FBE9E7;color:var(--acc);}
+.p-conf{background:#E3F2FD;color:#1565C0;}
+.p-prog{background:#E0F2F1;color:#004D40;}
+.p-term{background:#E8F5E9;color:var(--green);}
+.p-ann{background:#FFEBEE;color:var(--red);}
+.p-livreur{background:#E3F2FD;color:#1565C0;}
+.p-securite{background:#FFEBEE;color:#B71C1C;}
+.p-entretien{background:#F3E5F5;color:#6A1B9A;}
+.p-depannage{background:#FFF8E1;color:#F57F17;}
+.p-commercial{background:#E8F5E9;color:#1B5E20;}
+.p-comm{background:#FCE4EC;color:#C2185B;}
+.p-online{background:#E8F5E9;color:var(--green);}
+.p-offline{background:#EEE;color:#757575;}
+
+/* FILTERS */
+.filters-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.fbtn{background:#fff;border:1.5px solid var(--border);border-radius:999px;padding:7px 14px;
+  font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;color:var(--mid);transition:all .15s;white-space:nowrap;}
+.fbtn.on,.fbtn:hover{background:var(--acc);color:#fff;border-color:var(--acc);}
+.fsearch input{padding:9px 14px;border:1.5px solid var(--border);border-radius:999px;
+  font-size:12px;outline:none;font-family:'Poppins',sans-serif;background:#fff;min-width:180px;}
+.fsearch input:focus{border-color:var(--acc);}
+.action-btn{background:var(--acc);color:#fff;border:none;border-radius:999px;
+  padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;}
+.action-btn:hover{background:var(--acc-d);}
+
+/* TABLE COMMANDES */
+.orders-wrap{background:#fff;border-radius:16px;box-shadow:var(--sh);overflow:hidden;}
+.orders-head{display:grid;grid-template-columns:120px 1fr 120px 110px 100px 130px;gap:8px;
+  padding:11px 16px;background:var(--bg);font-size:10px;font-weight:700;color:var(--light);
+  text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.order-row{display:grid;grid-template-columns:120px 1fr 120px 110px 100px 130px;gap:8px;
+  padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s;}
+.order-row:last-child{border-bottom:none;}
+.order-row:hover{background:#FAFBFC;}
+
+/* TABLE AGENTS */
+.agents-wrap{background:#fff;border-radius:16px;box-shadow:var(--sh);overflow:hidden;}
+.agents-head{display:grid;grid-template-columns:46px 1fr 120px 90px 100px 130px;gap:8px;
+  padding:11px 16px;background:var(--bg);font-size:10px;font-weight:700;color:var(--light);
+  text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.agent-row{display:grid;grid-template-columns:46px 1fr 120px 90px 100px 130px;gap:8px;
+  padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background .1s;}
+.agent-row:last-child{border-bottom:none;}
+.agent-row:hover{background:#FAFBFC;}
+.a-av{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--acc-d));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;}
+.a-name{font-size:13px;font-weight:700;color:var(--dark);}
+.a-code{font-size:10px;color:var(--acc);font-weight:700;font-family:monospace;
+  background:var(--acc-s);padding:2px 7px;border-radius:5px;margin-top:2px;display:inline-block;}
+.a-sub{font-size:11px;color:var(--light);margin-top:1px;}
+
+/* MOBILE CARD */
+.ocm{background:#fff;border-radius:14px;padding:15px;box-shadow:var(--sh);margin-bottom:10px;display:none;}
+.ocm-h{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.ocm-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.acm{background:#fff;border-radius:14px;padding:15px;box-shadow:var(--sh);margin-bottom:10px;display:none;}
+.acm-h{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.acm-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+
+/* ACT BTNS */
+.act-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.act-v{background:#FBE9E7;color:var(--acc);border:none;border-radius:7px;padding:6px 9px;font-size:12px;cursor:pointer;}
+.act-a{background:#E3F2FD;color:var(--acc2);border:none;border-radius:7px;padding:6px 9px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;}
+.act-d{background:#FFEBEE;color:var(--red);border:none;border-radius:7px;padding:6px 9px;font-size:13px;cursor:pointer;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:18px;padding:28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:14px;right:14px;background:var(--bg);border:none;border-radius:9px;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--mid);}
+.modal-title{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--dark);margin-bottom:18px;}
+.f-label{display:block;font-size:11px;font-weight:700;color:var(--mid);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.f-inp,.f-sel,.f-ta{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;
+  font-family:'Poppins',sans-serif;font-size:13px;background:var(--bg);outline:none;
+  margin-bottom:13px;transition:border-color .2s;appearance:none;color:var(--dark);}
+.f-inp:focus,.f-sel:focus,.f-ta:focus{border-color:var(--acc);background:#fff;}
+.f-ta{resize:vertical;min-height:80px;}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-save-btn{width:100%;background:linear-gradient(135deg,var(--acc),var(--acc-d));color:#fff;
+  border:none;border-radius:999px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;}
+.modal-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bg);font-size:12px;}
+.modal-key{color:var(--light);font-weight:600;min-width:120px;}
+.modal-val{color:var(--dark);font-weight:600;text-align:right;word-break:break-word;}
+
+/* ANNONCES */
+.ann-card{background:#fff;border-radius:14px;padding:18px;box-shadow:var(--sh);margin-bottom:12px;
+  border-left:4px solid var(--acc);}
+.ann-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.ann-title{font-size:14px;font-weight:700;color:var(--dark);}
+.ann-date{font-size:10px;color:var(--light);}
+.ann-body{font-size:12px;color:var(--mid);line-height:1.6;}
+
+/* TÂCHE AGENT (vue agent) */
+.task-card{background:#fff;border-radius:16px;padding:18px;box-shadow:var(--sh);margin-bottom:14px;
+  border-left:4px solid var(--acc);}
+.task-card.p-haute{border-left-color:var(--red);}
+.task-card.p-normale{border-left-color:var(--acc2);}
+.task-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.task-ref{font-size:11px;font-weight:700;color:var(--light);font-family:monospace;}
+.task-title{font-size:14px;font-weight:700;color:var(--dark);margin-bottom:4px;}
+.task-desc{font-size:12px;color:var(--mid);line-height:1.6;margin-bottom:12px;}
+.task-meta{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--light);}
+.task-act-btn{background:linear-gradient(135deg,var(--acc),var(--acc-d));color:#fff;border:none;
+  border-radius:999px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:'Poppins',sans-serif;}
+.task-done-btn{background:linear-gradient(135deg,var(--green),#1B5E20);color:#fff;border:none;
+  border-radius:999px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:'Poppins',sans-serif;}
+.agent-topbar{background:#1A1A2E;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:10;}
+.agent-topbar-brand{font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:#fff;display:flex;align-items:center;gap:10px;}
+.agent-topbar-info{display:flex;align-items:center;gap:12px;}
+.agent-code-badge{background:rgba(230,81,0,.2);border:1px solid rgba(230,81,0,.4);
+  border-radius:8px;padding:5px 12px;font-family:monospace;font-size:14px;font-weight:800;color:var(--ora);}
+
+/* TOAST & SPINNER */
+.toast{position:fixed;bottom:24px;right:24px;background:#1A1A2E;color:#fff;border-radius:12px;
+  padding:13px 20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;
+  transition:opacity .3s;pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.3);}
+.toast.show{opacity:1;}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid rgba(230,81,0,.2);
+  border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-msg{text-align:center;padding:48px;color:var(--light);font-size:13px;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{position:fixed;top:0;bottom:0;left:0;z-index:200;transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .hamburger{display:flex;}
+  .main-inner{padding:60px 16px 40px;}
+  .orders-head,.order-row{display:none;}
+  .agents-head,.agent-row{display:none;}
+  .ocm{display:block;}
+  .acm{display:block;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .f-row{grid-template-columns:1fr;}
+}
+@media(min-width:1000px){.kpi-row{grid-template-columns:repeat(4,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- ══ SPLASH ══ -->
+<div id="splash">
+  <div class="sp-o sp-o1"></div>
+  <div class="sp-o sp-o2"></div>
+  <div class="sp-c">
+    <div class="sp-badge">⚙️ Opérations</div>
+    <div class="sp-logo"><img src="../assets/logo.png" alt="" onerror="this.parentElement.innerHTML='⚙️'"/></div>
+    <div class="sp-title">Omni<span class="o">Service</span> TG</div>
+    <div class="sp-tag">Centre des Opérations</div>
+    <div class="sp-bar"><div class="sp-bar-f"></div></div>
+  </div>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen">
+  <div class="lbox">
+    <div class="l-logo"><img src="../assets/logo.png" alt="" onerror="this.parentElement.innerHTML='⚙️'"/></div>
+    <div class="l-title">OmniService <span style="color:var(--ora)">TG</span></div>
+    <div class="l-role" id="l-role-badge">⚙️ Opérations</div>
+
+    <!-- Onglets: Responsable / Agent -->
+    <div class="l-tabs">
+      <button class="l-tab on" id="tab-ops" onclick="switchLoginTab('ops')">Responsable Ops</button>
+      <button class="l-tab" id="tab-agent" onclick="switchLoginTab('agent')">Agent (code RH)</button>
+    </div>
+
+    <!-- Formulaire Responsable Ops -->
+    <div id="panel-ops">
+      <label class="l-label">Email</label>
+      <input type="email" class="l-inp" id="l-email" value="ops@omniservicetg.com"/>
+      <label class="l-label">Mot de passe</label>
+      <input type="password" class="l-inp" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLoginOps()"/>
+      <button class="l-btn" onclick="doLoginOps()" id="login-ops-btn">Se connecter →</button>
+      <div class="l-err" id="l-err-ops"></div>
+      <div class="l-info"><b>Accès réservé :</b> Interface réservée au Chargé des Opérations d'OmniService TG.</div>
+    </div>
+
+    <!-- Formulaire Agent par code RH -->
+    <div id="panel-agent" style="display:none">
+      <label class="l-label">Code RH (fourni par le Responsable RH)</label>
+      <div class="code-inp-row" id="code-inp-row"></div>
+      <button class="l-btn" onclick="doLoginAgent()" id="login-agent-btn">Accéder à mes tâches →</button>
+      <div class="l-err" id="l-err-agent"></div>
+      <div class="l-info">Saisissez votre code unique de 6 caractères tel qu'il vous a été remis par le RH. Aucun email ni mot de passe requis.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ INTERFACE RESPONSABLE OPS ══ -->
+<div class="layout" id="ops-ui" style="display:none">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-lg"><img src="../assets/logo.png" alt="" onerror="this.parentElement.innerHTML='⚙️'"/></div>
+      <div>
+        <div class="sb-nm"><span class="b">Omni</span><span class="o">Service</span></div>
+        <div class="sb-su">Opérations</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Tableau de bord</div>
+      <button class="sb-item on" onclick="showSection('dashboard',this)"><span class="sb-ico">🏠</span>Vue d'ensemble</button>
+      <div class="sb-sec">Commandes</div>
+      <button class="sb-item" onclick="showSection('commandes',this)"><span class="sb-ico">📦</span>Commandes clients<span class="sb-badge" id="badge-commandes">0</span></button>
+      <button class="sb-item" onclick="showSection('taches',this)"><span class="sb-ico">✅</span>Tâches assignées<span class="sb-badge" id="badge-taches">0</span></button>
+      <div class="sb-sec">Agents</div>
+      <button class="sb-item" onclick="showSection('agents',this)"><span class="sb-ico">👥</span>Agents disponibles<span class="sb-badge" id="badge-agents-sb">0</span></button>
+      <div class="sb-sec">Communication</div>
+      <button class="sb-item" onclick="showSection('annonces',this)"><span class="sb-ico">📣</span>Annonces</button>
+      <button class="sb-item" onclick="showSection('partenaires',this)"><span class="sb-ico">🤝</span>Partenaires</button>
+      <button class="sb-item" onclick="showSection('visites',this)"><span class="sb-ico">📍</span>Visites terrain</button>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-ai">
+        <div class="sb-av">⚙️</div>
+        <div>
+          <div class="sb-an">Chargé des Ops</div>
+          <div class="sb-ae" id="ops-email-disp">ops@omniservicetg.com</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">🚪 Se déconnecter</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-inner">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div id="section-dashboard">
+        <div class="pg-title">⚙️ Tableau de bord Opérations</div>
+        <div class="pg-sub" id="ops-date"></div>
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-ico-wrap">📦</div></div>
+            <div class="kpi-val" id="kpi-total">0</div><div class="kpi-lbl">Commandes totales</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-ico-wrap">⏳</div></div>
+            <div class="kpi-val" id="kpi-att">0</div><div class="kpi-lbl">En attente</div>
+          </div>
+          <div class="kpi-card blue">
+            <div class="kpi-top"><div class="kpi-ico-wrap">🚀</div></div>
+            <div class="kpi-val" id="kpi-prog">0</div><div class="kpi-lbl">En cours</div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-top"><div class="kpi-ico-wrap">✅</div></div>
+            <div class="kpi-val" id="kpi-term">0</div><div class="kpi-lbl">Terminées aujourd'hui</div>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:var(--sh);margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="font-size:15px;font-weight:700;color:var(--dark);">📋 Dernières commandes</div>
+            <button class="action-btn" style="padding:7px 14px;font-size:11px;" onclick="loadDashboard()">🔄</button>
+          </div>
+          <div id="recent-orders"></div>
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:var(--sh);">
+          <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:14px;">👥 Agents en ligne</div>
+          <div id="online-agents-mini"></div>
+        </div>
+      </div>
+
+      <!-- ═══ COMMANDES ═══ -->
+      <div id="section-commandes" style="display:none">
+        <div class="pg-title">📦 Commandes clients</div>
+        <div class="pg-sub">Gérez et assignez les commandes aux agents</div>
+        <div class="filters-bar">
+          <button class="fbtn on" onclick="filterOrders('all',this)">Toutes</button>
+          <button class="fbtn" onclick="filterOrders('En attente',this)">⏳ En attente</button>
+          <button class="fbtn" onclick="filterOrders('Confirmée',this)">✅ Confirmées</button>
+          <button class="fbtn" onclick="filterOrders('En cours',this)">🚀 En cours</button>
+          <button class="fbtn" onclick="filterOrders('Terminée',this)">🎉 Terminées</button>
+          <div class="fsearch"><input type="text" placeholder="🔍 Référence, client, service..." oninput="searchOrders(this.value)"/></div>
+        </div>
+        <div class="orders-wrap">
+          <div class="orders-head">
+            <div>Réf / Date</div><div>Client & Service</div><div>Agent assigné</div>
+            <div>Priorité</div><div>Statut</div><div>Actions</div>
+          </div>
+          <div id="orders-desktop"><div class="empty-msg"><div class="spinner"></div></div></div>
+        </div>
+        <div id="orders-mobile"></div>
+      </div>
+
+      <!-- ═══ TÂCHES ═══ -->
+      <div id="section-taches" style="display:none">
+        <div class="pg-title">✅ Tâches assignées</div>
+        <div class="pg-sub">Suivi des missions en cours par agent</div>
+        <div class="filters-bar">
+          <button class="fbtn on" onclick="filterTasks('all',this)">Toutes</button>
+          <button class="fbtn" onclick="filterTasks('livreur',this)">🛵 Livreurs</button>
+          <button class="fbtn" onclick="filterTasks('securite',this)">🔒 Sécurité</button>
+          <button class="fbtn" onclick="filterTasks('entretien',this)">🧹 Entretien</button>
+          <button class="fbtn" onclick="filterTasks('depannage',this)">🔧 Dépannage</button>
+          <button class="fbtn" onclick="filterTasks('commercial',this)">💼 Commercial</button>
+        </div>
+        <div class="agents-wrap">
+          <div class="agents-head">
+            <div></div><div>Agent</div><div>Rôle</div><div>Mission</div><div>Statut</div><div>Actions</div>
+          </div>
+          <div id="tasks-desktop"><div class="empty-msg"><div class="spinner"></div></div></div>
+        </div>
+        <div id="tasks-mobile"></div>
+      </div>
+
+      <!-- ═══ AGENTS ═══ -->
+      <div id="section-agents" style="display:none">
+        <div class="pg-title">👥 Agents disponibles</div>
+        <div class="pg-sub">Agents enregistrés par le RH et leur statut actuel</div>
+        <div class="filters-bar">
+          <button class="fbtn on" onclick="filterAgents('all',this)">Tous</button>
+          <button class="fbtn" onclick="filterAgents('livreur',this)">🛵 Livreurs</button>
+          <button class="fbtn" onclick="filterAgents('securite',this)">🔒 Sécurité</button>
+          <button class="fbtn" onclick="filterAgents('entretien',this)">🧹 Entretien</button>
+          <button class="fbtn" onclick="filterAgents('depannage',this)">🔧 Dépannage</button>
+          <button class="fbtn" onclick="filterAgents('commercial',this)">💼 Commercial</button>
+          <button class="fbtn" onclick="filterAgents('comm',this)">📢 Communication</button>
+          <div class="fsearch"><input type="text" placeholder="🔍 Nom, code..." oninput="searchAgents(this.value)"/></div>
+        </div>
+        <div class="agents-wrap">
+          <div class="agents-head">
+            <div></div><div>Agent</div><div>Rôle</div><div>Zone</div><div>Statut</div><div>Actions</div>
+          </div>
+          <div id="agents-desktop"><div class="empty-msg"><div class="spinner"></div></div></div>
+        </div>
+        <div id="agents-mobile"></div>
+      </div>
+
+      <!-- ═══ ANNONCES ═══ -->
+      <div id="section-annonces" style="display:none">
+        <div class="pg-title">📣 Annonces</div>
+        <div class="pg-sub">Publiez des messages à destination des agents</div>
+        <button class="action-btn" style="margin-bottom:20px;" onclick="openModal('annonce')">➕ Nouvelle annonce</button>
+        <div id="annonces-list"><div class="empty-msg"><div class="spinner"></div></div></div>
+      </div>
+
+      <!-- ═══ PARTENAIRES ═══ -->
+      <div id="section-partenaires" style="display:none">
+        <div class="pg-title">🤝 Partenaires</div>
+        <div class="pg-sub">Entreprises et prestataires partenaires</div>
+        <button class="action-btn" style="margin-bottom:20px;" onclick="openModal('partenaire')">➕ Ajouter un partenaire</button>
+        <div id="partenaires-list"><div class="empty-msg"><div class="spinner"></div></div></div>
+      </div>
+
+      <!-- ═══ VISITES ═══ -->
+      <div id="section-visites" style="display:none">
+        <div class="pg-title">📍 Visites terrain</div>
+        <div class="pg-sub">Planifiez et suivez les visites des agents commerciaux</div>
+        <button class="action-btn" style="margin-bottom:20px;" onclick="openModal('visite')">➕ Planifier une visite</button>
+        <div id="visites-list"><div class="empty-msg"><div class="spinner"></div></div></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ══ INTERFACE AGENT ══ -->
+<div id="agent-ui" style="display:none;flex-direction:column;height:100vh;overflow:hidden;">
+  <div class="agent-topbar">
+    <div class="agent-topbar-brand">
+      <img src="../assets/logo.png" style="width:28px;height:28px;border-radius:7px;object-fit:contain;" onerror="this.outerHTML='⚙️'"/>
+      OmniService <span style="color:var(--ora);margin-left:4px">TG</span>
+    </div>
+    <div class="agent-topbar-info">
+      <div style="text-align:right;margin-right:10px;">
+        <div style="font-size:12px;font-weight:700;color:#fff;" id="agent-name-disp">—</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);" id="agent-role-disp">—</div>
+      </div>
+      <div class="agent-code-badge" id="agent-code-disp">——</div>
+      <button onclick="doLogout()" style="background:rgba(198,40,40,.25);color:#ff8a80;border:none;border-radius:8px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;margin-left:8px;">Quitter</button>
+    </div>
+  </div>
+  <div style="flex:1;overflow-y:auto;background:var(--bg);">
+    <div style="max-width:700px;margin:0 auto;padding:24px 16px 48px;">
+      <div class="kpi-row" style="grid-template-columns:repeat(3,1fr);">
+        <div class="kpi-card"><div class="kpi-top"><div class="kpi-ico-wrap">📥</div></div><div class="kpi-val" id="agent-kpi-att">0</div><div class="kpi-lbl">À faire</div></div>
+        <div class="kpi-card blue"><div class="kpi-top"><div class="kpi-ico-wrap">🚀</div></div><div class="kpi-val" id="agent-kpi-prog">0</div><div class="kpi-lbl">En cours</div></div>
+        <div class="kpi-card green"><div class="kpi-top"><div class="kpi-ico-wrap">✅</div></div><div class="kpi-val" id="agent-kpi-term">0</div><div class="kpi-lbl">Terminées</div></div>
+      </div>
+      <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:14px;">📋 Mes tâches</div>
+      <div id="agent-tasks-list"><div class="empty-msg">Chargement...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ASSIGNER ══ -->
+<div class="modal-overlay" id="modal-assigner">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('assigner')">✕</button>
+    <div class="modal-title">👤 Assigner un agent</div>
+    <input type="hidden" id="assign-order-id"/>
+    <div style="background:var(--bg);border-radius:11px;padding:14px;margin-bottom:16px;font-size:12px;" id="assign-order-info"></div>
+    <label class="f-label">Choisir l'agent</label>
+    <select class="f-sel" id="assign-agent-sel"></select>
+    <label class="f-label">Priorité</label>
+    <select class="f-sel" id="assign-priority">
+      <option value="Normale">Normale</option>
+      <option value="Haute">⚡ Haute</option>
+      <option value="Basse">Basse</option>
+    </select>
+    <label class="f-label">Note pour l'agent (optionnel)</label>
+    <textarea class="f-ta" id="assign-note" placeholder="Instructions spéciales, adresse, contact..."></textarea>
+    <button class="modal-save-btn" onclick="confirmAssign()">✅ Assigner la mission</button>
+    <div class="l-err" id="assign-err"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL VOIR COMMANDE ══ -->
+<div class="modal-overlay" id="modal-voir-cmd">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('voir-cmd')">✕</button>
+    <div class="modal-title">📦 Détail commande</div>
+    <div id="voir-cmd-content"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL ANNONCE ══ -->
+<div class="modal-overlay" id="modal-annonce">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('annonce')">✕</button>
+    <div class="modal-title">📣 Nouvelle annonce</div>
+    <label class="f-label">Titre *</label>
+    <input type="text" class="f-inp" id="ann-titre" placeholder="Ex : Réunion d'équipe lundi"/>
+    <label class="f-label">Destinataires</label>
+    <select class="f-sel" id="ann-cible">
+      <option value="tous">Tous les agents</option>
+      <option value="livreur">🛵 Livreurs</option>
+      <option value="securite">🔒 Sécurité</option>
+      <option value="entretien">🧹 Entretien</option>
+      <option value="depannage">🔧 Dépannage</option>
+      <option value="commercial">💼 Commercial</option>
+      <option value="comm">📢 Communication</option>
+    </select>
+    <label class="f-label">Message *</label>
+    <textarea class="f-ta" id="ann-message" placeholder="Contenu de l'annonce..."></textarea>
+    <button class="modal-save-btn" onclick="saveAnnonce()">📣 Publier l'annonce</button>
+    <div class="l-err" id="ann-err"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL PARTENAIRE ══ -->
+<div class="modal-overlay" id="modal-partenaire">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('partenaire')">✕</button>
+    <div class="modal-title">🤝 Nouveau partenaire</div>
+    <label class="f-label">Nom de l'entreprise *</label>
+    <input type="text" class="f-inp" id="part-nom" placeholder="Ex : TransTogo SARL"/>
+    <div class="f-row">
+      <div>
+        <label class="f-label">Domaine *</label>
+        <select class="f-sel" id="part-domaine">
+          <option value="">— Choisir —</option>
+          <option value="Transport">🚛 Transport</option>
+          <option value="Sécurité">🔒 Sécurité</option>
+          <option value="Entretien">🧹 Entretien</option>
+          <option value="IT / Technique">💻 IT / Technique</option>
+          <option value="Alimentation">🥘 Alimentation</option>
+          <option value="Immobilier">🏢 Immobilier</option>
+          <option value="Autre">📦 Autre</option>
+        </select>
+      </div>
+      <div>
+        <label class="f-label">Téléphone</label>
+        <input type="tel" class="f-inp" id="part-tel" placeholder="+228 XX XX XX XX"/>
+      </div>
+    </div>
+    <label class="f-label">Contact référent</label>
+    <input type="text" class="f-inp" id="part-contact" placeholder="Nom du contact"/>
+    <label class="f-label">Notes (optionnel)</label>
+    <textarea class="f-ta" id="part-notes" placeholder="Conditions, tarifs, remarques..."></textarea>
+    <button class="modal-save-btn" onclick="savePartenaire()">💾 Enregistrer</button>
+    <div class="l-err" id="part-err"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL VISITE ══ -->
+<div class="modal-overlay" id="modal-visite">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('visite')">✕</button>
+    <div class="modal-title">📍 Planifier une visite</div>
+    <label class="f-label">Agent commercial *</label>
+    <select class="f-sel" id="visite-agent"></select>
+    <label class="f-label">Prospect / Client *</label>
+    <input type="text" class="f-inp" id="visite-client" placeholder="Nom ou raison sociale"/>
+    <div class="f-row">
+      <div>
+        <label class="f-label">Date *</label>
+        <input type="date" class="f-inp" id="visite-date"/>
+      </div>
+      <div>
+        <label class="f-label">Heure</label>
+        <input type="time" class="f-inp" id="visite-heure"/>
+      </div>
+    </div>
+    <label class="f-label">Zone / Quartier *</label>
+    <input type="text" class="f-inp" id="visite-zone" placeholder="Ex : Agoè, Bè, Tokoin..."/>
+    <label class="f-label">Objectif de la visite</label>
+    <textarea class="f-ta" id="visite-obj" placeholder="Présentation des services, relance, signature..."></textarea>
+    <button class="modal-save-btn" onclick="saveVisite()">📍 Planifier</button>
+    <div class="l-err" id="visite-err"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ FIREBASE ES MODULE ══ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc,
+         doc, query, where, orderBy, serverTimestamp, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const fbConfig = {
+  apiKey:            "AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",
+  authDomain:        "omniservicetg-59df3.firebaseapp.com",
+  projectId:         "omniservicetg-59df3",
+  storageBucket:     "omniservicetg-59df3.firebasestorage.app",
+  messagingSenderId: "196278567761",
+  appId:             "1:196278567761:web:4f6416acaab58b67bf4970"
+};
+const fbApp = initializeApp(fbConfig);
+const db    = getFirestore(fbApp);
+const auth  = getAuth(fbApp);
+
+const OPS_EMAIL = 'ops@omniservicetg.com';
+
+const ROLE_LABELS = {
+  livreur:'🛵 Livreur', securite:'🔒 Sécurité', entretien:'🧹 Entretien',
+  depannage:'🔧 Dépannage', commercial:'💼 Commercial', comm:'📢 Communication',
+  ops:'⚙️ Chargé des Opérations'
+};
+const ROLE_CLASS = {
+  livreur:'p-livreur', securite:'p-securite', entretien:'p-entretien',
+  depannage:'p-depannage', commercial:'p-commercial', comm:'p-comm'
+};
+
+// ── State ──
+let ordersCache   = [];
+let agentsCache   = [];
+let annoncesCache = [];
+let partCache     = [];
+let visitesCache  = [];
+let filtreStatut  = 'all';
+let filtreSearch  = '';
+let filtreRole    = 'all';
+let filtreTask    = 'all';
+let currentAgentData = null; // pour la vue agent
+
+// Fermer splash
+if (typeof window._hideSplash === 'function') window._hideSplash();
+
+// ── Auth ──
+onAuthStateChanged(auth, async user => {
+  if (typeof window._hideSplash === 'function') window._hideSplash();
+
+  // Vérifier si c'est un agent connecté par code (état local)
+  if (!user && currentAgentData) {
+    // Agent déjà connecté par code — on ne touche pas son UI
+    return;
+  }
+
+  if (user && user.email === OPS_EMAIL) {
+    // Responsable Ops connecté via email/password
+    document.getElementById('login-screen').style.display  = 'none';
+    document.getElementById('ops-ui').style.display        = 'flex';
+    document.getElementById('agent-ui').style.display      = 'none';
+    document.getElementById('ops-email-disp').textContent  = user.email;
+    document.getElementById('ops-date').textContent =
+      new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    await loadDashboard();
+  } else if (!currentAgentData) {
+    if (user) { await signOut(auth); toast('⛔ Accès non autorisé','#C62828'); }
+    document.getElementById('login-screen').style.display  = 'flex';
+    document.getElementById('ops-ui').style.display        = 'none';
+    document.getElementById('agent-ui').style.display      = 'none';
+  }
+});
+
+// ── Login Responsable ──
+window.doLoginOps = async function(){
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const btn   = document.getElementById('login-ops-btn');
+  const err   = document.getElementById('l-err-ops');
+  err.textContent = '';
+  if (!email||!pass){ err.textContent='⚠️ Champs obligatoires.'; return; }
+  btn.disabled=true; btn.textContent='⏳…';
+  try { await signInWithEmailAndPassword(auth,email,pass); }
+  catch(e){ err.textContent = e.code?.includes('credential')||e.code?.includes('password')
+    ? '❌ Email ou mot de passe incorrect.' : '❌ '+e.message; }
+  finally { btn.disabled=false; btn.textContent='Se connecter →'; }
+};
+
+// ── Login Agent par code RH ──
+window.doLoginAgent = async function(){
+  const boxes = document.querySelectorAll('.code-digit');
+  const code  = Array.from(boxes).map(b=>b.value.trim().toUpperCase()).join('');
+  const err   = document.getElementById('l-err-agent');
+  const btn   = document.getElementById('login-agent-btn');
+  err.textContent = '';
+  if (code.length < 6) { err.textContent='⚠️ Entrez les 6 caractères de votre code.'; return; }
+  btn.disabled=true; btn.textContent='⏳ Vérification...';
+  try {
+    const snap = await getDocs(query(collection(db,'agents'), where('code','==',code)));
+    if (snap.empty) { err.textContent='❌ Code invalide ou agent inconnu.'; return; }
+    const agentDoc = snap.docs[0];
+    const agent    = {id: agentDoc.id, ...agentDoc.data()};
+    if (agent.actif === false) { err.textContent='❌ Ce compte est désactivé. Contactez le RH.'; return; }
+
+    // Marquer dernière connexion
+    await updateDoc(doc(db,'agents',agent.id),{derniere_connexion: serverTimestamp()});
+
+    // Basculer vers l'interface agent
+    currentAgentData = agent;
+    document.getElementById('login-screen').style.display  = 'none';
+    document.getElementById('ops-ui').style.display        = 'none';
+    document.getElementById('agent-ui').style.display      = 'flex';
+    document.getElementById('agent-name-disp').textContent = agent.nom || '—';
+    document.getElementById('agent-role-disp').textContent = ROLE_LABELS[agent.role] || agent.role || '—';
+    document.getElementById('agent-code-disp').textContent = agent.code;
+    await loadAgentTasks(agent);
+  } catch(e) {
+    err.textContent = '❌ Erreur : ' + e.message;
+  } finally {
+    btn.disabled=false; btn.textContent='Accéder à mes tâches →';
+  }
+};
+
+window.doLogout = async function(){
+  if (currentAgentData) {
+    // Déconnexion agent par code : retour login sans signOut Firebase
+    currentAgentData = null;
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('agent-ui').style.display     = 'none';
+    // Réinitialiser les cases code
+    document.querySelectorAll('.code-digit').forEach(b=>b.value='');
+    return;
+  }
+  await signOut(auth);
+};
+
+window.toggleSidebar = function(){ document.getElementById('sidebar').classList.toggle('open'); };
+
+// ── Sections ──
+const SECTIONS = ['dashboard','commandes','taches','agents','annonces','partenaires','visites'];
+window.showSection = function(id,btn){
+  SECTIONS.forEach(s=>{ const el=document.getElementById('section-'+s); if(el) el.style.display=s===id?'block':'none'; });
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  if(window.innerWidth<769) document.getElementById('sidebar').classList.remove('open');
+  if(id==='commandes') loadOrders();
+  if(id==='taches')    loadTaches();
+  if(id==='agents')    loadAgents();
+  if(id==='annonces')  loadAnnonces();
+  if(id==='partenaires') loadPartenaires();
+  if(id==='visites')   loadVisites();
+};
+
+// ── Toast ──
+function toast(msg,bg='#1A1A2E'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=bg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ── Modals ──
+window.openModal = function(id, extra){
+  if(id==='assigner' && extra){
+    const o = ordersCache.find(x=>x.id===extra);
+    if(!o) return;
+    document.getElementById('assign-order-id').value = extra;
+    document.getElementById('assign-order-info').innerHTML =
+      `<b>${o.service||o.serviceName||'—'}</b><br/><span style="color:var(--mid);font-size:11px">${o.clientNom||o.nomClient||'—'} · ${o.phone||o.clientTel||'—'}</span>`;
+    // Remplir la liste des agents compatibles
+    const sel = document.getElementById('assign-agent-sel');
+    const targeted = agentsCache.filter(a=>a.actif!==false);
+    sel.innerHTML = '<option value="">— Sélectionner —</option>' +
+      targeted.map(a=>`<option value="${a.id}">${ROLE_LABELS[a.role]||a.role} · ${a.nom} (${a.code})</option>`).join('');
+    document.getElementById('assign-note').value='';
+  }
+  if(id==='visite'){
+    const sel = document.getElementById('visite-agent');
+    const commerciaux = agentsCache.filter(a=>a.role==='commercial' && a.actif!==false);
+    sel.innerHTML = '<option value="">— Choisir —</option>' +
+      commerciaux.map(a=>`<option value="${a.id}">${a.nom} (${a.code})</option>`).join('');
+  }
+  document.getElementById('modal-'+id).classList.add('show');
+};
+window.closeModal = function(id){ document.getElementById('modal-'+id).classList.remove('show'); };
+
+// ════ DASHBOARD ════
+async function loadDashboard(){
+  try {
+    const [ordSnap, agtSnap] = await Promise.all([
+      getDocs(query(collection(db,'commandes'), orderBy('createdAt','desc'))),
+      getDocs(collection(db,'agents'))
+    ]);
+    ordersCache = ordSnap.docs.map(d=>({id:d.id,...d.data()}));
+    agentsCache = agtSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+    const total = ordersCache.length;
+    const att   = ordersCache.filter(o=>o.statut==='En attente').length;
+    const prog  = ordersCache.filter(o=>['Confirmée','En cours'].includes(o.statut)).length;
+    const today = new Date().toDateString();
+    const term  = ordersCache.filter(o=>o.statut==='Terminée'&&o.createdAt&&new Date(o.createdAt.toDate()).toDateString()===today).length;
+
+    document.getElementById('kpi-total').textContent = total;
+    document.getElementById('kpi-att').textContent   = att;
+    document.getElementById('kpi-prog').textContent  = prog;
+    document.getElementById('kpi-term').textContent  = term;
+    document.getElementById('badge-commandes').textContent = att;
+    document.getElementById('badge-taches').textContent    = prog;
+    document.getElementById('badge-agents-sb').textContent = agentsCache.filter(a=>a.actif!==false).length;
+
+    // Dernières commandes
+    const recent = ordersCache.slice(0,6);
+    document.getElementById('recent-orders').innerHTML = recent.length
+      ? recent.map(o=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span class="pill ${statPill(o.statut)}">${o.statut||'—'}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:var(--dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.serviceName||o.service||'—'}</div>
+            <div style="font-size:11px;color:var(--light)">${o.clientNom||o.nomClient||'—'} · ${fmtDate(o.createdAt)}</div>
+          </div>
+          <span style="font-size:10px;font-family:monospace;color:var(--acc)">#${(o.id||'').slice(0,8).toUpperCase()}</span>
+        </div>`).join('')
+      : '<div class="empty-msg">Aucune commande.</div>';
+
+    // Agents en ligne
+    const now = Date.now();
+    const online = agentsCache.filter(a=>a.derniere_connexion&&(now-a.derniere_connexion.toMillis())<15*60*1000);
+    document.getElementById('online-agents-mini').innerHTML = online.length
+      ? `<div style="display:flex;flex-wrap:wrap;gap:10px">`+online.map(a=>`
+          <div style="background:var(--bg);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);"></div>
+            <span style="font-size:12px;font-weight:600;color:var(--dark)">${a.nom}</span>
+            <span class="pill ${ROLE_CLASS[a.role]||'p-livreur'}" style="font-size:9px">${ROLE_LABELS[a.role]||a.role}</span>
+          </div>`).join('')+`</div>`
+      : '<div style="font-size:12px;color:var(--light);padding:8px">Aucun agent en ligne actuellement.</div>';
+  } catch(e){ console.error(e); }
+}
+
+// ════ COMMANDES ════
+async function loadOrders(){
+  document.getElementById('orders-desktop').innerHTML='<div class="empty-msg"><div class="spinner"></div></div>';
+  document.getElementById('orders-mobile').innerHTML='';
+  try {
+    const snap = await getDocs(query(collection(db,'commandes'), orderBy('createdAt','desc')));
+    ordersCache = snap.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e){ document.getElementById('orders-desktop').innerHTML='<div class="empty-msg">Erreur de chargement.</div>'; return; }
+  renderOrders();
+}
+function renderOrders(){
+  let list = ordersCache;
+  if(filtreStatut!=='all') list=list.filter(o=>o.statut===filtreStatut);
+  if(filtreSearch) list=list.filter(o=>
+    (o.id||'').toLowerCase().includes(filtreSearch)||
+    (o.clientNom||o.nomClient||'').toLowerCase().includes(filtreSearch)||
+    (o.serviceName||o.service||'').toLowerCase().includes(filtreSearch)
+  );
+  const dEl=document.getElementById('orders-desktop');
+  const mEl=document.getElementById('orders-mobile');
+  if(!list.length){ dEl.innerHTML='<div class="empty-msg">Aucune commande.</div>'; mEl.innerHTML=''; return; }
+
+  dEl.innerHTML = list.map(o=>{
+    const agent = o.agentId ? agentsCache.find(a=>a.id===o.agentId) : null;
+    return `<div class="order-row">
+      <div>
+        <div style="font-size:11px;font-weight:700;font-family:monospace;color:var(--acc)">#${(o.id||'').slice(0,8).toUpperCase()}</div>
+        <div style="font-size:10px;color:var(--light)">${fmtDate(o.createdAt)}</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.clientNom||o.nomClient||'—'}</div>
+        <div style="font-size:11px;color:var(--light)">${o.serviceName||o.service||'—'}</div>
+        <div style="font-size:11px;color:var(--light)">${o.phone||o.clientTel||''}</div>
+      </div>
+      <div>${agent?`<div class="a-code">${agent.code}</div><div style="font-size:11px;color:var(--mid)">${agent.nom}</div>`:'<span style="font-size:11px;color:var(--light)">Non assigné</span>'}</div>
+      <div><span class="pill ${o.priorite==='Haute'?'p-att':o.priorite==='Basse'?'p-conf':'p-prog'}">${o.priorite||'Normale'}</span></div>
+      <div><span class="pill ${statPill(o.statut)}">${o.statut||'—'}</span></div>
+      <div class="act-btns">
+        <button class="act-v" onclick="voirCommande('${o.id}')" title="Voir">👁️</button>
+        ${o.statut==='En attente'?`<button class="act-a" onclick="openModal('assigner','${o.id}')" title="Assigner">👤</button>`:''}
+        ${['En attente','Confirmée'].includes(o.statut)?`<button class="act-a" style="background:#E8F5E9;color:var(--green);" onclick="updateOrderStatus('${o.id}','En cours')" title="Démarrer">🚀</button>`:''}
+        ${o.statut==='En cours'?`<button class="act-a" style="background:#E8F5E9;color:var(--green);" onclick="updateOrderStatus('${o.id}','Terminée')" title="Terminer">✅</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  mEl.innerHTML = list.map(o=>{
+    const agent = o.agentId ? agentsCache.find(a=>a.id===o.agentId) : null;
+    return `<div class="ocm">
+      <div class="ocm-h">
+        <div>
+          <div style="font-size:12px;font-weight:700;font-family:monospace;color:var(--acc);">#${(o.id||'').slice(0,8).toUpperCase()}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--dark);margin-top:3px">${o.clientNom||o.nomClient||'—'}</div>
+          <div style="font-size:11px;color:var(--light)">${o.serviceName||o.service||'—'}</div>
+        </div>
+        <span class="pill ${statPill(o.statut)}">${o.statut||'—'}</span>
+      </div>
+      <div style="font-size:11px;color:var(--mid)">Agent : ${agent?agent.nom+' ('+agent.code+')':'Non assigné'}</div>
+      <div style="font-size:11px;color:var(--light);margin-top:3px">${fmtDate(o.createdAt)}</div>
+      <div class="ocm-acts">
+        <button class="act-v" onclick="voirCommande('${o.id}')">👁️ Voir</button>
+        ${o.statut==='En attente'?`<button class="act-a" onclick="openModal('assigner','${o.id}')">👤 Assigner</button>`:''}
+        ${['En attente','Confirmée'].includes(o.statut)?`<button class="act-a" style="background:#E8F5E9;color:var(--green);" onclick="updateOrderStatus('${o.id}','En cours')">🚀 Démarrer</button>`:''}
+        ${o.statut==='En cours'?`<button class="act-a" style="background:#E8F5E9;color:var(--green);" onclick="updateOrderStatus('${o.id}','Terminée')">✅ Terminer</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.filterOrders = function(s,btn){
+  filtreStatut=s;
+  document.querySelectorAll('#section-commandes .fbtn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  renderOrders();
+};
+window.searchOrders = function(v){ filtreSearch=v.toLowerCase(); renderOrders(); };
+
+window.voirCommande = function(id){
+  const o = ordersCache.find(x=>x.id===id); if(!o) return;
+  const agent = o.agentId ? agentsCache.find(a=>a.id===o.agentId) : null;
+  const fields = [
+    ['Référence', '#'+(o.id||'').slice(0,8).toUpperCase()],
+    ['Service', o.serviceName||o.service||'—'],
+    ['Client', o.clientNom||o.nomClient||'—'],
+    ['Téléphone', o.phone||o.clientTel||'—'],
+    ['Ville', o.clientVille||'—'],
+    ['Statut', o.statut||'—'],
+    ['Priorité', o.priorite||'Normale'],
+    ['Agent assigné', agent ? agent.nom+' ('+agent.code+')' : 'Non assigné'],
+    ['Note agent', o.noteAgent||'—'],
+    ['Livraison', o.adresseLivraison||o.adresse||'—'],
+    ['Date', fmtDate(o.createdAt)],
+    ['Détails', o.besoin||o.description||'—'],
+  ];
+  document.getElementById('voir-cmd-content').innerHTML = fields.map(([k,v])=>
+    `<div class="modal-row"><div class="modal-key">${k}</div><div class="modal-val">${v}</div></div>`
+  ).join('');
+  openModal('voir-cmd');
+};
+
+window.updateOrderStatus = async function(id, statut){
+  try {
+    await updateDoc(doc(db,'commandes',id), {statut, updatedAt: serverTimestamp()});
+    const o = ordersCache.find(x=>x.id===id); if(o) o.statut=statut;
+    renderOrders();
+    toast('✅ Statut mis à jour : '+statut,'#2E7D32');
+  } catch(e){ toast('❌ Erreur : '+e.message,'#C62828'); }
+};
+
+window.confirmAssign = async function(){
+  const orderId  = document.getElementById('assign-order-id').value;
+  const agentId  = document.getElementById('assign-agent-sel').value;
+  const priorite = document.getElementById('assign-priority').value;
+  const note     = document.getElementById('assign-note').value.trim();
+  const err      = document.getElementById('assign-err');
+  err.textContent='';
+  if(!agentId){ err.textContent='⚠️ Sélectionnez un agent.'; return; }
+  try {
+    await updateDoc(doc(db,'commandes',orderId),{
+      agentId, priorite, noteAgent:note||null,
+      statut:'Confirmée', updatedAt: serverTimestamp()
+    });
+    const o = ordersCache.find(x=>x.id===orderId);
+    if(o){ o.agentId=agentId; o.priorite=priorite; o.noteAgent=note; o.statut='Confirmée'; }
+    closeModal('assigner');
+    renderOrders();
+    toast('✅ Mission assignée avec succès','#2E7D32');
+  } catch(e){ err.textContent='❌ Erreur : '+e.message; }
+};
+
+// ════ TÂCHES ════
+async function loadTaches(){
+  document.getElementById('tasks-desktop').innerHTML='<div class="empty-msg"><div class="spinner"></div></div>';
+  try {
+    const [ordSnap,agtSnap] = await Promise.all([
+      getDocs(query(collection(db,'commandes'), orderBy('createdAt','desc'))),
+      getDocs(collection(db,'agents'))
+    ]);
+    ordersCache = ordSnap.docs.map(d=>({id:d.id,...d.data()}));
+    agentsCache = agtSnap.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e){ document.getElementById('tasks-desktop').innerHTML='<div class="empty-msg">Erreur.</div>'; return; }
+  renderTaches();
+}
+function renderTaches(){
+  // Commandes assignées à un agent
+  let list = ordersCache.filter(o=>o.agentId && ['Confirmée','En cours'].includes(o.statut));
+  if(filtreTask!=='all') list=list.filter(o=>{
+    const agent=agentsCache.find(a=>a.id===o.agentId);
+    return agent && agent.role===filtreTask;
+  });
+  const dEl=document.getElementById('tasks-desktop');
+  const mEl=document.getElementById('tasks-mobile');
+  if(!list.length){ dEl.innerHTML='<div class="empty-msg">Aucune tâche en cours.</div>'; mEl.innerHTML=''; return; }
+
+  dEl.innerHTML = list.map(o=>{
+    const agent = agentsCache.find(a=>a.id===o.agentId);
+    return `<div class="agent-row">
+      <div class="a-av">${agent?agent.nom.charAt(0):'?'}</div>
+      <div>
+        <div class="a-name">${agent?agent.nom:'—'}</div>
+        <div class="a-code">${agent?agent.code:'—'}</div>
+      </div>
+      <div><span class="pill ${agent?ROLE_CLASS[agent.role]||'p-livreur':''}">${agent?ROLE_LABELS[agent.role]||agent.role:'—'}</span></div>
+      <div style="font-size:12px;color:var(--mid);overflow:hidden;text-overflow:ellipsis">${o.serviceName||o.service||'—'} — ${o.clientNom||o.nomClient||'—'}</div>
+      <div><span class="pill ${statPill(o.statut)}">${o.statut}</span></div>
+      <div class="act-btns">
+        <button class="act-v" onclick="voirCommande('${o.id}')">👁️</button>
+        <button class="act-a" style="background:#E8F5E9;color:var(--green);" onclick="updateOrderStatus('${o.id}','Terminée')">✅</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  mEl.innerHTML = list.map(o=>{
+    const agent=agentsCache.find(a=>a.id===o.agentId);
+    return `<div class="acm">
+      <div class="acm-h">
+        <div class="a-av">${agent?agent.nom.charAt(0):'?'}</div>
+        <div class="acm-info" style="flex:1">
+          <div class="a-name">${agent?agent.nom:'—'}</div>
+          <div class="a-code">${agent?agent.code:'—'}</div>
+        </div>
+        <span class="pill ${statPill(o.statut)}">${o.statut}</span>
+      </div>
+      <div style="font-size:12px;color:var(--mid)">${o.serviceName||o.service||'—'} · ${o.clientNom||o.nomClient||'—'}</div>
+      <div class="acm-acts">
+        <button class="act-v" onclick="voirCommande('${o.id}')">👁️ Voir</button>
+        <button class="act-a" style="background:#E8F5E9;color:var(--green);" onclick="updateOrderStatus('${o.id}','Terminée')">✅ Terminer</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+window.filterTasks = function(r,btn){
+  filtreTask=r;
+  document.querySelectorAll('#section-taches .fbtn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  renderTaches();
+};
+
+// ════ AGENTS ════
+async function loadAgents(){
+  document.getElementById('agents-desktop').innerHTML='<div class="empty-msg"><div class="spinner"></div></div>';
+  document.getElementById('agents-mobile').innerHTML='';
+  try {
+    const snap = await getDocs(collection(db,'agents'));
+    agentsCache = snap.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e){ document.getElementById('agents-desktop').innerHTML='<div class="empty-msg">Erreur.</div>'; return; }
+  renderAgents();
+}
+function renderAgents(){
+  let list=agentsCache;
+  if(filtreRole!=='all') list=list.filter(a=>a.role===filtreRole);
+  if(filtreSearch) list=list.filter(a=>
+    (a.nom||'').toLowerCase().includes(filtreSearch)||(a.code||'').toLowerCase().includes(filtreSearch)
+  );
+  const dEl=document.getElementById('agents-desktop');
+  const mEl=document.getElementById('agents-mobile');
+  if(!list.length){ dEl.innerHTML='<div class="empty-msg">Aucun agent.</div>'; mEl.innerHTML=''; return; }
+  const now=Date.now();
+  dEl.innerHTML=list.map(a=>{
+    const onl=a.derniere_connexion&&(now-a.derniere_connexion.toMillis())<15*60*1000;
+    return `<div class="agent-row">
+      <div class="a-av">${(a.nom||'?').charAt(0).toUpperCase()}</div>
+      <div>
+        <div class="a-name">${a.nom||'—'}</div>
+        <div class="a-code">${a.code||'—'}</div>
+        <div class="a-sub">${a.zone||''}</div>
+      </div>
+      <div><span class="pill ${ROLE_CLASS[a.role]||'p-livreur'}">${ROLE_LABELS[a.role]||a.role||'—'}</span></div>
+      <div style="font-size:12px;color:var(--mid)">${a.zone||'—'}</div>
+      <div>
+        <span class="pill ${onl?'p-online':'p-offline'}">${onl?'🟢 En ligne':'⚫ Hors ligne'}</span>
+        ${a.actif===false?'<br/><span class="pill p-ann" style="margin-top:4px">Inactif</span>':''}
+      </div>
+      <div class="act-btns">
+        <button class="act-v" onclick="voirAgent('${a.id}')" title="Voir profil">👁️</button>
+      </div>
+    </div>`;
+  }).join('');
+  mEl.innerHTML=list.map(a=>{
+    const onl=a.derniere_connexion&&(now-a.derniere_connexion.toMillis())<15*60*1000;
+    return `<div class="acm">
+      <div class="acm-h">
+        <div class="a-av">${(a.nom||'?').charAt(0).toUpperCase()}</div>
+        <div style="flex:1">
+          <div class="a-name">${a.nom||'—'}</div>
+          <div class="a-code">${a.code||'—'}</div>
+        </div>
+        <span class="pill ${onl?'p-online':'p-offline'}">${onl?'🟢':'⚫'}</span>
+      </div>
+      <div><span class="pill ${ROLE_CLASS[a.role]||'p-livreur'}">${ROLE_LABELS[a.role]||a.role}</span> · ${a.zone||'—'}</div>
+      <div class="acm-acts">
+        <button class="act-v" onclick="voirAgent('${a.id}')">👁️ Profil</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+window.filterAgents=function(r,btn){filtreRole=r;document.querySelectorAll('#section-agents .fbtn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderAgents();};
+window.searchAgents=function(v){filtreSearch=v.toLowerCase();renderAgents();};
+
+window.voirAgent = function(id){
+  const a=agentsCache.find(x=>x.id===id); if(!a) return;
+  const now=Date.now();
+  const onl=a.derniere_connexion&&(now-a.derniere_connexion.toMillis())<15*60*1000;
+  const fields=[
+    ['Nom',a.nom||'—'],['Code RH',a.code||'—'],
+    ['Rôle',ROLE_LABELS[a.role]||a.role||'—'],
+    ['Zone',a.zone||'—'],['Téléphone',a.telephone||'—'],
+    ['Statut',onl?'🟢 En ligne':'⚫ Hors ligne'],
+    ['Compte',a.actif===false?'❌ Désactivé':'✅ Actif'],
+    ['Spécialité',a.specialite||'—'],
+  ];
+  document.getElementById('voir-cmd-content').innerHTML =
+    `<div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:14px">👤 ${a.nom||'—'}</div>`+
+    fields.map(([k,v])=>`<div class="modal-row"><div class="modal-key">${k}</div><div class="modal-val">${v}</div></div>`).join('');
+  openModal('voir-cmd');
+};
+
+// ════ ANNONCES ════
+async function loadAnnonces(){
+  document.getElementById('annonces-list').innerHTML='<div class="empty-msg"><div class="spinner"></div></div>';
+  try {
+    const snap=await getDocs(query(collection(db,'annonces_ops'), orderBy('createdAt','desc')));
+    annoncesCache=snap.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e){ annoncesCache=[]; }
+  renderAnnonces();
+}
+function renderAnnonces(){
+  const el=document.getElementById('annonces-list');
+  if(!annoncesCache.length){ el.innerHTML='<div class="empty-msg">Aucune annonce publiée.</div>'; return; }
+  el.innerHTML=annoncesCache.map(a=>`
+    <div class="ann-card">
+      <div class="ann-head">
+        <div class="ann-title">📣 ${a.titre||'—'}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="pill p-prog">${a.cible==='tous'?'Tous':ROLE_LABELS[a.cible]||a.cible}</span>
+          <div class="ann-date">${fmtDate(a.createdAt)}</div>
+        </div>
+      </div>
+      <div class="ann-body">${a.message||''}</div>
+    </div>`).join('');
+}
+window.saveAnnonce=async function(){
+  const titre=document.getElementById('ann-titre').value.trim();
+  const cible=document.getElementById('ann-cible').value;
+  const message=document.getElementById('ann-message').value.trim();
+  const err=document.getElementById('ann-err');
+  err.textContent='';
+  if(!titre||!message){err.textContent='⚠️ Titre et message obligatoires.';return;}
+  try {
+    await addDoc(collection(db,'annonces_ops'),{titre,cible,message,createdAt:serverTimestamp()});
+    closeModal('annonce');
+    document.getElementById('ann-titre').value='';
+    document.getElementById('ann-message').value='';
+    toast('📣 Annonce publiée','#2E7D32');
+    loadAnnonces();
+  } catch(e){err.textContent='❌ '+e.message;}
+};
+
+// ════ PARTENAIRES ════
+async function loadPartenaires(){
+  document.getElementById('partenaires-list').innerHTML='<div class="empty-msg"><div class="spinner"></div></div>';
+  try {
+    const snap=await getDocs(query(collection(db,'partenaires_ops'), orderBy('createdAt','desc')));
+    partCache=snap.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e){ partCache=[]; }
+  renderPartenaires();
+}
+function renderPartenaires(){
+  const el=document.getElementById('partenaires-list');
+  if(!partCache.length){ el.innerHTML='<div class="empty-msg">Aucun partenaire enregistré.</div>'; return; }
+  el.innerHTML=`<div style="background:#fff;border-radius:16px;box-shadow:var(--sh);overflow:hidden;">
+    <div style="display:grid;grid-template-columns:1fr 120px 140px 80px;gap:8px;padding:11px 16px;background:var(--bg);font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;border-bottom:1px solid var(--border)">
+      <div>Entreprise</div><div>Domaine</div><div>Contact</div><div>Actions</div>
+    </div>`+
+    partCache.map(p=>`
+      <div style="display:grid;grid-template-columns:1fr 120px 140px 80px;gap:8px;padding:13px 16px;border-bottom:1px solid var(--border);align-items:center;font-size:12px;">
+        <div><div style="font-size:13px;font-weight:700;color:var(--dark)">${p.nom||'—'}</div>
+          <div style="font-size:11px;color:var(--light)">${p.notes||''}</div></div>
+        <div><span class="pill p-prog">${p.domaine||'—'}</span></div>
+        <div style="color:var(--mid)">${p.contact||'—'}<br/><span style="color:var(--light)">${p.telephone||''}</span></div>
+        <div><button class="act-d" onclick="deletePartenaire('${p.id}')">🗑️</button></div>
+      </div>`).join('')+`</div>`;
+}
+window.savePartenaire=async function(){
+  const nom=document.getElementById('part-nom').value.trim();
+  const domaine=document.getElementById('part-domaine').value;
+  const tel=document.getElementById('part-tel').value.trim();
+  const contact=document.getElementById('part-contact').value.trim();
+  const notes=document.getElementById('part-notes').value.trim();
+  const err=document.getElementById('part-err');
+  err.textContent='';
+  if(!nom||!domaine){err.textContent='⚠️ Nom et domaine obligatoires.';return;}
+  try {
+    await addDoc(collection(db,'partenaires_ops'),{nom,domaine,telephone:tel,contact,notes,createdAt:serverTimestamp()});
+    closeModal('partenaire');
+    ['part-nom','part-tel','part-contact','part-notes'].forEach(id=>document.getElementById(id).value='');
+    toast('✅ Partenaire enregistré','#2E7D32');
+    loadPartenaires();
+  } catch(e){err.textContent='❌ '+e.message;}
+};
+window.deletePartenaire=async function(id){
+  if(!confirm('Supprimer ce partenaire ?')) return;
+  try{ await deleteDoc(doc(db,'partenaires_ops',id)); partCache=partCache.filter(p=>p.id!==id); renderPartenaires(); toast('🗑️ Supprimé'); }
+  catch(e){ toast('❌ '+e.message,'#C62828'); }
+};
+
+// ════ VISITES ════
+async function loadVisites(){
+  document.getElementById('visites-list').innerHTML='<div class="empty-msg"><div class="spinner"></div></div>';
+  try {
+    const snap=await getDocs(query(collection(db,'visites_ops'), orderBy('createdAt','desc')));
+    visitesCache=snap.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e){ visitesCache=[]; }
+  renderVisites();
+}
+function renderVisites(){
+  const el=document.getElementById('visites-list');
+  if(!visitesCache.length){ el.innerHTML='<div class="empty-msg">Aucune visite planifiée.</div>'; return; }
+  el.innerHTML=visitesCache.map(v=>{
+    const agent=agentsCache.find(a=>a.id===v.agentId);
+    return `<div class="ann-card" style="border-left-color:var(--acc2)">
+      <div class="ann-head">
+        <div class="ann-title">📍 ${v.client||'—'}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="pill p-conf">${v.date||'—'} ${v.heure||''}</span>
+          <button class="act-d" onclick="deleteVisite('${v.id}')">🗑️</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--mid);margin-bottom:4px">Agent : ${agent?agent.nom+' ('+agent.code+')':'—'} · Zone : ${v.zone||'—'}</div>
+      <div class="ann-body">${v.objectif||'—'}</div>
+    </div>`;
+  }).join('');
+}
+window.saveVisite=async function(){
+  const agentId=document.getElementById('visite-agent').value;
+  const client=document.getElementById('visite-client').value.trim();
+  const date=document.getElementById('visite-date').value;
+  const heure=document.getElementById('visite-heure').value;
+  const zone=document.getElementById('visite-zone').value.trim();
+  const objectif=document.getElementById('visite-obj').value.trim();
+  const err=document.getElementById('visite-err');
+  err.textContent='';
+  if(!agentId||!client||!date||!zone){err.textContent='⚠️ Champs obligatoires manquants.';return;}
+  try {
+    await addDoc(collection(db,'visites_ops'),{agentId,client,date,heure,zone,objectif,createdAt:serverTimestamp()});
+    closeModal('visite');
+    toast('📍 Visite planifiée','#2E7D32');
+    loadVisites();
+  } catch(e){err.textContent='❌ '+e.message;}
+};
+window.deleteVisite=async function(id){
+  if(!confirm('Supprimer cette visite ?')) return;
+  try{ await deleteDoc(doc(db,'visites_ops',id)); visitesCache=visitesCache.filter(v=>v.id!==id); renderVisites(); toast('🗑️ Supprimé'); }
+  catch(e){ toast('❌ '+e.message,'#C62828'); }
+};
+
+// ════ VUE AGENT — TÂCHES ════
+async function loadAgentTasks(agent){
+  document.getElementById('agent-tasks-list').innerHTML='<div class="empty-msg"><div class="spinner"></div></div>';
+  try {
+    const snap = await getDocs(query(
+      collection(db,'commandes'),
+      where('agentId','==',agent.id),
+      orderBy('createdAt','desc')
+    ));
+    const tasks = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const att   = tasks.filter(t=>t.statut==='Confirmée').length;
+    const prog  = tasks.filter(t=>t.statut==='En cours').length;
+    const term  = tasks.filter(t=>t.statut==='Terminée').length;
+    document.getElementById('agent-kpi-att').textContent  = att;
+    document.getElementById('agent-kpi-prog').textContent = prog;
+    document.getElementById('agent-kpi-term').textContent = term;
+
+    if(!tasks.length){
+      document.getElementById('agent-tasks-list').innerHTML=
+        `<div class="empty-msg" style="background:#fff;border-radius:16px;padding:48px;box-shadow:var(--sh)">
+          <div style="font-size:40px;margin-bottom:12px">✅</div>
+          <div style="font-weight:700;color:var(--dark);margin-bottom:4px">Aucune tâche assignée</div>
+          <div>En attente d'une mission du responsable opérations.</div>
+        </div>`;
+      return;
+    }
+
+    document.getElementById('agent-tasks-list').innerHTML = tasks.map(t=>{
+      const isHaute = t.priorite==='Haute';
+      let btn='';
+      if(t.statut==='Confirmée')
+        btn=`<button class="task-act-btn" onclick="agentUpdateTask('${t.id}','En cours')">🚀 Démarrer</button>`;
+      else if(t.statut==='En cours')
+        btn=`<button class="task-done-btn" onclick="agentUpdateTask('${t.id}','Terminée')">✅ Marquer terminé</button>`;
+      else
+        btn=`<span style="font-size:11px;font-weight:700;color:var(--green)">✅ Terminé</span>`;
+      return `<div class="task-card ${isHaute?'p-haute':'p-normale'}">
+        <div class="task-head">
+          <span class="task-ref">#${(t.id||'').slice(0,8).toUpperCase()}</span>
+          <span class="pill ${isHaute?'p-att':'p-conf'}">${t.priorite||'Normale'}</span>
+        </div>
+        <div class="task-title">${t.serviceName||t.service||'—'}</div>
+        <div class="task-desc">${t.besoin||t.description||t.adresseLivraison||'—'}</div>
+        <div class="task-meta">
+          <span>👤 ${t.clientNom||t.nomClient||'—'}</span>
+          <span>📞 ${t.phone||t.clientTel||'—'}</span>
+          <span>📅 ${fmtDate(t.createdAt)}</span>
+          <span class="pill ${statPill(t.statut)}" style="margin-left:auto">${t.statut}</span>
+        </div>
+        ${t.noteAgent?`<div style="background:var(--bg);border-radius:9px;padding:10px 12px;margin-top:10px;font-size:12px;color:var(--mid)">📝 Note : ${t.noteAgent}</div>`:''}
+        <div style="margin-top:12px;display:flex;justify-content:flex-end">${btn}</div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    document.getElementById('agent-tasks-list').innerHTML='<div class="empty-msg">Erreur de chargement.</div>';
+  }
+}
+
+window.agentUpdateTask = async function(id, statut){
+  try {
+    await updateDoc(doc(db,'commandes',id),{statut, updatedAt:serverTimestamp()});
+    toast(statut==='En cours'?'🚀 Mission démarrée !':'✅ Mission terminée !', statut==='Terminée'?'#2E7D32':'#1E6FBE');
+    await loadAgentTasks(currentAgentData);
+  } catch(e){ toast('❌ '+e.message,'#C62828'); }
+};
+
+// ════ HELPERS ════
+function fmtDate(ts){
+  if(!ts) return '—';
+  try { return ts.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+  catch(e){ return '—'; }
+}
+function statPill(s){
+  return {
+    'En attente':'p-att','Confirmée':'p-conf','En cours':'p-prog',
+    'Terminée':'p-term','Annulée':'p-ann'
+  }[s]||'p-att';
+}
+
+</script>
+
+<script>
+// ── Tabs de login ──
+window.switchLoginTab = function(mode){
+  document.getElementById('tab-ops').classList.toggle('on',mode==='ops');
+  document.getElementById('tab-agent').classList.toggle('on',mode==='agent');
+  document.getElementById('panel-ops').style.display   = mode==='ops'   ? '' : 'none';
+  document.getElementById('panel-agent').style.display = mode==='agent' ? '' : 'none';
+  document.getElementById('l-role-badge').textContent  = mode==='ops' ? '⚙️ Responsable Opérations' : '👤 Agent — Code RH';
+  if(mode==='agent') buildCodeInput();
+};
+
+// ── Cases code RH ──
+function buildCodeInput(){
+  const row = document.getElementById('code-inp-row');
+  if(row.children.length>0) return; // déjà construit
+  for(let i=0;i<6;i++){
+    const inp=document.createElement('input');
+    inp.type='text'; inp.maxLength=1; inp.className='code-digit';
+    inp.autocomplete='off'; inp.spellcheck=false;
+    inp.addEventListener('input',e=>{
+      e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+      if(e.target.value && i<5) row.children[i+1].focus();
+    });
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Backspace'&&!e.target.value&&i>0) row.children[i-1].focus();
+      if(e.key==='Enter') window.doLoginAgent();
+    });
+    row.appendChild(inp);
+  }
+  row.children[0].focus();
+}
+</script>
+</body>
+</html>
