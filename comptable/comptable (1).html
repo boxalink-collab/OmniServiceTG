@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>OmniService TG — Comptabilité</title>
+<meta name="theme-color" content="#2E7D32"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Compta OmniTG"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="../assets/logo.png" type="image/png"/>
+<link rel="apple-touch-icon" href="../assets/logo.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<script>
+(function(){
+  function _hs(){
+    var s=document.getElementById('splash');
+    if(!s||s._g)return;s._g=true;
+    s.style.transition='opacity .5s,transform .5s';
+    s.style.opacity='0';s.style.transform='scale(1.03)';s.style.pointerEvents='none';
+    setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},520);
+  }
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(_hs,2800);setTimeout(_hs,6000);});
+  if(document.readyState!=='loading'){setTimeout(_hs,2800);setTimeout(_hs,6000);}
+  window._hideSplash=_hs;
+})();
+</script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#2E7D32;--g-d:#1B5E20;--g-s:rgba(46,125,50,.1);
+  --blue:#1E6FBE;--blue-d:#155A9C;--blue-s:rgba(30,111,190,.1);
+  --ora:#F5820A;--dark:#1A1A2E;--mid:#4A4A6A;--light:#9999BB;
+  --border:#E8EAF0;--bg:#F4F6FA;--red:#C62828;
+  --sh:0 2px 12px rgba(0,0,0,.07);
+}
+html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--dark);}
+body{overflow-x:hidden;}
+
+/* ══ SPLASH ══ */
+#splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#0a1f0c,#1B5E20 55%,#0a1f0c);}
+#splash::before{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:40px 40px;}
+.sp-o{position:absolute;border-radius:50%;pointer-events:none;}
+.sp-o1{width:380px;height:380px;top:-100px;right:-80px;
+  background:radial-gradient(circle,rgba(245,130,10,.12) 0%,transparent 70%);
+  animation:spO 4s ease-in-out infinite alternate;}
+.sp-o2{width:300px;height:300px;bottom:-80px;left:-60px;
+  background:radial-gradient(circle,rgba(46,125,50,.25) 0%,transparent 70%);
+  animation:spO 4s ease-in-out infinite alternate-reverse;}
+@keyframes spO{from{transform:scale(1)}to{transform:scale(1.18) translate(8px,-8px)}}
+.sp-c{position:relative;z-index:2;text-align:center;padding:32px;}
+.sp-badge{display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+  border-radius:999px;padding:5px 16px;font-size:10px;font-weight:800;letter-spacing:1.5px;
+  color:rgba(255,255,255,.85);text-transform:uppercase;margin-bottom:20px;animation:spFu .5s .3s both;}
+.sp-logo{width:100px;height:100px;border-radius:26px;margin:0 auto 20px;
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;animation:spPi .8s .4s both;}
+.sp-logo img{width:76px;height:76px;object-fit:contain;}
+.sp-title{font-family:'Nunito',sans-serif;font-size:30px;font-weight:900;color:#fff;
+  margin-bottom:4px;animation:spFu .6s .8s both;}
+.sp-title .o{color:var(--ora)}
+.sp-tag{font-size:11px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px;animation:spFu .6s 1s both;}
+.sp-bar{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;
+  margin:24px auto 0;animation:spFu .5s 1.2s both;}
+.sp-bar-f{height:100%;background:linear-gradient(90deg,rgba(46,125,50,.8),#A5D6A7,var(--ora));
+  animation:spBl 1.8s 1.3s both;}
+@keyframes spBl{0%{width:0}100%{width:100%}}
+@keyframes spFu{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes spPi{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ══ LOGIN ══ */
+#login-screen{position:fixed;inset:0;
+  background:linear-gradient(145deg,#0a1f0c,#1B5E20 55%,#0a1f0c);
+  display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;}
+.lbox{background:#fff;border-radius:24px;padding:36px 32px;width:100%;max-width:380px;
+  text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.l-logo{width:72px;height:72px;background:linear-gradient(135deg,var(--g),var(--g-d));
+  border-radius:18px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.l-logo img{width:56px;height:56px;object-fit:contain;}
+.l-title{font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--dark);margin-bottom:2px;}
+.l-role{display:inline-block;background:#E8F5E9;color:var(--g);font-size:11px;font-weight:700;
+  padding:3px 12px;border-radius:999px;margin-bottom:18px;}
+.l-label{display:block;font-size:11px;font-weight:700;color:var(--mid);text-align:left;
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.l-inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:11px;
+  font-size:13px;font-family:'Poppins',sans-serif;margin-bottom:13px;outline:none;
+  background:var(--bg);transition:border-color .2s;}
+.l-inp:focus{border-color:var(--g);background:#fff;}
+.l-btn{width:100%;background:linear-gradient(135deg,var(--g),var(--g-d));color:#fff;border:none;
+  border-radius:999px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Poppins',sans-serif;box-shadow:0 4px 16px var(--g-s);transition:opacity .2s;}
+.l-btn:hover{opacity:.9;}
+.l-err{color:var(--red);font-size:12px;font-weight:600;margin-top:10px;min-height:18px;}
+.l-info{margin-top:14px;font-size:11px;color:var(--light);background:var(--bg);
+  border-radius:9px;padding:10px 12px;text-align:left;line-height:1.7;}
+
+/* ══ LAYOUT ══ */
+.layout{display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:252px;background:#1A1A2E;flex-shrink:0;display:flex;flex-direction:column;transition:transform .3s;z-index:100;}
+.sb-brand{padding:20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:12px;}
+.sb-lg{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(46,125,50,.4),rgba(46,125,50,.2));
+  border:1px solid rgba(46,125,50,.5);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+.sb-lg img{width:32px;height:32px;object-fit:contain;}
+.sb-nm{font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;}
+.sb-nm .b{color:var(--blue)}.sb-nm .o{color:var(--ora)}
+.sb-su{font-size:10px;color:rgba(255,255,255,.3);margin-top:2px;}
+.sb-nav{padding:16px 12px;flex:1;overflow-y:auto;}
+.sb-sec{font-size:9px;font-weight:800;color:rgba(255,255,255,.2);text-transform:uppercase;
+  letter-spacing:1px;padding:0 10px;margin:14px 0 6px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;
+  cursor:pointer;margin-bottom:3px;transition:background .15s;font-size:13px;font-weight:600;
+  color:rgba(255,255,255,.5);border:none;background:transparent;width:100%;text-align:left;font-family:'Poppins',sans-serif;}
+.sb-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+.sb-item.on{background:rgba(46,125,50,.35);color:#fff;}
+.sb-ico{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
+.sb-footer{padding:14px;border-top:1px solid rgba(255,255,255,.07);}
+.sb-ai{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sb-av{width:38px;height:38px;border-radius:10px;background:rgba(46,125,50,.25);
+  border:1px solid rgba(46,125,50,.4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.sb-an{font-size:12px;font-weight:700;color:rgba(255,255,255,.8);}
+.sb-ae{font-size:10px;color:rgba(255,255,255,.3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.logout-btn{width:100%;background:rgba(198,40,40,.2);color:#ff8a80;border:none;border-radius:9px;
+  padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;}
+.logout-btn:hover{background:rgba(198,40,40,.35);}
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--g);color:#fff;
+  border:none;border-radius:10px;width:40px;height:40px;font-size:18px;cursor:pointer;
+  align-items:center;justify-content:center;}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;background:var(--bg);}
+.main-inner{max-width:1100px;margin:0 auto;padding:28px 24px 56px;}
+.pg-title{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--dark);margin-bottom:4px;}
+.pg-sub{font-size:12px;color:var(--light);margin-bottom:24px;}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px;}
+.kpi-card{background:#fff;border-radius:16px;padding:20px;box-shadow:var(--sh);position:relative;overflow:hidden;}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--g);}
+.kpi-card.blue::after{background:var(--blue);}
+.kpi-card.orange::after{background:var(--ora);}
+.kpi-card.red::after{background:var(--red);}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.kpi-ico-wrap{width:42px;height:42px;border-radius:12px;background:var(--g-s);
+  display:flex;align-items:center;justify-content:center;font-size:20px;}
+.kpi-card.blue .kpi-ico-wrap{background:var(--blue-s);}
+.kpi-card.orange .kpi-ico-wrap{background:rgba(245,130,10,.1);}
+.kpi-card.red .kpi-ico-wrap{background:rgba(198,40,40,.1);}
+.kpi-trend{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;}
+.trend-up{background:#E8F5E9;color:var(--g);}
+.trend-dn{background:#FFEBEE;color:var(--red);}
+.trend-eq{background:var(--bg);color:var(--light);}
+.kpi-val{font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:var(--dark);}
+.kpi-lbl{font-size:11px;color:var(--light);font-weight:600;margin-top:2px;}
+
+/* CHART PLACEHOLDER */
+.chart-wrap{background:#fff;border-radius:16px;padding:22px;box-shadow:var(--sh);margin-bottom:20px;}
+.chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.chart-title{font-size:15px;font-weight:700;color:var(--dark);}
+.chart-filters{display:flex;gap:6px;}
+.cf{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:5px 12px;
+  font-size:11px;font-weight:700;color:var(--mid);cursor:pointer;font-family:'Poppins',sans-serif;}
+.cf.on{background:var(--g);color:#fff;border-color:var(--g);}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px;}
+.bc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.bc-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;border-radius:6px 6px 0 0;overflow:hidden;min-height:8px;}
+.bc-bar{width:100%;background:linear-gradient(to top,var(--g),#66BB6A);border-radius:6px 6px 0 0;
+  transition:height .6s cubic-bezier(.4,0,.2,1);}
+.bc-lbl{font-size:9px;color:var(--light);font-weight:600;}
+.bc-val{font-size:9px;color:var(--g);font-weight:700;}
+
+/* PILLS */
+.pill{font-size:10px;font-weight:700;padding:4px 10px;border-radius:999px;display:inline-block;}
+.p-enc{background:#FFF3E0;color:#E65100;}
+.p-conf{background:#E3F2FD;color:#1565C0;}
+.p-prog{background:#E0F2F1;color:#004D40;}
+.p-livr{background:#E8F5E9;color:var(--g);}
+.p-ann{background:#FFEBEE;color:var(--red);}
+.p-cash{background:#FFF8E1;color:#F57F17;}
+.p-mm{background:#E8F5E9;color:var(--g);}
+.p-cb{background:#E3F2FD;color:var(--blue);}
+
+/* FILTERS */
+.filters-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.fbtn{background:#fff;border:1.5px solid var(--border);border-radius:999px;padding:7px 14px;
+  font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;
+  color:var(--mid);transition:all .15s;white-space:nowrap;}
+.fbtn.on,.fbtn:hover{background:var(--g);color:#fff;border-color:var(--g);}
+.fsearch input{padding:9px 14px;border:1.5px solid var(--border);border-radius:999px;
+  font-size:12px;outline:none;font-family:'Poppins',sans-serif;background:#fff;min-width:180px;}
+.fsearch input:focus{border-color:var(--g);}
+.action-btn{background:var(--g);color:#fff;border:none;border-radius:999px;
+  padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:'Poppins',sans-serif;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.action-btn:hover{background:var(--g-d);}
+.action-btn.blue{background:var(--blue);}
+.action-btn.blue:hover{background:var(--blue-d);}
+
+/* TABLE */
+.table-wrap{background:#fff;border-radius:16px;box-shadow:var(--sh);overflow:hidden;}
+.table-head{display:grid;gap:10px;padding:11px 16px;background:var(--bg);
+  font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;
+  letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.table-row{display:grid;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border);
+  align-items:center;font-size:12px;transition:background .1s;}
+.table-row:last-child{border-bottom:none;}
+.table-row:hover{background:#FAFBFC;}
+.t-name{font-size:13px;font-weight:700;color:var(--dark);}
+.t-id{font-size:10px;color:var(--blue);font-weight:700;font-family:monospace;
+  background:var(--blue-s);padding:2px 7px;border-radius:5px;display:inline-block;margin-top:2px;}
+.t-amount{font-size:14px;font-weight:800;color:var(--g);}
+.t-amount.neg{color:var(--red);}
+
+/* MOBILE CARD */
+.mcm{background:#fff;border-radius:14px;padding:14px;box-shadow:var(--sh);
+  margin-bottom:10px;display:none;border-left:3px solid var(--g);}
+
+/* PAYMENT BREAKDOWN */
+.pay-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+.pay-card{background:#fff;border-radius:14px;padding:16px;box-shadow:var(--sh);text-align:center;}
+.pay-ico{font-size:28px;margin-bottom:6px;}
+.pay-val{font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:var(--dark);}
+.pay-lbl{font-size:10px;color:var(--light);font-weight:600;margin-top:2px;}
+.pay-sub{font-size:11px;color:var(--g);font-weight:700;margin-top:4px;}
+
+/* EXPORT PANEL */
+.export-panel{background:#fff;border-radius:16px;padding:22px;box-shadow:var(--sh);}
+.export-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;}
+.export-btn{border:1.5px solid var(--border);background:#fff;border-radius:12px;padding:18px;
+  text-align:center;cursor:pointer;transition:all .15s;font-family:'Poppins',sans-serif;}
+.export-btn:hover{border-color:var(--g);background:var(--g-s);}
+.export-ico{font-size:28px;margin-bottom:6px;}
+.export-lbl{font-size:12px;font-weight:700;color:var(--dark);}
+.export-sub{font-size:10px;color:var(--light);margin-top:2px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:18px;padding:28px;max-width:480px;width:100%;
+  max-height:90vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:14px;right:14px;background:var(--bg);border:none;
+  border-radius:9px;width:34px;height:34px;font-size:16px;cursor:pointer;color:var(--mid);}
+.modal-title{font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:var(--dark);margin-bottom:18px;}
+.m-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bg);font-size:12px;}
+.m-row:last-child{border-bottom:none;}
+.m-key{color:var(--light);font-weight:600;min-width:120px;}
+.m-val{color:var(--dark);font-weight:700;text-align:right;word-break:break-word;}
+.m-total{display:flex;justify-content:space-between;padding:12px 0;font-size:16px;font-weight:800;
+  border-top:2px solid var(--border);margin-top:4px;}
+
+/* TOAST & SPINNER */
+.toast{position:fixed;bottom:24px;right:24px;background:#1A1A2E;color:#fff;border-radius:12px;
+  padding:13px 20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;
+  pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.3);}
+.toast.show{opacity:1;}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--g-s);
+  border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-msg{text-align:center;padding:48px;color:var(--light);font-size:13px;}
+.empty-ico{font-size:48px;margin-bottom:10px;opacity:.4;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{position:fixed;top:0;bottom:0;left:0;z-index:200;transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .hamburger{display:flex;}
+  .main-inner{padding:60px 16px 40px;}
+  .table-head,.table-row{display:none;}
+  .mcm{display:block;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .pay-grid{grid-template-columns:1fr 1fr;}
+  .export-grid{grid-template-columns:1fr 1fr;}
+}
+@media(min-width:900px){.kpi-row{grid-template-columns:repeat(4,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-o sp-o1"></div>
+  <div class="sp-o sp-o2"></div>
+  <div class="sp-c">
+    <div class="sp-badge">💰 Comptabilité</div>
+    <div class="sp-logo">
+      <img src="../assets/logo.png" alt="" onerror="this.outerHTML='<div style=font-size:46px>💰</div>'"/>
+    </div>
+    <div class="sp-title"><span style="color:#fff">Omni</span><span class="o">Service</span> <span style="color:#fff">TG</span></div>
+    <div class="sp-tag">Interface Comptable</div>
+    <div class="sp-bar"><div class="sp-bar-f"></div></div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="lbox">
+    <div class="l-logo"><img src="../assets/logo.png" alt="" onerror="this.parentElement.innerHTML='💰'"/></div>
+    <div class="l-title">OmniService <span style="color:var(--ora)">TG</span></div>
+    <div class="l-role">💰 Comptable</div>
+    <label class="l-label">Email</label>
+    <input type="email" class="l-inp" id="l-email" placeholder="comptable@omniservicetg.com"/>
+    <label class="l-label">Mot de passe</label>
+    <input type="password" class="l-inp" id="l-pass" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="l-btn" onclick="doLogin()" id="login-btn">Se connecter →</button>
+    <div class="l-err" id="l-err"></div>
+    <div class="l-info"><b>Accès réservé :</b> Interface de comptabilité OmniService TG.</div>
+  </div>
+</div>
+
+<!-- INTERFACE PRINCIPALE -->
+<div class="layout" id="compta-ui" style="display:none">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-lg"><img src="../assets/logo.png" alt="" onerror="this.parentElement.innerHTML='💰'"/></div>
+      <div>
+        <div class="sb-nm"><span class="b">Omni</span><span class="o">Service</span></div>
+        <div class="sb-su">Comptabilité</div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Vue générale</div>
+      <button class="sb-item on" onclick="showSection('dashboard',this)">
+        <span class="sb-ico">🏠</span>Tableau de bord
+      </button>
+      <div class="sb-sec">Finances</div>
+      <button class="sb-item" onclick="showSection('revenus',this)">
+        <span class="sb-ico">💵</span>Chiffre d'affaires
+      </button>
+      <button class="sb-item" onclick="showSection('commandes',this)">
+        <span class="sb-ico">📦</span>Commandes encaissées
+      </button>
+      <button class="sb-item" onclick="showSection('paiements',this)">
+        <span class="sb-ico">💳</span>Modes de paiement
+      </button>
+      <div class="sb-sec">Analyse</div>
+      <button class="sb-item" onclick="showSection('marges',this)">
+        <span class="sb-ico">📊</span>Marges & Bénéfices
+      </button>
+      <button class="sb-item" onclick="showSection('salaires',this)">
+        <span class="sb-ico">👥</span>Masse salariale
+      </button>
+      <div class="sb-sec">Exports</div>
+      <button class="sb-item" onclick="showSection('exports',this)">
+        <span class="sb-ico">📥</span>Export données
+      </button>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-ai">
+        <div class="sb-av">💰</div>
+        <div>
+          <div class="sb-an">Comptable</div>
+          <div class="sb-ae" id="user-email-disp">—</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">🚪 Se déconnecter</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-inner">
+
+      <!-- ══ DASHBOARD ══ -->
+      <div id="section-dashboard">
+        <div class="pg-title">💰 Tableau de bord comptable</div>
+        <div class="pg-sub" id="dash-date">Chargement…</div>
+
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-ico-wrap">💵</div>
+              <span class="kpi-trend trend-up" id="kpi-ca-trend">+0%</span>
+            </div>
+            <div class="kpi-val" id="kpi-ca">0 FCFA</div>
+            <div class="kpi-lbl">CA du mois</div>
+          </div>
+          <div class="kpi-card blue">
+            <div class="kpi-top">
+              <div class="kpi-ico-wrap">📦</div>
+              <span class="kpi-trend trend-eq" id="kpi-ord-trend">0</span>
+            </div>
+            <div class="kpi-val" id="kpi-orders">0</div>
+            <div class="kpi-lbl">Commandes encaissées</div>
+          </div>
+          <div class="kpi-card orange">
+            <div class="kpi-top">
+              <div class="kpi-ico-wrap">📅</div>
+              <span class="kpi-trend trend-eq" id="kpi-today-trend">—</span>
+            </div>
+            <div class="kpi-val" id="kpi-today">0 FCFA</div>
+            <div class="kpi-lbl">CA aujourd'hui</div>
+          </div>
+          <div class="kpi-card red">
+            <div class="kpi-top">
+              <div class="kpi-ico-wrap">⏳</div>
+              <span class="kpi-trend trend-eq" id="kpi-pend-trend">—</span>
+            </div>
+            <div class="kpi-val" id="kpi-pending">0</div>
+            <div class="kpi-lbl">En attente</div>
+          </div>
+        </div>
+
+        <!-- Graphe CA -->
+        <div class="chart-wrap">
+          <div class="chart-head">
+            <div class="chart-title">📈 Évolution du chiffre d'affaires</div>
+            <div class="chart-filters">
+              <button class="cf on" onclick="loadChart('week',this)">7j</button>
+              <button class="cf" onclick="loadChart('month',this)">30j</button>
+              <button class="cf" onclick="loadChart('year',this)">1an</button>
+            </div>
+          </div>
+          <div class="bar-chart" id="chart-bars">
+            <div class="empty-msg"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Répartition paiement rapide -->
+        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:var(--sh);margin-bottom:20px;">
+          <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:14px;">💳 Répartition des paiements</div>
+          <div class="pay-grid" id="pay-quick"></div>
+        </div>
+
+        <!-- Dernières transactions -->
+        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:var(--sh);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-size:15px;font-weight:700;color:var(--dark);">🕐 Dernières transactions</div>
+            <button class="action-btn" onclick="showSection('commandes',null)" style="padding:7px 14px;font-size:11px;">Tout voir</button>
+          </div>
+          <div id="recent-txns"></div>
+        </div>
+      </div>
+
+      <!-- ══ CHIFFRE D'AFFAIRES ══ -->
+      <div id="section-revenus" style="display:none">
+        <div class="pg-title">💵 Chiffre d'affaires</div>
+        <div class="pg-sub">Analyse des revenus par période</div>
+        <div class="filters-bar">
+          <button class="fbtn on" onclick="loadRevenus('today',this)">Aujourd'hui</button>
+          <button class="fbtn" onclick="loadRevenus('week',this)">Cette semaine</button>
+          <button class="fbtn" onclick="loadRevenus('month',this)">Ce mois</button>
+          <button class="fbtn" onclick="loadRevenus('year',this)">Cette année</button>
+          <button class="action-btn" onclick="loadRevenus(currentPeriod)" style="margin-left:auto;">🔄</button>
+        </div>
+
+        <div class="kpi-row" style="grid-template-columns:repeat(3,1fr);" id="rev-kpi"></div>
+
+        <div class="chart-wrap">
+          <div class="chart-title" style="margin-bottom:16px;">📊 Évolution sur la période</div>
+          <div class="bar-chart" id="rev-chart">
+            <div class="empty-msg"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Par service -->
+        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:var(--sh);">
+          <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:14px;">📂 Revenus par service</div>
+          <div id="rev-by-service"></div>
+        </div>
+      </div>
+
+      <!-- ══ COMMANDES ENCAISSÉES ══ -->
+      <div id="section-commandes" style="display:none">
+        <div class="pg-title">📦 Commandes encaissées</div>
+        <div class="pg-sub">Historique de toutes les transactions</div>
+        <div class="filters-bar">
+          <button class="fbtn on" onclick="filterOrders('all',this)">Toutes</button>
+          <button class="fbtn" onclick="filterOrders('Terminée',this)">✅ Terminées</button>
+          <button class="fbtn" onclick="filterOrders('En cours',this)">🔄 En cours</button>
+          <button class="fbtn" onclick="filterOrders('En attente',this)">⏳ En attente</button>
+          <button class="fbtn" onclick="filterOrders('Annulée',this)">❌ Annulées</button>
+          <div class="fsearch"><input type="text" placeholder="🔍 ID, client, montant…" oninput="searchOrders(this.value)"/></div>
+          <button class="action-btn" onclick="loadOrders()">🔄</button>
+          <button class="action-btn blue" onclick="exportCSV()">📥 CSV</button>
+        </div>
+
+        <!-- Desktop table -->
+        <div class="table-wrap">
+          <div class="table-head" style="grid-template-columns:120px 1fr 90px 90px 90px 100px 80px;">
+            <div>ID Commande</div><div>Client</div><div>Montant</div>
+            <div>Paiement</div><div>Statut</div><div>Date</div><div>Action</div>
+          </div>
+          <div id="orders-desktop">
+            <div class="empty-msg"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Mobile cards -->
+        <div id="orders-mobile"></div>
+      </div>
+
+      <!-- ══ MODES DE PAIEMENT ══ -->
+      <div id="section-paiements" style="display:none">
+        <div class="pg-title">💳 Modes de paiement</div>
+        <div class="pg-sub">Répartition et suivi par mode</div>
+        <div class="filters-bar">
+          <button class="fbtn on" onclick="loadPaiements('month',this)">Ce mois</button>
+          <button class="fbtn" onclick="loadPaiements('week',this)">Cette semaine</button>
+          <button class="fbtn" onclick="loadPaiements('year',this)">Cette année</button>
+        </div>
+
+        <div class="pay-grid" id="pay-detail" style="grid-template-columns:repeat(2,1fr);gap:14px;"></div>
+
+        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:var(--sh);margin-top:4px;">
+          <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:14px;">📊 Détail par mode</div>
+          <div id="pay-table"></div>
+        </div>
+      </div>
+
+      <!-- ══ EXPORTS ══ -->
+      <div id="section-exports" style="display:none">
+        <div class="pg-title">📥 Export des données</div>
+        <div class="pg-sub">Téléchargez vos données au format CSV ou texte</div>
+
+        <div class="export-panel">
+          <div style="font-size:14px;color:var(--mid);line-height:1.7;margin-bottom:8px;">
+            Sélectionnez la période et le type de données à exporter.
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--mid);margin-bottom:5px;text-transform:uppercase;">Du</label>
+              <input type="date" class="l-inp" id="exp-from" style="margin-bottom:0;"/>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--mid);margin-bottom:5px;text-transform:uppercase;">Au</label>
+              <input type="date" class="l-inp" id="exp-to" style="margin-bottom:0;"/>
+            </div>
+          </div>
+
+          <div class="export-grid">
+            <div class="export-btn" onclick="doExport('commandes')">
+              <div class="export-ico">📦</div>
+              <div class="export-lbl">Commandes</div>
+              <div class="export-sub">Toutes les commandes</div>
+            </div>
+            <div class="export-btn" onclick="doExport('revenus')">
+              <div class="export-ico">💵</div>
+              <div class="export-lbl">Revenus</div>
+              <div class="export-sub">CA par période</div>
+            </div>
+            <div class="export-btn" onclick="doExport('paiements')">
+              <div class="export-ico">💳</div>
+              <div class="export-lbl">Paiements</div>
+              <div class="export-sub">Détail par mode</div>
+            </div>
+            <div class="export-btn" onclick="doExport('clients')">
+              <div class="export-ico">👤</div>
+              <div class="export-lbl">Clients</div>
+              <div class="export-sub">Liste des acheteurs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MODAL DÉTAIL COMMANDE -->
+<div class="modal-overlay" id="modal-order">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-order')">✕</button>
+    <div class="modal-title">📦 Détail commande</div>
+    <div id="modal-order-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+      <!-- ══ MARGES & BÉNÉFICES ══ -->
+      <div id="section-marges" style="display:none">
+        <div class="pg-title">📊 Marges &amp; Bénéfices</div>
+        <div class="pg-sub">Calculez le bénéfice net par article en définissant vos taux</div>
+
+        <div style="background:#fff;border-radius:16px;padding:20px 22px;box-shadow:var(--sh);margin-bottom:18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div style="font-size:15px;font-weight:700;color:var(--dark);">🏷️ Articles &amp; taux de marge</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="action-btn" onclick="loadArticlesMarges()">🔄 Actualiser</button>
+              <button class="action-btn blue" onclick="exportMargesXLSX()">📥 Excel</button>
+              <button class="action-btn" style="background:#E8F5E9;color:#2E7D32;" onclick="exportMargesPDF()">📄 PDF</button>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--light);margin-bottom:14px;">
+            💡 Entrez le % de coût (achat/charges) par article — le bénéfice sera calculé automatiquement sur le CA total vendu.
+          </div>
+          <div class="filters-bar" id="marges-svc-filters" style="margin-bottom:16px;">
+            <button class="fbtn on" onclick="filterMargesSvc('all',this)">Tous</button>
+          </div>
+          <div class="table-wrap">
+            <div class="table-head" style="grid-template-columns:3fr 1fr 110px 100px 120px 130px 110px;font-size:11px;">
+              <div>Article</div><div>Service</div><div>Prix unitaire</div><div>Qté vendue</div>
+              <div>CA généré</div><div style="color:#1E6FBE">% Coût ▼</div><div style="color:#2E7D32">Bénéfice net</div>
+            </div>
+            <div id="marges-table-body">
+              <div class="empty-msg"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="marges-recap-block" style="display:none;">
+          <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px;" id="marges-kpi-row"></div>
+          <div style="background:#fff;border-radius:16px;padding:20px 22px;box-shadow:var(--sh);">
+            <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:14px;">📂 Bénéfice par service</div>
+            <div id="marges-by-service"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MASSE SALARIALE ══ -->
+      <div id="section-salaires" style="display:none">
+        <div class="pg-title">👥 Masse salariale</div>
+        <div class="pg-sub">Définissez les salaires et analysez l'impact sur le bénéfice</div>
+
+        <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px;">
+          <div class="kpi-card"><div class="kpi-top"><div class="kpi-ico-wrap">💵</div></div>
+            <div class="kpi-val" id="sal-kpi-ca">—</div><div class="kpi-lbl">CA du mois</div></div>
+          <div class="kpi-card blue"><div class="kpi-top"><div class="kpi-ico-wrap">📊</div></div>
+            <div class="kpi-val" id="sal-kpi-ben">—</div><div class="kpi-lbl">Bénéfice brut</div></div>
+          <div class="kpi-card orange"><div class="kpi-top"><div class="kpi-ico-wrap">👥</div></div>
+            <div class="kpi-val" id="sal-kpi-total">—</div><div class="kpi-lbl">Total salaires</div></div>
+          <div class="kpi-card" style="border-top:3px solid #2E7D32"><div class="kpi-top"><div class="kpi-ico-wrap">🏦</div></div>
+            <div class="kpi-val" id="sal-kpi-net" style="color:#2E7D32">—</div><div class="kpi-lbl">Restant entreprise</div></div>
+        </div>
+
+        <div style="background:#fff;border-radius:16px;padding:20px 22px;box-shadow:var(--sh);margin-bottom:18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div style="font-size:15px;font-weight:700;color:var(--dark);">🧑‍💼 Équipe &amp; salaires</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="action-btn" onclick="loadAgentsSalaires()">🔄 Actualiser</button>
+              <button class="action-btn blue" onclick="exportSalairesXLSX()">📥 Excel</button>
+              <button class="action-btn" style="background:#E8F5E9;color:#2E7D32;" onclick="exportSalairesPDF()">📄 PDF</button>
+              <button class="action-btn" style="background:linear-gradient(135deg,#2E7D32,#1B5E20);color:#fff;" onclick="addAgent()">＋ Ajouter un agent</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-head" style="grid-template-columns:2fr 160px 140px 120px 120px 80px;font-size:11px;">
+              <div>Nom de l'agent</div><div>Rôle</div><div style="color:#1E6FBE">Salaire mensuel</div>
+              <div>% du bénéfice</div><div style="color:#2E7D32">Part du CA</div><div>Action</div>
+            </div>
+            <div id="sal-table-body">
+              <div class="empty-msg"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border-radius:16px;padding:20px 22px;box-shadow:var(--sh);">
+          <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:14px;">📊 Répartition par rôle</div>
+          <div id="sal-by-role" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;"></div>
+        </div>
+      </div>
+
+      <!-- Modal agent salaire -->
+      <div id="modal-agent" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:16px;">
+        <div style="background:#fff;border-radius:20px;padding:28px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.3);">
+          <div style="font-size:16px;font-weight:800;color:var(--dark);margin-bottom:20px;" id="modal-agent-title">👤 Ajouter un agent</div>
+          <input type="hidden" id="ag-edit-id"/>
+          <label class="l-label">Nom complet</label>
+          <input class="l-inp" id="ag-nom" placeholder="Ex: Kofi Mensah"/>
+          <label class="l-label">Rôle</label>
+          <select class="l-inp" id="ag-role">
+            <option value="Agent de livraison">Agent de livraison</option>
+            <option value="Agent de communication">Agent de communication</option>
+            <option value="Chargé des opérations">Chargé des opérations</option>
+            <option value="Statisticien">Statisticien</option>
+            <option value="Comptable">Comptable</option>
+            <option value="Manager">Manager</option>
+            <option value="Développeur">Développeur</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <label class="l-label">Salaire mensuel (FCFA)</label>
+          <input class="l-inp" id="ag-salaire" type="number" placeholder="Ex: 150000" min="0"/>
+          <label class="l-label">Note / Commentaire (optionnel)</label>
+          <input class="l-inp" id="ag-note" placeholder="Prime, contrat, etc."/>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button class="l-btn" style="background:#1E6FBE;" onclick="saveAgent()">💾 Enregistrer</button>
+            <button class="l-btn" style="background:#E8EAF0;color:#1A1A2E;" onclick="closeAgentModal()">Annuler</button>
+          </div>
+        </div>
+      </div>
+
+<!-- FIREBASE MODULE -->
+<script type="module">
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, getDoc,
+         query, where, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const fbConfig = {
+  apiKey:            "AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",
+  authDomain:        "omniservicetg-59df3.firebaseapp.com",
+  projectId:         "omniservicetg-59df3",
+  storageBucket:     "omniservicetg-59df3.firebasestorage.app",
+  messagingSenderId: "196278567761",
+  appId:             "1:196278567761:web:4f6416acaab58b67bf4970"
+};
+const fbApp = initializeApp(fbConfig);
+const db    = getFirestore(fbApp);
+const auth  = getAuth(fbApp);
+
+const COMPTA_EMAIL = 'comptable@omniservicetg.com';
+
+// ── State ──
+let ordersCache   = [];
+let filtreStatut  = 'all';
+let filtreSearch  = '';
+let currentPeriod = 'month';
+window.currentPeriod = 'month';
+
+// Fermer splash dès que le module s'exécute
+if (typeof window._hideSplash === 'function') window._hideSplash();
+
+// ── Auth ──
+onAuthStateChanged(auth, async user => {
+  if (typeof window._hideSplash === 'function') window._hideSplash();
+  if (user && user.email === COMPTA_EMAIL) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('compta-ui').style.display    = 'flex';
+    document.getElementById('user-email-disp').textContent = user.email;
+    document.getElementById('dash-date').textContent =
+      new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    // Set date defaults for export
+    const today = new Date().toISOString().slice(0,10);
+    const monthAgo = new Date(Date.now()-30*864e5).toISOString().slice(0,10);
+    document.getElementById('exp-from').value = monthAgo;
+    document.getElementById('exp-to').value   = today;
+    await loadDashboard();
+  } else {
+    if (user) { await signOut(auth); toast('⛔ Accès non autorisé','#C62828'); }
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('compta-ui').style.display    = 'none';
+  }
+});
+
+window.doLogin = async function(){
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('l-err');
+  err.textContent = '';
+  if (!email||!pass){ err.textContent='⚠️ Champs obligatoires.'; return; }
+  btn.disabled=true; btn.textContent='⏳…';
+  try { await signInWithEmailAndPassword(auth,email,pass); }
+  catch(e){ err.textContent = e.code?.includes('credential')||e.code?.includes('password')
+    ? '❌ Email ou mot de passe incorrect.' : '❌ '+e.message; }
+  finally { btn.disabled=false; btn.textContent='Se connecter →'; }
+};
+window.doLogout     = async function(){ await signOut(auth); };
+window.toggleSidebar = function(){ document.getElementById('sidebar').classList.toggle('open'); };
+
+const SECTIONS = ['dashboard','revenus','commandes','paiements','marges','salaires','exports'];
+window.showSection = function(id,btn){
+  SECTIONS.forEach(s=>{ const el=document.getElementById('section-'+s); if(el) el.style.display=s===id?'block':'none'; });
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  if(window.innerWidth<769) document.getElementById('sidebar').classList.remove('open');
+  if(id==='commandes')  loadOrders();
+  if(id==='paiements')  loadPaiements('month');
+  if(id==='revenus')    loadRevenus('month');
+  if(id==='marges')     loadArticlesMarges();
+  if(id==='salaires')   loadAgentsSalaires();
+};
+
+function toast(msg,bg='#1A1A2E'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=bg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200);
+}
+window.closeModal=function(id){document.getElementById(id).classList.remove('show');};
+
+// ── Helpers ──
+function fmt(n){ return new Intl.NumberFormat('fr-FR').format(Math.round(n||0))+' FCFA'; }
+function fmtDate(ts){
+  if(!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function fmtDateShort(ts){
+  if(!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+}
+function statusPill(s){
+  const m={
+    'Terminée':'p-livr','Livré':'p-livr','En cours':'p-conf',
+    'En attente':'p-enc','Confirmée':'p-conf','Annulée':'p-ann',
+    'En route':'p-prog'
+  };
+  return m[s]||'p-enc';
+}
+function payPill(p){
+  if(!p) return 'p-enc';
+  if(p.toLowerCase().includes('mobile')||p.toLowerCase().includes('flooz')||p.toLowerCase().includes('tmoney')) return 'p-mm';
+  if(p.toLowerCase().includes('cash')||p.toLowerCase().includes('livraison')) return 'p-cash';
+  return 'p-cb';
+}
+function periodRange(period){
+  const now = new Date();
+  let from;
+  if(period==='today'){from=new Date(now);from.setHours(0,0,0,0);}
+  else if(period==='week'){from=new Date(now);from.setDate(from.getDate()-7);}
+  else if(period==='month'){from=new Date(now);from.setDate(1);from.setHours(0,0,0,0);}
+  else{from=new Date(now);from.setMonth(0,1);from.setHours(0,0,0,0);}
+  return from;
+}
+
+// ── Fetch all orders ──
+async function fetchOrders(){
+  const snap = await getDocs(collection(db,'commandes'));
+  return snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+
+// ══ DASHBOARD ══
+async function loadDashboard(){
+  try{
+    const all = await fetchOrders();
+    ordersCache = all;
+
+    const now   = Date.now();
+    const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+
+    const done    = all.filter(o=>['Terminée','Livré'].includes(o.statut));
+    const thisMonth = done.filter(o=>o.createdAt?.toDate()>=monthStart);
+    const today   = done.filter(o=>o.createdAt?.toDate()>=todayStart);
+    const pending = all.filter(o=>['En attente','En cours','Confirmée','En route'].includes(o.statut));
+
+    const caMonth = thisMonth.reduce((s,o)=>s+(o.total||o.montant||0),0);
+    const caToday = today.reduce((s,o)=>s+(o.total||o.montant||0),0);
+
+    document.getElementById('kpi-ca').textContent      = fmt(caMonth);
+    document.getElementById('kpi-orders').textContent  = thisMonth.length;
+    document.getElementById('kpi-today').textContent   = fmt(caToday);
+    document.getElementById('kpi-pending').textContent = pending.length;
+    document.getElementById('kpi-ord-trend').textContent = thisMonth.length+' ce mois';
+
+    // Paiements rapides
+    renderPayQuick(done);
+    // Graphe
+    loadChart('week',null,done);
+    // Dernières txns
+    renderRecentTxns(all.slice(-8).reverse());
+  }catch(e){ toast('❌ Erreur dashboard : '+e.message,'#C62828'); }
+}
+window.loadDashboard=loadDashboard;
+
+function renderPayQuick(done){
+  const modes={};
+  done.forEach(o=>{const m=o.modePaiement||o.paiement||'Autre';modes[m]=(modes[m]||0)+(o.total||o.montant||0);});
+  const icons={'Flooz':'📱','TMoney':'📱','Mobile Money':'📱','Cash':'💵','Livraison':'🚪','Carte':'💳'};
+  const bg={'Flooz':'#E8F5E9','TMoney':'#E8F5E9','Mobile Money':'#E8F5E9','Cash':'#FFF8E1','Livraison':'#FFF3E0','Carte':'#E3F2FD'};
+  const fc={'Flooz':var_g,'TMoney':var_g,'Mobile Money':var_g,'Cash':'#F57F17','Livraison':'#E65100','Carte':var_blue};
+  const total=Object.values(modes).reduce((s,v)=>s+v,0)||1;
+  document.getElementById('pay-quick').innerHTML=Object.entries(modes).slice(0,4).map(([m,v])=>`
+    <div class="pay-card">
+      <div class="pay-ico">${icons[m]||'💰'}</div>
+      <div class="pay-val">${fmt(v)}</div>
+      <div class="pay-lbl">${m}</div>
+      <div class="pay-sub">${Math.round(v/total*100)}% du total</div>
+    </div>`).join('')||'<div class="empty-msg" style="grid-column:1/-1">Aucune donnée.</div>';
+}
+
+function loadChart(period,btn,data){
+  if(btn){document.querySelectorAll('.cf').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+  const src = data||ordersCache.filter(o=>['Terminée','Livré'].includes(o.statut));
+  const el  = document.getElementById('chart-bars');
+  const now = new Date();
+  let labels=[], values=[];
+
+  if(period==='week'){
+    for(let i=6;i>=0;i--){
+      const d=new Date(now);d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+      const next=new Date(d);next.setDate(next.getDate()+1);
+      const sum=src.filter(o=>{const t=o.createdAt?.toDate();return t&&t>=d&&t<next;}).reduce((s,o)=>s+(o.total||o.montant||0),0);
+      labels.push(d.toLocaleDateString('fr-FR',{weekday:'short'}));
+      values.push(sum);
+    }
+  } else if(period==='month'){
+    for(let i=29;i>=0;i-=3){
+      const d=new Date(now);d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+      const next=new Date(d);next.setDate(next.getDate()+3);
+      const sum=src.filter(o=>{const t=o.createdAt?.toDate();return t&&t>=d&&t<next;}).reduce((s,o)=>s+(o.total||o.montant||0),0);
+      labels.push(d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}));
+      values.push(sum);
+    }
+  } else {
+    for(let i=11;i>=0;i--){
+      const d=new Date(now);d.setMonth(d.getMonth()-i,1);d.setHours(0,0,0,0);
+      const next=new Date(d);next.setMonth(next.getMonth()+1);
+      const sum=src.filter(o=>{const t=o.createdAt?.toDate();return t&&t>=d&&t<next;}).reduce((s,o)=>s+(o.total||o.montant||0),0);
+      labels.push(d.toLocaleDateString('fr-FR',{month:'short'}));
+      values.push(sum);
+    }
+  }
+
+  const max=Math.max(...values,1);
+  el.innerHTML=labels.map((l,i)=>`
+    <div class="bc-col">
+      <div class="bc-val">${values[i]>0?Math.round(values[i]/1000)+'k':''}</div>
+      <div class="bc-bar-wrap">
+        <div class="bc-bar" style="height:${Math.round(values[i]/max*100)}%"></div>
+      </div>
+      <div class="bc-lbl">${l}</div>
+    </div>`).join('');
+}
+window.loadChart=loadChart;
+
+function renderRecentTxns(orders){
+  if(!orders.length){document.getElementById('recent-txns').innerHTML='<div class="empty-msg">Aucune transaction.</div>';return;}
+  document.getElementById('recent-txns').innerHTML=orders.map(o=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bg);cursor:pointer;" onclick="viewOrder('${o.id}')">
+      <div style="width:36px;height:36px;background:var(--g-s);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📦</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;color:var(--dark);">${o.clientNom||o.nomClient||o.uid?.slice(0,8)||'Client'}</div>
+        <div style="font-size:10px;color:var(--light);">${fmtDateShort(o.createdAt)} · ${o.modePaiement||'—'}</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:var(--g);text-align:right;">${fmt(o.total||o.montant)}</div>
+        <div style="text-align:right;"><span class="pill ${statusPill(o.statut)}">${o.statut||'—'}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+// ══ CHIFFRE D'AFFAIRES ══
+async function loadRevenus(period,btn){
+  currentPeriod=period; window.currentPeriod=period;
+  if(btn){document.querySelectorAll('#section-revenus .fbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+  try{
+    const all   = ordersCache.length?ordersCache:await fetchOrders();
+    const from  = periodRange(period);
+    const filt  = all.filter(o=>['Terminée','Livré'].includes(o.statut)&&o.createdAt?.toDate()>=from);
+    const ca    = filt.reduce((s,o)=>s+(o.total||o.montant||0),0);
+    const avg   = filt.length?ca/filt.length:0;
+    const maxO  = filt.reduce((m,o)=>Math.max(m,o.total||o.montant||0),0);
+    document.getElementById('rev-kpi').innerHTML=`
+      <div class="kpi-card"><div class="kpi-top"><div class="kpi-ico-wrap">💵</div></div>
+        <div class="kpi-val">${fmt(ca)}</div><div class="kpi-lbl">CA total</div></div>
+      <div class="kpi-card blue"><div class="kpi-top"><div class="kpi-ico-wrap" style="background:var(--blue-s)">📦</div></div>
+        <div class="kpi-val">${filt.length}</div><div class="kpi-lbl">Commandes</div></div>
+      <div class="kpi-card orange"><div class="kpi-top"><div class="kpi-ico-wrap" style="background:rgba(245,130,10,.1)">📊</div></div>
+        <div class="kpi-val">${fmt(avg)}</div><div class="kpi-lbl">Panier moyen</div></div>`;
+
+    // Chart
+    const chartEl=document.getElementById('rev-chart');
+    const now=new Date();
+    let labels=[],values=[];
+    if(period==='today'){
+      for(let h=0;h<24;h+=2){
+        const d=new Date(now);d.setHours(h,0,0,0);
+        const next=new Date(d);next.setHours(h+2);
+        const sum=filt.filter(o=>{const t=o.createdAt?.toDate();return t&&t>=d&&t<next;}).reduce((s,o)=>s+(o.total||o.montant||0),0);
+        labels.push(h+'h');values.push(sum);
+      }
+    } else if(period==='week'){
+      for(let i=6;i>=0;i--){
+        const d=new Date(now);d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+        const next=new Date(d);next.setDate(next.getDate()+1);
+        const sum=filt.filter(o=>{const t=o.createdAt?.toDate();return t&&t>=d&&t<next;}).reduce((s,o)=>s+(o.total||o.montant||0),0);
+        labels.push(d.toLocaleDateString('fr-FR',{weekday:'short'}));values.push(sum);
+      }
+    } else if(period==='month'){
+      for(let i=29;i>=0;i-=3){
+        const d=new Date(now);d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+        const next=new Date(d);next.setDate(next.getDate()+3);
+        const sum=filt.filter(o=>{const t=o.createdAt?.toDate();return t&&t>=d&&t<next;}).reduce((s,o)=>s+(o.total||o.montant||0),0);
+        labels.push(d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}));values.push(sum);
+      }
+    } else {
+      for(let i=11;i>=0;i--){
+        const d=new Date(now);d.setMonth(d.getMonth()-i,1);d.setHours(0,0,0,0);
+        const next=new Date(d);next.setMonth(next.getMonth()+1);
+        const sum=filt.filter(o=>{const t=o.createdAt?.toDate();return t&&t>=d&&t<next;}).reduce((s,o)=>s+(o.total||o.montant||0),0);
+        labels.push(d.toLocaleDateString('fr-FR',{month:'short'}));values.push(sum);
+      }
+    }
+    const maxV=Math.max(...values,1);
+    chartEl.innerHTML=labels.map((l,i)=>`
+      <div class="bc-col">
+        <div class="bc-val">${values[i]>0?Math.round(values[i]/1000)+'k':''}</div>
+        <div class="bc-bar-wrap"><div class="bc-bar" style="height:${Math.round(values[i]/maxV*100)}%"></div></div>
+        <div class="bc-lbl">${l}</div>
+      </div>`).join('');
+
+    // Par service
+    const byService={};
+    filt.forEach(o=>{const s=o.service||o.categorie||'Autre';byService[s]=(byService[s]||0)+(o.total||o.montant||0);});
+    const sTotal=Object.values(byService).reduce((s,v)=>s+v,0)||1;
+    const sorted=Object.entries(byService).sort((a,b)=>b[1]-a[1]);
+    document.getElementById('rev-by-service').innerHTML=sorted.length
+      ? sorted.map(([s,v])=>`
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px;">
+            <span>${s}</span><span style="color:var(--g)">${fmt(v)}</span>
+          </div>
+          <div style="height:7px;background:var(--bg);border-radius:999px;overflow:hidden;">
+            <div style="height:100%;background:linear-gradient(90deg,var(--g),#66BB6A);border-radius:999px;width:${Math.round(v/sTotal*100)}%;transition:width .6s;"></div>
+          </div>
+        </div>`).join('')
+      : '<div class="empty-msg">Aucune donnée.</div>';
+  }catch(e){ toast('❌ Erreur revenus','#C62828'); }
+}
+window.loadRevenus=loadRevenus;
+
+// ══ COMMANDES ══
+async function loadOrders(){
+  document.getElementById('orders-desktop').innerHTML='<div class="empty-msg"><div class="spinner"></div></div>';
+  document.getElementById('orders-mobile').innerHTML='';
+  try{
+    const snap=await getDocs(collection(db,'commandes'));
+    ordersCache=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderOrders();
+  }catch(e){ document.getElementById('orders-desktop').innerHTML='<div class="empty-msg">Erreur.</div>'; }
+}
+window.loadOrders=loadOrders;
+
+function renderOrders(){
+  let list=[...ordersCache].sort((a,b)=>(b.createdAt?.toMillis()||0)-(a.createdAt?.toMillis()||0));
+  if(filtreStatut!=='all') list=list.filter(o=>o.statut===filtreStatut);
+  if(filtreSearch){const s=filtreSearch.toLowerCase();list=list.filter(o=>(o.id||'').toLowerCase().includes(s)||(o.clientNom||o.nomClient||'').toLowerCase().includes(s)||String(o.total||o.montant||'').includes(s));}
+
+  const dEl=document.getElementById('orders-desktop');
+  const mEl=document.getElementById('orders-mobile');
+  if(!list.length){dEl.innerHTML='<div class="empty-msg">Aucune commande.</div>';mEl.innerHTML='';return;}
+
+  dEl.innerHTML=list.map(o=>`
+    <div class="table-row" style="grid-template-columns:120px 1fr 90px 90px 90px 100px 80px;">
+      <div><div class="t-id">${o.id?.slice(0,10)||'—'}</div></div>
+      <div>
+        <div class="t-name">${o.clientNom||o.nomClient||'Client'}</div>
+        <div style="font-size:11px;color:var(--light);">${o.service||'—'}</div>
+      </div>
+      <div class="t-amount">${fmt(o.total||o.montant)}</div>
+      <div><span class="pill ${payPill(o.modePaiement||o.paiement)}">${o.modePaiement||o.paiement||'—'}</span></div>
+      <div><span class="pill ${statusPill(o.statut)}">${o.statut||'—'}</span></div>
+      <div style="font-size:11px;color:var(--light);">${fmtDateShort(o.createdAt)}</div>
+      <div><button style="background:var(--g-s);color:var(--g);border:none;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;" onclick="viewOrder('${o.id}')">👁 Voir</button></div>
+    </div>`).join('');
+
+  mEl.innerHTML=list.map(o=>`
+    <div class="mcm" onclick="viewOrder('${o.id}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">
+        <div>
+          <div class="t-id">${o.id?.slice(0,12)||'—'}</div>
+          <div class="t-name" style="margin-top:4px;">${o.clientNom||o.nomClient||'Client'}</div>
+          <div style="font-size:11px;color:var(--light);">${o.service||'—'} · ${fmtDateShort(o.createdAt)}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="t-amount">${fmt(o.total||o.montant)}</div>
+          <span class="pill ${statusPill(o.statut)}" style="margin-top:4px;">${o.statut||'—'}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <span class="pill ${payPill(o.modePaiement||o.paiement)}">${o.modePaiement||o.paiement||'—'}</span>
+      </div>
+    </div>`).join('');
+}
+
+window.filterOrders=function(s,btn){filtreStatut=s;document.querySelectorAll('#section-commandes .fbtn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderOrders();};
+window.searchOrders=function(v){filtreSearch=v;renderOrders();};
+
+window.viewOrder=function(id){
+  const o=ordersCache.find(x=>x.id===id); if(!o) return;
+  const articles=o.articles||o.items||[];
+  document.getElementById('modal-order-content').innerHTML=`
+    <div class="m-row"><div class="m-key">ID</div><div class="m-val" style="font-family:monospace;font-size:11px;">${o.id||'—'}</div></div>
+    <div class="m-row"><div class="m-key">Client</div><div class="m-val">${o.clientNom||o.nomClient||'—'}</div></div>
+    <div class="m-row"><div class="m-key">Téléphone</div><div class="m-val">${o.telephone||o.clientTel||'—'}</div></div>
+    <div class="m-row"><div class="m-key">Service</div><div class="m-val">${o.service||o.categorie||'—'}</div></div>
+    <div class="m-row"><div class="m-key">Date</div><div class="m-val">${fmtDate(o.createdAt)}</div></div>
+    <div class="m-row"><div class="m-key">Statut</div><div class="m-val"><span class="pill ${statusPill(o.statut)}">${o.statut||'—'}</span></div></div>
+    <div class="m-row"><div class="m-key">Paiement</div><div class="m-val"><span class="pill ${payPill(o.modePaiement||o.paiement)}">${o.modePaiement||o.paiement||'—'}</span></div></div>
+    ${o.adresse||o.livraison?`<div class="m-row"><div class="m-key">Adresse</div><div class="m-val">${o.adresse||o.livraison||'—'}</div></div>`:''}
+    ${articles.length?`<div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Articles</div>
+    ${articles.map(a=>`<div class="m-row"><div class="m-key">${a.nom||a.name||a}</div><div class="m-val">${a.quantite||a.qty||1} × ${fmt(a.prix||a.price||0)}</div></div>`).join('')}`:''}
+    <div class="m-total"><span>Total</span><span style="color:var(--g)">${fmt(o.total||o.montant)}</span></div>`;
+  document.getElementById('modal-order').classList.add('show');
+};
+
+// ══ PAIEMENTS ══
+async function loadPaiements(period,btn){
+  if(btn){document.querySelectorAll('#section-paiements .fbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+  try{
+    const all  = ordersCache.length?ordersCache:await fetchOrders();
+    const from = periodRange(period);
+    const filt = all.filter(o=>['Terminée','Livré'].includes(o.statut)&&o.createdAt?.toDate()>=from);
+    const modes={};
+    filt.forEach(o=>{const m=o.modePaiement||o.paiement||'Autre';if(!modes[m])modes[m]={count:0,total:0};modes[m].count++;modes[m].total+=(o.total||o.montant||0);});
+    const total=filt.reduce((s,o)=>s+(o.total||o.montant||0),0)||1;
+    const icons={'Flooz':'📱','TMoney':'📱','Mobile Money':'📱','Cash':'💵','Livraison':'🚪','Carte':'💳','Autre':'💰'};
+    const entries=Object.entries(modes).sort((a,b)=>b[1].total-a[1].total);
+
+    document.getElementById('pay-detail').innerHTML=entries.slice(0,4).map(([m,v])=>`
+      <div class="pay-card" style="text-align:left;padding:18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="font-size:26px;">${icons[m]||'💰'}</div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--dark);">${m}</div>
+          <div style="font-size:10px;color:var(--light);">${v.count} transaction${v.count>1?'s':''}</div></div>
+        </div>
+        <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--g);">${fmt(v.total)}</div>
+        <div style="height:5px;background:var(--bg);border-radius:999px;overflow:hidden;margin-top:8px;">
+          <div style="height:100%;background:var(--g);border-radius:999px;width:${Math.round(v.total/total*100)}%;"></div>
+        </div>
+        <div style="font-size:10px;color:var(--light);margin-top:4px;">${Math.round(v.total/total*100)}% du total</div>
+      </div>`).join('')||'<div class="empty-msg" style="grid-column:1/-1">Aucun paiement.</div>';
+
+    // Table détail
+    document.getElementById('pay-table').innerHTML=entries.length
+      ? entries.map(([m,v])=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bg);">
+          <div style="font-size:22px;width:32px;text-align:center;">${icons[m]||'💰'}</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:var(--dark);">${m}</div>
+            <div style="height:5px;background:var(--bg);border-radius:999px;overflow:hidden;margin-top:5px;">
+              <div style="height:100%;background:linear-gradient(90deg,var(--g),#66BB6A);border-radius:999px;width:${Math.round(v.total/total*100)}%;"></div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:14px;font-weight:800;color:var(--g);">${fmt(v.total)}</div>
+            <div style="font-size:10px;color:var(--light);">${v.count} commande${v.count>1?'s':''}</div>
+          </div>
+        </div>`).join('')
+      : '<div class="empty-msg">Aucun paiement sur cette période.</div>';
+  }catch(e){ toast('❌ Erreur paiements','#C62828'); }
+}
+window.loadPaiements=loadPaiements;
+
+// ══ EXPORT CSV ══
+window.exportCSV = function(){
+  if(!ordersCache.length){toast('⚠️ Chargez les commandes d\'abord.','#E65100');return;}
+  const rows=[['ID','Client','Téléphone','Service','Montant','Paiement','Statut','Date']];
+  ordersCache.forEach(o=>{
+    rows.push([
+      o.id||'',
+      o.clientNom||o.nomClient||'',
+      o.telephone||o.clientTel||'',
+      o.service||o.categorie||'',
+      o.total||o.montant||0,
+      o.modePaiement||o.paiement||'',
+      o.statut||'',
+      o.createdAt?.toDate()?.toLocaleDateString('fr-FR')||''
+    ]);
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;
+  a.download='omniservice_commandes_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();URL.revokeObjectURL(url);
+  toast('✅ CSV téléchargé !','#2E7D32');
+};
+
+window.doExport=async function(type){
+  toast('⏳ Préparation de l\'export…','#1A1A2E');
+  try{
+    const all=ordersCache.length?ordersCache:await fetchOrders();
+    const fromStr=document.getElementById('exp-from').value;
+    const toStr  =document.getElementById('exp-to').value;
+    const from   =fromStr?new Date(fromStr):new Date(0);
+    const to     =toStr?new Date(toStr+'T23:59:59'):new Date();
+    const filt   =all.filter(o=>{const d=o.createdAt?.toDate();return d&&d>=from&&d<=to;});
+
+    let rows=[],filename='';
+    if(type==='commandes'){
+      rows=[['ID','Client','Téléphone','Service','Montant','Paiement','Statut','Date']];
+      filt.forEach(o=>rows.push([o.id||'',o.clientNom||o.nomClient||'',o.telephone||o.clientTel||'',o.service||o.categorie||'',o.total||o.montant||0,o.modePaiement||o.paiement||'',o.statut||'',o.createdAt?.toDate()?.toLocaleDateString('fr-FR')||'']));
+      filename='commandes';
+    } else if(type==='revenus'){
+      const done=filt.filter(o=>['Terminée','Livré'].includes(o.statut));
+      rows=[['Date','Nombre commandes','CA (FCFA)']];
+      const byDay={};
+      done.forEach(o=>{const d=o.createdAt?.toDate()?.toLocaleDateString('fr-FR')||'—';if(!byDay[d])byDay[d]={n:0,ca:0};byDay[d].n++;byDay[d].ca+=(o.total||o.montant||0);});
+      Object.entries(byDay).forEach(([d,v])=>rows.push([d,v.n,v.ca]));
+      filename='revenus';
+    } else if(type==='paiements'){
+      rows=[['Mode','Nombre','Total (FCFA)']];
+      const done=filt.filter(o=>['Terminée','Livré'].includes(o.statut));
+      const modes={};
+      done.forEach(o=>{const m=o.modePaiement||o.paiement||'Autre';if(!modes[m])modes[m]={n:0,t:0};modes[m].n++;modes[m].t+=(o.total||o.montant||0);});
+      Object.entries(modes).forEach(([m,v])=>rows.push([m,v.n,v.t]));
+      filename='paiements';
+    } else if(type==='clients'){
+      const clients={};
+      filt.forEach(o=>{const c=o.clientNom||o.nomClient||o.uid||'';if(!clients[c])clients[c]={tel:o.telephone||o.clientTel||'',commandes:0,total:0};clients[c].commandes++;clients[c].total+=(o.total||o.montant||0);});
+      rows=[['Client','Téléphone','Commandes','Total dépensé (FCFA)']];
+      Object.entries(clients).forEach(([n,v])=>rows.push([n,v.tel,v.commandes,v.total]));
+      filename='clients';
+    }
+
+    const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;
+    a.download=`omniservice_${filename}_${fromStr}_${toStr}.csv`;
+    a.click();URL.revokeObjectURL(url);
+    toast(`✅ Export "${filename}" téléchargé !`,'#2E7D32');
+  }catch(e){toast('❌ Erreur export : '+e.message,'#C62828');}
+};
+
+// ═══════════════════════════════════════════════════════════════
+// ██  MARGES & BÉNÉFICES
+// ═══════════════════════════════════════════════════════════════
+let margesData     = [];    // { id, nom, service, emoji, prix, qtyVendue, cout }
+let margesSvcFilter = 'all';
+
+// Charge les articles depuis Firestore + calcule les quantités vendues
+window.loadArticlesMarges = async function(){
+  const tbody = document.getElementById('marges-table-body');
+  if(tbody) tbody.innerHTML = '<div class="empty-msg"><div class="spinner"></div></div>';
+
+  // 1. Articles publiés
+  const artSnap = await getDocs(collection(db,'articles'));
+  const arts = artSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+  // 2. Commandes terminées — extraire les articles vendus
+  const cmdSnap = await getDocs(query(collection(db,'commandes'), where('statut','==','Terminée')));
+  const venteMap = {}; // articleId -> { qtyVendue, caTotal }
+  cmdSnap.docs.forEach(d=>{
+    const cmd = d.data();
+    if(cmd.articles && Array.isArray(cmd.articles)){
+      cmd.articles.forEach(a=>{
+        const key = a.id||a.name||a.nom||'?';
+        if(!venteMap[key]) venteMap[key]={qty:0,ca:0};
+        const qty = Number(a.qty)||1;
+        const prix = Number(a.price||a.prix||0);
+        venteMap[key].qty += qty;
+        venteMap[key].ca  += qty*prix;
+      });
+    }
+  });
+
+  // 3. Construire margesData — charger taux depuis localStorage (persisté localement)
+  const savedCout = JSON.parse(localStorage.getItem('omni_marges_cout')||'{}');
+  margesData = arts.map(a=>{
+    const key = a.id;
+    const vente = venteMap[key]||venteMap[a.nom||a.name]||{qty:0,ca:0};
+    return {
+      id:         key,
+      nom:        a.nom||a.name||'Article',
+      service:    a.service||'—',
+      emoji:      a.emoji||'🛒',
+      prix:       Number(a.prix||a.price||0),
+      qtyVendue:  vente.qty,
+      caTotal:    vente.ca || (Number(a.prix||a.price||0)*vente.qty),
+      cout:       Number(savedCout[key]??30),  // % coût par défaut 30%
+    };
+  });
+
+  // Filtres services dynamiques
+  const svcs = [...new Set(margesData.map(a=>a.service))].filter(Boolean);
+  const fbar = document.getElementById('marges-svc-filters');
+  if(fbar){
+    fbar.innerHTML = '<button class="fbtn '+(margesSvcFilter==='all'?'on':'')+'" onclick="filterMargesSvc(\'all\',this)">Tous</button>'
+      + svcs.map(s=>'<button class="fbtn '+(margesSvcFilter===s?'on':'')+'" onclick="filterMargesSvc(\''+s+'\',this)">'+s+'</button>').join('');
+  }
+
+  renderMargesTable();
+};
+
+window.filterMargesSvc = function(svc,btn){
+  margesSvcFilter = svc;
+  document.querySelectorAll('#marges-svc-filters .fbtn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  renderMargesTable();
+};
+
+function renderMargesTable(){
+  const tbody = document.getElementById('marges-table-body');
+  if(!tbody) return;
+
+  const filtered = margesSvcFilter==='all' ? margesData : margesData.filter(a=>a.service===margesSvcFilter);
+  if(!filtered.length){
+    tbody.innerHTML='<div class="empty-msg" style="color:var(--light);font-size:12px;">Aucun article trouvé</div>';
+    document.getElementById('marges-recap-block').style.display='none';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(a=>{
+    const benefice = a.caTotal * (1 - a.cout/100);
+    const benefColor = benefice>=0 ? '#2E7D32' : '#C62828';
+    return `<div class="table-row" style="grid-template-columns:3fr 1fr 110px 100px 120px 130px 110px;font-size:12px;">
+      <div style="display:flex;align-items:center;gap:8px;font-weight:600;">${a.emoji} ${a.nom}</div>
+      <div><span style="background:#E3F2FD;color:#1E6FBE;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;">${a.service}</span></div>
+      <div style="font-weight:600;">${fmt(a.prix)}</div>
+      <div style="color:var(--mid);">${a.qtyVendue} unité${a.qtyVendue>1?'s':''}</div>
+      <div style="font-weight:700;">${fmt(a.caTotal)}</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" min="0" max="100" value="${a.cout}" step="1"
+            style="width:62px;padding:5px 8px;border:1.5px solid #E8EAF0;border-radius:8px;font-size:12px;font-family:'Poppins',sans-serif;text-align:center;"
+            onchange="updateCout('${a.id}',this.value)"
+            oninput="updateCout('${a.id}',this.value)"/>
+          <span style="font-size:11px;color:var(--light);">%</span>
+        </div>
+        <div style="height:4px;background:#E8EAF0;border-radius:4px;margin-top:4px;overflow:hidden;">
+          <div style="height:100%;width:${Math.min(a.cout,100)}%;background:#1E6FBE;border-radius:4px;transition:width .3s;"></div>
+        </div>
+      </div>
+      <div style="font-weight:800;color:${benefColor};">${fmt(benefice)}</div>
+    </div>`;
+  }).join('');
+
+  renderMargesRecap(filtered);
+  document.getElementById('marges-recap-block').style.display = 'block';
+}
+
+window.updateCout = function(id, val){
+  const saved = JSON.parse(localStorage.getItem('omni_marges_cout')||'{}');
+  saved[id] = Math.max(0,Math.min(100,Number(val)||0));
+  localStorage.setItem('omni_marges_cout', JSON.stringify(saved));
+  const art = margesData.find(a=>a.id===id);
+  if(art){ art.cout = saved[id]; renderMargesTable(); }
+};
+
+function renderMargesRecap(filtered){
+  const totalCA     = filtered.reduce((s,a)=>s+a.caTotal, 0);
+  const totalBen    = filtered.reduce((s,a)=>s+(a.caTotal*(1-a.cout/100)), 0);
+  const totalCouts  = totalCA - totalBen;
+  const margeMoy    = totalCA>0 ? (totalBen/totalCA*100) : 0;
+
+  const kpiRow = document.getElementById('marges-kpi-row');
+  if(kpiRow) kpiRow.innerHTML = `
+    <div class="kpi-card"><div class="kpi-top"><div class="kpi-ico-wrap">💰</div></div>
+      <div class="kpi-val">${fmt(totalCA)}</div><div class="kpi-lbl">CA total analysé</div></div>
+    <div class="kpi-card orange"><div class="kpi-top"><div class="kpi-ico-wrap">⚙️</div></div>
+      <div class="kpi-val">${fmt(totalCouts)}</div><div class="kpi-lbl">Total coûts</div></div>
+    <div class="kpi-card blue"><div class="kpi-top"><div class="kpi-ico-wrap">📊</div></div>
+      <div class="kpi-val">${margeMoy.toFixed(1)}%</div><div class="kpi-lbl">Marge moyenne</div></div>
+    <div class="kpi-card" style="border-top:3px solid #2E7D32"><div class="kpi-top"><div class="kpi-ico-wrap">🏆</div></div>
+      <div class="kpi-val" style="color:#2E7D32">${fmt(totalBen)}</div><div class="kpi-lbl">Bénéfice net total</div></div>`;
+
+  // Par service
+  const bySvc = {};
+  filtered.forEach(a=>{
+    if(!bySvc[a.service]) bySvc[a.service]={ca:0,ben:0};
+    bySvc[a.service].ca  += a.caTotal;
+    bySvc[a.service].ben += a.caTotal*(1-a.cout/100);
+  });
+  const container = document.getElementById('marges-by-service');
+  if(container){
+    const maxBen = Math.max(...Object.values(bySvc).map(v=>v.ben));
+    container.innerHTML = Object.entries(bySvc).map(([svc,v])=>{
+      const marge = v.ca>0 ? (v.ben/v.ca*100) : 0;
+      const pct = maxBen>0 ? (v.ben/maxBen*100) : 0;
+      const color = marge>=50?'#2E7D32':marge>=20?'#1E6FBE':'#F5820A';
+      return `<div style="display:grid;grid-template-columns:140px 1fr 100px 100px 80px;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <div style="font-weight:600;">${svc}</div>
+        <div><div style="height:8px;background:#E8EAF0;border-radius:8px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${color};border-radius:8px;"></div></div></div>
+        <div style="font-size:11px;color:var(--mid);">${fmt(v.ca)}</div>
+        <div style="font-weight:700;color:${color};">${fmt(v.ben)}</div>
+        <div style="font-size:11px;font-weight:700;color:${color};">${marge.toFixed(1)}%</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── Export Marges XLSX ──
+window.exportMargesXLSX = function(){
+  const filtered = margesSvcFilter==='all' ? margesData : margesData.filter(a=>a.service===margesSvcFilter);
+  if(!filtered.length){ toast('⚠️ Aucune donnée à exporter','#F5820A'); return; }
+
+  let csv = 'Article;Service;Prix unitaire (FCFA);Qté vendue;CA généré (FCFA);% Coût;Coût total (FCFA);Bénéfice net (FCFA);Marge %\n';
+  filtered.forEach(a=>{
+    const ben = a.caTotal*(1-a.cout/100);
+    const coutTotal = a.caTotal - ben;
+    const marge = a.caTotal>0?(ben/a.caTotal*100):0;
+    csv += [a.nom, a.service, a.prix, a.qtyVendue,
+      Math.round(a.caTotal), a.cout, Math.round(coutTotal),
+      Math.round(ben), marge.toFixed(1)+'%'].join(';')+'\n';
+  });
+  const totalCA  = filtered.reduce((s,a)=>s+a.caTotal,0);
+  const totalBen = filtered.reduce((s,a)=>s+a.caTotal*(1-a.cout/100),0);
+  csv += '\nTOTAL;;' + ';;' + Math.round(totalCA)+';;;'+ Math.round(totalBen)+'\n';
+
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download='omniservice_marges_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+  toast('✅ Export Marges téléchargé !','#2E7D32');
+};
+
+// ── Export Marges PDF (print-based) ──
+window.exportMargesPDF = function(){
+  const filtered = margesSvcFilter==='all' ? margesData : margesData.filter(a=>a.service===margesSvcFilter);
+  if(!filtered.length){ toast('⚠️ Aucune donnée','#F5820A'); return; }
+  const totalCA  = filtered.reduce((s,a)=>s+a.caTotal,0);
+  const totalBen = filtered.reduce((s,a)=>s+a.caTotal*(1-a.cout/100),0);
+  const totalCout= totalCA-totalBen;
+  const marge    = totalCA>0?(totalBen/totalCA*100):0;
+  const rows = filtered.map(a=>{
+    const ben = a.caTotal*(1-a.cout/100);
+    const color = ben>=0?'#2E7D32':'#C62828';
+    return `<tr><td>${a.emoji} ${a.nom}</td><td>${a.service}</td><td>${fmt(a.prix)}</td><td>${a.qtyVendue}</td>
+      <td>${fmt(a.caTotal)}</td><td>${a.cout}%</td><td style="color:${color};font-weight:700">${fmt(ben)}</td></tr>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Marges OmniService TG</title>
+  <style>body{font-family:Arial,sans-serif;font-size:12px;margin:24px;}h1{color:#1A1A2E;font-size:18px;}
+  table{width:100%;border-collapse:collapse;margin-top:16px;}th{background:#1A1A2E;color:#fff;padding:8px 10px;text-align:left;font-size:11px;}
+  td{padding:7px 10px;border-bottom:1px solid #E8EAF0;}tr:nth-child(even){background:#F9F9F9;}
+  .recap{display:flex;gap:16px;margin-top:20px;flex-wrap:wrap;}
+  .rcard{background:#F4F6FA;border-radius:10px;padding:14px 18px;flex:1;min-width:140px;}
+  .rv{font-size:16px;font-weight:800;color:#1A1A2E;}.rl{font-size:10px;color:#9999BB;text-transform:uppercase;}
+  .footer{margin-top:24px;font-size:10px;color:#9999BB;}
+  </style></head><body>
+  <h1>📊 Rapport Marges & Bénéfices — OmniService TG</h1>
+  <p style="color:#9999BB;font-size:11px;">Généré le ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p>
+  <div class="recap">
+    <div class="rcard"><div class="rv">${fmt(totalCA)}</div><div class="rl">CA total analysé</div></div>
+    <div class="rcard"><div class="rv">${fmt(totalCout)}</div><div class="rl">Total coûts</div></div>
+    <div class="rcard"><div class="rv">${marge.toFixed(1)}%</div><div class="rl">Marge moyenne</div></div>
+    <div class="rcard" style="border-left:3px solid #2E7D32"><div class="rv" style="color:#2E7D32">${fmt(totalBen)}</div><div class="rl">Bénéfice net</div></div>
+  </div>
+  <table><thead><tr><th>Article</th><th>Service</th><th>Prix unit.</th><th>Qté</th><th>CA généré</th><th>% Coût</th><th>Bénéfice net</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <div class="footer">OmniService TG — Document confidentiel</div>
+  </body></html>`;
+  const win = window.open('','_blank','width=900,height=700');
+  win.document.write(html); win.document.close(); win.print();
+};
+
+
+// ═══════════════════════════════════════════════════════════════
+// ██  MASSE SALARIALE
+// ═══════════════════════════════════════════════════════════════
+let agentsData = []; // { id, nom, role, salaire, note }
+const SAL_KEY  = 'omni_agents_salaires';
+
+function saveAgentsLocal(){ localStorage.setItem(SAL_KEY, JSON.stringify(agentsData)); }
+function loadAgentsLocal(){
+  try{ return JSON.parse(localStorage.getItem(SAL_KEY)||'[]'); }catch(e){ return []; }
+}
+
+window.loadAgentsSalaires = async function(){
+  const tbody = document.getElementById('sal-table-body');
+  if(tbody) tbody.innerHTML = '<div class="empty-msg"><div class="spinner"></div></div>';
+
+  // Charger agents depuis localStorage (données locales gérées par comptable)
+  agentsData = loadAgentsLocal();
+
+  // Récupérer le CA du mois et le bénéfice brut si les marges ont été calculées
+  const now  = new Date();
+  const y    = now.getFullYear(), m = now.getMonth();
+  const from = new Date(y,m,1);
+  const to   = new Date(y,m+1,0,23,59,59);
+  // CA mois courant
+  const cmdSnap = await getDocs(query(collection(db,'commandes'),
+    where('statut','==','Terminée')));
+  let caMonth = 0;
+  cmdSnap.docs.forEach(d=>{
+    const cmd = d.data();
+    const dt  = cmd.createdAt?.toDate ? cmd.createdAt.toDate() : new Date(cmd.createdAt||0);
+    if(dt>=from && dt<=to) caMonth += Number(cmd.montant||cmd.total||0);
+  });
+
+  // Bénéfice brut estimé (depuis marges si calculées, sinon 70% du CA par défaut)
+  const savedCout  = JSON.parse(localStorage.getItem('omni_marges_cout')||'{}');
+  const hasCout    = Object.keys(savedCout).length > 0;
+  const margeMoy   = hasCout
+    ? (() => { const vals = Object.values(savedCout); return vals.reduce((s,v)=>s+v,0)/vals.length; })()
+    : 30;
+  const benefBrut  = caMonth * (1 - margeMoy/100);
+
+  const totalSalaires = agentsData.reduce((s,a)=>s+Number(a.salaire||0),0);
+  const restant       = benefBrut - totalSalaires;
+
+  // KPIs
+  const setT = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  setT('sal-kpi-ca',    fmt(caMonth));
+  setT('sal-kpi-ben',   fmt(benefBrut));
+  setT('sal-kpi-total', fmt(totalSalaires));
+  const netEl = document.getElementById('sal-kpi-net');
+  if(netEl){ netEl.textContent=fmt(restant); netEl.style.color=restant>=0?'#2E7D32':'#C62828'; }
+
+  renderAgentsTable(benefBrut, totalSalaires);
+  renderSalByRole(benefBrut);
+};
+
+function renderAgentsTable(benefBrut, totalSalaires){
+  const tbody = document.getElementById('sal-table-body');
+  if(!tbody) return;
+
+  if(!agentsData.length){
+    tbody.innerHTML = `<div class="empty-msg" style="padding:24px;text-align:center;color:var(--light);">
+      <div style="font-size:32px;margin-bottom:8px;">👥</div>
+      <div style="font-size:13px;font-weight:600;">Aucun agent ajouté</div>
+      <div style="font-size:11px;margin-top:4px;">Cliquez sur "＋ Ajouter un agent" pour commencer</div>
+    </div>`;
+    return;
+  }
+
+  const ROLE_COLORS = {
+    'Agent de livraison':'#1E6FBE','Agent de communication':'#7B1FA2',
+    'Chargé des opérations':'#F5820A','Statisticien':'#00796B',
+    'Comptable':'#2E7D32','Manager':'#C62828','Développeur':'#3949AB','Autre':'#757575'
+  };
+
+  tbody.innerHTML = agentsData.map(a=>{
+    const sal    = Number(a.salaire||0);
+    const pctBen = benefBrut>0 ? (sal/benefBrut*100) : 0;
+    const pctCA  = totalSalaires>0 ? (sal/totalSalaires*100) : 0;
+    const color  = ROLE_COLORS[a.role]||'#757575';
+    return `<div class="table-row" style="grid-template-columns:2fr 160px 140px 120px 120px 80px;font-size:12px;">
+      <div>
+        <div style="font-weight:700;">${a.nom}</div>
+        ${a.note?`<div style="font-size:10px;color:var(--light);">${a.note}</div>`:''}
+      </div>
+      <div><span style="background:${color}22;color:${color};border-radius:6px;padding:3px 10px;font-size:10px;font-weight:700;">${a.role}</span></div>
+      <div style="font-weight:800;color:#1E6FBE;">${fmt(sal)}</div>
+      <div>
+        <span style="font-weight:700;">${pctBen.toFixed(1)}%</span>
+        <div style="height:4px;background:#E8EAF0;border-radius:4px;margin-top:3px;overflow:hidden;">
+          <div style="height:100%;width:${Math.min(pctBen,100)}%;background:#1E6FBE;border-radius:4px;"></div>
+        </div>
+      </div>
+      <div>
+        <span style="font-weight:700;">${pctCA.toFixed(1)}%</span>
+        <div style="height:4px;background:#E8EAF0;border-radius:4px;margin-top:3px;overflow:hidden;">
+          <div style="height:100%;width:${Math.min(pctCA,100)}%;background:#2E7D32;border-radius:4px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="editAgent('${a.id}')" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:7px;padding:6px 10px;cursor:pointer;font-size:12px;">✏️</button>
+        <button onclick="deleteAgent('${a.id}')" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px;padding:6px 10px;cursor:pointer;font-size:12px;">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSalByRole(benefBrut){
+  const container = document.getElementById('sal-by-role');
+  if(!container) return;
+  const ROLE_COLORS = {
+    'Agent de livraison':'#1E6FBE','Agent de communication':'#7B1FA2',
+    'Chargé des opérations':'#F5820A','Statisticien':'#00796B',
+    'Comptable':'#2E7D32','Manager':'#C62828','Développeur':'#3949AB','Autre':'#757575'
+  };
+  const byRole = {};
+  agentsData.forEach(a=>{
+    if(!byRole[a.role]) byRole[a.role]={count:0,total:0};
+    byRole[a.role].count++;
+    byRole[a.role].total += Number(a.salaire||0);
+  });
+  if(!Object.keys(byRole).length){
+    container.innerHTML='<div style="color:var(--light);font-size:12px;padding:12px;">Aucun rôle défini</div>';
+    return;
+  }
+  container.innerHTML = Object.entries(byRole).map(([role,v])=>{
+    const color = ROLE_COLORS[role]||'#757575';
+    const pct   = benefBrut>0 ? (v.total/benefBrut*100) : 0;
+    return `<div style="background:#F4F6FA;border-radius:12px;padding:16px;border-left:4px solid ${color};">
+      <div style="font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">${role}</div>
+      <div style="font-size:18px;font-weight:900;color:var(--dark);">${fmt(v.total)}</div>
+      <div style="font-size:11px;color:var(--light);margin-top:2px;">${v.count} agent${v.count>1?'s':''} · ${pct.toFixed(1)}% du bénéfice</div>
+    </div>`;
+  }).join('');
+}
+
+// ── CRUD agents ──
+window.addAgent = function(){
+  document.getElementById('modal-agent-title').textContent = '👤 Ajouter un agent';
+  document.getElementById('ag-edit-id').value  = '';
+  document.getElementById('ag-nom').value      = '';
+  document.getElementById('ag-role').value     = 'Agent de livraison';
+  document.getElementById('ag-salaire').value  = '';
+  document.getElementById('ag-note').value     = '';
+  document.getElementById('modal-agent').style.display = 'flex';
+};
+
+window.editAgent = function(id){
+  const a = agentsData.find(x=>x.id===id);
+  if(!a) return;
+  document.getElementById('modal-agent-title').textContent = '✏️ Modifier l\'agent';
+  document.getElementById('ag-edit-id').value  = id;
+  document.getElementById('ag-nom').value      = a.nom;
+  document.getElementById('ag-role').value     = a.role;
+  document.getElementById('ag-salaire').value  = a.salaire;
+  document.getElementById('ag-note').value     = a.note||'';
+  document.getElementById('modal-agent').style.display = 'flex';
+};
+
+window.deleteAgent = function(id){
+  if(!confirm('Supprimer cet agent de la liste salariale ?')) return;
+  agentsData = agentsData.filter(a=>a.id!==id);
+  saveAgentsLocal();
+  loadAgentsSalaires();
+  toast('🗑 Agent supprimé','#C62828');
+};
+
+window.saveAgent = function(){
+  const id  = document.getElementById('ag-edit-id').value.trim();
+  const nom = document.getElementById('ag-nom').value.trim();
+  const role= document.getElementById('ag-role').value;
+  const sal = Number(document.getElementById('ag-salaire').value)||0;
+  const note= document.getElementById('ag-note').value.trim();
+  if(!nom){ toast('⚠️ Nom obligatoire','#F5820A'); return; }
+  if(id){
+    const idx = agentsData.findIndex(a=>a.id===id);
+    if(idx>=0) agentsData[idx] = {id,nom,role,salaire:sal,note};
+  } else {
+    agentsData.push({ id:'ag_'+Date.now(), nom, role, salaire:sal, note });
+  }
+  saveAgentsLocal();
+  closeAgentModal();
+  loadAgentsSalaires();
+  toast('✅ Agent enregistré','#2E7D32');
+};
+
+window.closeAgentModal = function(){
+  document.getElementById('modal-agent').style.display = 'none';
+};
+
+// ── Export Salaires XLSX ──
+window.exportSalairesXLSX = function(){
+  if(!agentsData.length){ toast('⚠️ Aucun agent à exporter','#F5820A'); return; }
+  let csv = 'Nom;Rôle;Salaire mensuel (FCFA);Note\n';
+  agentsData.forEach(a=>{
+    csv += [a.nom, a.role, a.salaire, a.note||''].join(';')+'\n';
+  });
+  const totalSal = agentsData.reduce((s,a)=>s+Number(a.salaire||0),0);
+  csv += `\nTOTAL MASSE SALARIALE;;${totalSal};\n`;
+
+  const byRole = {};
+  agentsData.forEach(a=>{
+    if(!byRole[a.role]) byRole[a.role]=0;
+    byRole[a.role] += Number(a.salaire||0);
+  });
+  csv += '\nRépartition par rôle\nRôle;Total (FCFA)\n';
+  Object.entries(byRole).forEach(([r,v])=>{ csv += r+';'+v+'\n'; });
+
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download='omniservice_salaires_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+  toast('✅ Export Salaires téléchargé !','#2E7D32');
+};
+
+// ── Export Salaires PDF ──
+window.exportSalairesPDF = function(){
+  if(!agentsData.length){ toast('⚠️ Aucun agent','#F5820A'); return; }
+  const totalSal  = agentsData.reduce((s,a)=>s+Number(a.salaire||0),0);
+  const savedCout = JSON.parse(localStorage.getItem('omni_marges_cout')||'{}');
+  const ROLE_COLORS = {'Agent de livraison':'#1E6FBE','Agent de communication':'#7B1FA2','Chargé des opérations':'#F5820A','Statisticien':'#00796B','Comptable':'#2E7D32','Manager':'#C62828','Développeur':'#3949AB','Autre':'#757575'};
+  const byRole = {};
+  agentsData.forEach(a=>{
+    if(!byRole[a.role]) byRole[a.role]=0;
+    byRole[a.role] += Number(a.salaire||0);
+  });
+  const rows = agentsData.map(a=>{
+    const color = ROLE_COLORS[a.role]||'#757575';
+    return `<tr><td>${a.nom}</td><td style="color:${color};font-weight:700">${a.role}</td>
+      <td style="font-weight:800;color:#1E6FBE">${fmt(Number(a.salaire||0))}</td><td style="color:#9999BB">${a.note||'—'}</td></tr>`;
+  }).join('');
+  const roleRows = Object.entries(byRole).map(([r,v])=>`<tr><td>${r}</td><td style="font-weight:700">${fmt(v)}</td></tr>`).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Masse Salariale OmniService TG</title>
+  <style>body{font-family:Arial,sans-serif;font-size:12px;margin:24px;}h1{color:#1A1A2E;font-size:18px;}h2{font-size:14px;color:#1A1A2E;margin:20px 0 8px;}
+  table{width:100%;border-collapse:collapse;margin-top:8px;}th{background:#1A1A2E;color:#fff;padding:8px 10px;text-align:left;font-size:11px;}
+  td{padding:7px 10px;border-bottom:1px solid #E8EAF0;}tr:nth-child(even){background:#F9F9F9;}
+  .total-row{font-weight:800;background:#E8F5E9 !important;font-size:13px;}
+  .footer{margin-top:24px;font-size:10px;color:#9999BB;}</style>
+  </head><body>
+  <h1>👥 Rapport Masse Salariale — OmniService TG</h1>
+  <p style="color:#9999BB;font-size:11px;">Généré le ${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p>
+  <h2>Liste des agents</h2>
+  <table><thead><tr><th>Nom</th><th>Rôle</th><th>Salaire mensuel</th><th>Note</th></tr></thead>
+  <tbody>${rows}<tr class="total-row"><td colspan="2">TOTAL MASSE SALARIALE</td><td>${fmt(totalSal)}</td><td></td></tr></tbody></table>
+  <h2>Répartition par rôle</h2>
+  <table><thead><tr><th>Rôle</th><th>Total versé</th></tr></thead><tbody>${roleRows}</tbody></table>
+  <div class="footer">OmniService TG — Document confidentiel</div></body></html>`;
+  const win = window.open('','_blank','width=900,height=700');
+  win.document.write(html); win.document.close(); win.print();
+};
+
+
+// CSS var helpers (pour renderPayQuick)
+const var_g='#2E7D32',var_blue='#1E6FBE';
+
+</script>
+</body>
+</html>
