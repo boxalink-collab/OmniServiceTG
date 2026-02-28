@@ -538,13 +538,6 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
       <div class="sb-sec">Communication</div>
       <button class="sb-item" onclick="showSection('partenaires',document.querySelector('.sb-item[onclick*=partenaires]'))"><span class="sb-ico">🎨</span>Bandeaux d'accueil</button>
       <button class="sb-item" onclick="showSection('notifications',this)"><span class="sb-ico">🔔</span>Notifications clients<span class="sb-badge" style="background:var(--purple)">ENVOI</span></button>
-      <div class="sb-sec">Interfaces Employés</div>
-      <button class="sb-item" onclick="showSection('emp-comptable',this)"><span class="sb-ico">💰</span>Comptabilité</button>
-      <button class="sb-item" onclick="showSection('emp-operations',this)"><span class="sb-ico">⚙️</span>Opérations</button>
-      <button class="sb-item" onclick="showSection('emp-rh',this)"><span class="sb-ico">👥</span>Ressources Humaines</button>
-      <button class="sb-item" onclick="showSection('emp-stats',this)"><span class="sb-ico">📈</span>Statisticien</button>
-      <div class="sb-sec">Gestion Accès</div>
-      <button class="sb-item" onclick="showSection('gestion-employes',this)"><span class="sb-ico">🔐</span>Gestion Employés<span class="sb-badge" style="background:var(--green)">NEW</span></button>
       <div class="sb-sec">Réglages</div>
       <button class="sb-item" onclick="showSection('settings',this)"><span class="sb-ico">⚙️</span>Paramètres</button>
       <button class="sb-item" onclick="showSection('password',this)"><span class="sb-ico">🔑</span>Mot de passe</button>
@@ -627,6 +620,7 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
           <div class="svc-tabs">
             <button class="svc-tab on" onclick="loadArticles('food',this)">🥘 Produits Locaux/Frais</button>
             <button class="svc-tab" onclick="loadArticles('clothes',this)">👗 Prêt-à-porter</button>
+            <button class="svc-tab" onclick="loadArticles('traiteur',this)">🍽️ Service Traiteur</button>
             <button class="svc-tab" onclick="loadArticles('omni_drink',this)">🍾 Omni Drink TG</button>
             <button class="svc-tab" onclick="loadArticles('avendre',this)">🏷️ À vendre</button>
             <button class="svc-tab" onclick="loadArticles('alouer',this)">🔑 À Louer</button>
@@ -898,174 +892,8 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
         </div>
       </div>
 
-      <!-- ══ INTERFACE COMPTABLE ══ -->
-      <div id="section-emp-comptable" style="display:none">
-        <div class="pg-title">💰 Interface Comptable</div>
-        <div class="pg-sub">Accès direct à l'interface de comptabilité — même vue que le comptable</div>
-        <div style="background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1.5px solid rgba(46,125,50,.2);display:flex;align-items:center;gap:12px">
-          <span style="font-size:22px">💡</span>
-          <div style="font-size:12px;color:#1B5E20;line-height:1.6">Vous naviguez en tant qu'<b>Administrateur</b>. Toutes les fonctionnalités de comptabilité sont disponibles ci-dessous.</div>
-        </div>
-        <div style="border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);background:#fff">
-          <iframe id="iframe-comptable" src="comptable/index.html" style="width:100%;height:85vh;border:none;display:block" loading="lazy"></iframe>
-        </div>
-      </div>
-
-      <!-- ══ INTERFACE OPÉRATIONS ══ -->
-      <div id="section-emp-operations" style="display:none">
-        <div class="pg-title">⚙️ Interface Opérations</div>
-        <div class="pg-sub">Accès direct à l'interface du Chargé des Opérations</div>
-        <div style="background:linear-gradient(135deg,#FBE9E7,#FFF3E0);border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1.5px solid rgba(230,81,0,.2);display:flex;align-items:center;gap:12px">
-          <span style="font-size:22px">💡</span>
-          <div style="font-size:12px;color:#BF360C;line-height:1.6">Vous naviguez en tant qu'<b>Administrateur</b>. Toutes les fonctionnalités opérations sont disponibles ci-dessous.</div>
-        </div>
-        <div style="border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);background:#fff">
-          <iframe id="iframe-operations" src="operations/index.html" style="width:100%;height:85vh;border:none;display:block" loading="lazy"></iframe>
-        </div>
-      </div>
-
-      <!-- ══ INTERFACE RH ══ -->
-      <div id="section-emp-rh" style="display:none">
-        <div class="pg-title">👥 Ressources Humaines</div>
-        <div class="pg-sub">Accès direct à l'interface RH — gestion complète des agents</div>
-        <div style="background:linear-gradient(135deg,#EDE7F6,#F3E5F5);border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1.5px solid rgba(123,31,162,.2);display:flex;align-items:center;gap:12px">
-          <span style="font-size:22px">💡</span>
-          <div style="font-size:12px;color:#4A148C;line-height:1.6">Vous naviguez en tant qu'<b>Administrateur</b>. Toutes les fonctionnalités RH sont disponibles ci-dessous.</div>
-        </div>
-        <div style="border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);background:#fff">
-          <iframe id="iframe-rh" src="rh/index.html" style="width:100%;height:85vh;border:none;display:block" loading="lazy"></iframe>
-        </div>
-      </div>
-
-      <!-- ══ INTERFACE STATISTICIEN ══ -->
-      <div id="section-emp-stats" style="display:none">
-        <div class="pg-title">📈 Interface Statisticien</div>
-        <div class="pg-sub">Accès direct à l'interface de statistiques avancées</div>
-        <div style="background:linear-gradient(135deg,#E3F2FD,#E8EAF6);border-radius:14px;padding:14px 18px;margin-bottom:16px;border:1.5px solid rgba(21,101,192,.2);display:flex;align-items:center;gap:12px">
-          <span style="font-size:22px">💡</span>
-          <div style="font-size:12px;color:#0D47A1;line-height:1.6">Vous naviguez en tant qu'<b>Administrateur</b>. Toutes les fonctionnalités statistiques sont disponibles ci-dessous.</div>
-        </div>
-        <div style="border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);background:#fff">
-          <iframe id="iframe-statisticien" src="stats/index.html" style="width:100%;height:85vh;border:none;display:block" loading="lazy"></iframe>
-        </div>
-      </div>
-
-      <!-- ══ GESTION EMPLOYÉS ══ -->
-      <div id="section-gestion-employes" style="display:none">
-        <div class="pg-title">🔐 Gestion des Employés</div>
-        <div class="pg-sub">Créez les comptes d'accès des employés — email + mot de passe pour chaque poste</div>
-
-        <!-- Formulaire création compte -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-
-          <!-- Créer un compte -->
-          <div class="settings-card" style="max-width:100%">
-            <div class="settings-title" style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:18px">➕</span> Créer un compte employé
-            </div>
-
-            <div style="background:linear-gradient(135deg,#E3F2FD,#EDE7F6);border-radius:11px;padding:12px 14px;margin-bottom:18px;font-size:11px;color:#1A237E;line-height:1.8;border:1px solid rgba(30,111,190,.2)">
-              🔑 <b>Postes disponibles :</b><br/>
-              💰 Comptable · ⚙️ Chargé des Opérations<br/>
-              👥 RH Manager · 📊 Statisticien
-            </div>
-
-            <label class="f-label">Poste / Rôle *</label>
-            <select class="f-sel" id="emp-role" onchange="updateEmpEmailPreview()">
-              <option value="">— Sélectionner un poste —</option>
-              <option value="comptable">💰 Comptable</option>
-              <option value="ops">⚙️ Chargé des Opérations</option>
-              <option value="rh">👥 RH Manager</option>
-              <option value="statisticien">📊 Statisticien</option>
-            </select>
-
-            <label class="f-label">Nom complet *</label>
-            <input type="text" class="f-inp" id="emp-nom" placeholder="Ex : Marie Kokou"/>
-
-            <label class="f-label">Email professionnel *</label>
-            <input type="email" class="f-inp" id="emp-email" placeholder="marie@omniservicetg.com"/>
-            <div id="emp-email-hint" style="font-size:11px;color:var(--light);margin-top:-9px;margin-bottom:12px;padding-left:2px"></div>
-
-            <label class="f-label">Mot de passe initial *</label>
-            <div style="position:relative;margin-bottom:13px">
-              <input type="password" class="f-inp" id="emp-pass" placeholder="Min. 8 caractères" style="margin-bottom:0;padding-right:48px"/>
-              <button onclick="togglePassVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;color:var(--mid)" title="Afficher/Masquer">👁</button>
-            </div>
-
-            <div style="background:var(--bg);border-radius:11px;padding:14px;margin-bottom:18px">
-              <div style="font-size:10px;font-weight:800;color:var(--light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🔑 Générateur de mot de passe sécurisé</div>
-              <div style="display:flex;gap:8px;align-items:center">
-                <div id="gen-pass-display" style="flex:1;font-family:monospace;font-size:14px;font-weight:700;color:var(--dark);background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;letter-spacing:2px;word-break:break-all">—</div>
-                <button onclick="generatePassword()" style="background:var(--blue);color:#fff;border:none;border-radius:9px;padding:10px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap">🎲 Générer</button>
-                <button onclick="copyGenPass()" id="copy-pass-btn" style="background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" title="Copier">📋</button>
-              </div>
-              <button onclick="useGenPass()" style="width:100%;margin-top:8px;background:transparent;border:1.5px dashed var(--blue);border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;color:var(--blue);font-family:'Poppins',sans-serif">↑ Utiliser ce mot de passe</button>
-            </div>
-
-            <button class="modal-save-btn" id="emp-create-btn" onclick="createEmployeeAccount()" style="background:linear-gradient(135deg,var(--green),#1B5E20)">
-              ✅ Créer le compte
-            </button>
-            <div id="emp-create-msg" style="margin-top:12px;font-size:12px;font-weight:600;min-height:18px;text-align:center"></div>
-          </div>
-
-          <!-- Comptes existants + infos -->
-          <div>
-            <!-- Comptes existants en Firestore -->
-            <div class="settings-card" style="max-width:100%;margin-bottom:0">
-              <div class="settings-title" style="display:flex;align-items:center;justify-content:space-between">
-                <span>👤 Comptes employés Firebase</span>
-                <button onclick="loadEmpAccounts()" style="background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;color:var(--mid);font-family:'Poppins',sans-serif">🔄</button>
-              </div>
-              <div id="emp-accounts-list">
-                <div style="text-align:center;padding:30px;color:var(--light)"><div class="spinner"></div></div>
-              </div>
-            </div>
-
-            <!-- Interfaces associées -->
-            <div class="settings-card" style="max-width:100%;margin-top:16px">
-              <div class="settings-title">📌 Emails & Interfaces</div>
-              <div style="font-size:12px;color:var(--mid);line-height:2.2">
-                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
-                  <span>💰 <b>Comptable</b></span>
-                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px">comptable@omniservicetg.com</span>
-                </div>
-                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
-                  <span>⚙️ <b>Opérations</b></span>
-                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px">ops@omniservicetg.com</span>
-                </div>
-                <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
-                  <span>👥 <b>RH Manager</b></span>
-                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px">rh@omniservicetg.com</span>
-                </div>
-                <div style="display:flex;justify-content:space-between">
-                  <span>📊 <b>Statisticien</b></span>
-                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px">stats@omniservicetg.com</span>
-                </div>
-              </div>
-              <div style="margin-top:14px;padding:12px;background:#FFF8E1;border-radius:10px;font-size:11px;color:#E65100;line-height:1.7;border:1px solid rgba(245,130,10,.2)">
-                ⚠️ <b>Important :</b> Les emails ci-dessus sont les valeurs par défaut attendues par chaque interface. Pour personnaliser, modifiez la constante <code style="background:rgba(0,0,0,.08);padding:1px 5px;border-radius:4px">XXX_EMAIL</code> dans chaque fichier HTML correspondant.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </main>
-</div>
-
-<!-- Modal succès création employé -->
-<div class="modal-overlay" id="emp-success-modal" onclick="if(event.target===this)this.classList.remove('show')">
-  <div class="modal" style="max-width:440px;text-align:center">
-    <button class="modal-close" onclick="document.getElementById('emp-success-modal').classList.remove('show')">✕</button>
-    <div style="font-size:52px;margin-bottom:12px">🎉</div>
-    <div class="modal-title" style="text-align:center">Compte créé !</div>
-    <div id="emp-success-info" style="background:var(--bg);border-radius:12px;padding:16px;text-align:left;font-size:12px;line-height:2;margin-bottom:18px"></div>
-    <div style="background:#FFF8E1;border-radius:10px;padding:12px;font-size:11px;color:#E65100;margin-bottom:16px;text-align:left">
-      ⚠️ <b>Notez ce mot de passe</b> — il ne sera plus visible une fois cette fenêtre fermée.
-    </div>
-    <button onclick="document.getElementById('emp-success-modal').classList.remove('show')" class="modal-save-btn">Fermer</button>
-  </div>
 </div>
 
 <!-- Modal Détail commande -->
@@ -1527,15 +1355,14 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
 
 <!-- ════ FIREBASE ════ -->
 <script type="module">
-import { initializeApp, initializeApp as initApp2 }            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp }            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, getDocs, doc,
          addDoc, updateDoc, deleteDoc, setDoc, orderBy,
          query, where, serverTimestamp, onSnapshot }
                                     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut,
          onAuthStateChanged, updatePassword,
-         EmailAuthProvider, reauthenticateWithCredential,
-         createUserWithEmailAndPassword, getAuth as getAuthFn }
+         EmailAuthProvider, reauthenticateWithCredential }
                                     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 // ── Config Firebase ──
@@ -2024,37 +1851,6 @@ const DEFAULT_ARTICLES={
     {id:'c4',name:'Sac en cuir',          desc:'Fabriqué localement',           price:15000, unit:'pièce', emoji:'👜'},
     {id:'c5',name:'Sandales tressées',    desc:'Artisanat togolais',            price:7500,  unit:'paire', emoji:'👡'},
     {id:'c6',name:'Kit cosmétiques',      desc:'Savon karité + huile de palme', price:4500,  unit:'kit',   emoji:'✨'},
-  ],
-  omni_drink:[
-    {id:'od1',name:'Eau minérale (casier 24×50cl)',   desc:'Eau minérale pure, 24 bouteilles',                     price:3500,  unit:'casier',   emoji:'💧'},
-    {id:'od2',name:'Jus de fruits naturels (1L)',     desc:'Orange, ananas, bissap — sans conservateurs',          price:1500,  unit:'bouteille',emoji:'🍊'},
-    {id:'od3',name:'Sodas assortis (casier 24)',      desc:'Coca-Cola, Fanta, Sprite...',                          price:9000,  unit:'casier',   emoji:'🥤'},
-    {id:'od4',name:'Bières locales (casier 24)',      desc:'Awooyo, Castel, Flag...',                              price:14000, unit:'casier',   emoji:'🍺'},
-    {id:'od5',name:'Vin de palme (5L)',               desc:'Artisanal frais, production locale',                   price:4000,  unit:'bidon',    emoji:'🌴'},
-    {id:'od6',name:'Pack événement boissons',         desc:'Assortiment complet pour 50 personnes',                price:45000, unit:'pack',     emoji:'🎉'},
-  ],
-  avendre:[
-    {id:'av1',name:'Recherche personnalisée',   desc:'Recherche du bien correspondant à vos critères de vente/achat', price:0, unit:'service',  emoji:'🔍'},
-    {id:'av2',name:'Vérification administrative',desc:'Contrôle des documents, titres fonciers et conformité légale',  price:0, unit:'contrôle', emoji:'📋'},
-    {id:'av3',name:'Accompagnement juridique',  desc:'Assistance d\'un conseiller juridique pour sécuriser la transaction', price:0, unit:'assistance',emoji:'⚖️'},
-    {id:'av4',name:'Négociation encadrée',      desc:'Mediation et négociation professionnelle entre acheteur et vendeur', price:0, unit:'service',  emoji:'🤝'},
-    {id:'av5',name:'Sécurisation transaction',  desc:'Protocole sécurisé pour garantir le bon déroulement de la vente',  price:0, unit:'garantie', emoji:'🔒'},
-  ],
-  alouer:[
-    {id:'al1',name:'Appartements',             desc:'Recherche et mise en location d\'appartements vérifiés',        price:0, unit:'recherche', emoji:'🏢'},
-    {id:'al2',name:'Villas',                   desc:'Villas et maisons individuelles disponibles à la location',     price:0, unit:'recherche', emoji:'🏡'},
-    {id:'al3',name:'Bureaux',                  desc:'Espaces de travail et bureaux professionnels à louer',         price:0, unit:'recherche', emoji:'💼'},
-    {id:'al4',name:'Espaces commerciaux',      desc:'Boutiques, magasins, locaux commerciaux disponibles',          price:0, unit:'recherche', emoji:'🏪'},
-    {id:'al5',name:'Entrepôts',                desc:'Espaces de stockage et entrepôts à louer',                     price:0, unit:'recherche', emoji:'🏭'},
-    {id:'al6',name:'Biens vérifiés et sécurisés',desc:'Tous nos biens font l\'objet d\'une vérification rigoureuse',price:0, unit:'garantie', emoji:'✅'},
-  ],
-  marketplace:[
-    {id:'mk1',name:'Articles ménagers',               desc:'Ustensiles, casseroles, vaisselle, petits électroménagers',price:5000, unit:'article',emoji:'🏠'},
-    {id:'mk2',name:'Fournitures de bureau',           desc:'Rames papier, stylos, classeurs, cartouches imprimante', price:2500, unit:'lot',    emoji:'✏️'},
-    {id:'mk3',name:'Produits hygiène & beauté',       desc:'Savons, shampooings, crèmes, parfums, soins du corps',   price:3000, unit:'lot',    emoji:'🧴'},
-    {id:'mk4',name:'Électronique & Accessoires',      desc:'Câbles USB, chargeurs, batteries, accessoires téléphone',price:4500, unit:'pièce',  emoji:'📱'},
-    {id:'mk5',name:'Jouets & Articles enfants',       desc:'Jouets éducatifs, fournitures scolaires, articles bébé', price:6000, unit:'article',emoji:'🧸'},
-    {id:'mk6',name:'Article personnalisé',            desc:'Dites-nous ce que vous cherchez, on le trouve pour vous !',price:0,  unit:'sur devis',emoji:'🛒'},
   ]
 };
 
@@ -2064,7 +1860,7 @@ let articlesCache=[];
 window.loadArticles=async function(svc,btn){
   currentArtSvc=svc;
   if(btn){document.querySelectorAll(".svc-tab").forEach(b=>b.classList.remove("on"));btn.classList.add("on");}
-  const titles={'food':'Produits Locaux/Frais','restaurant':'Restauration','clothes':'Prêt-à-porter','omni_drink':'Omni Drink TG','avendre':'À Vendre — Immobilier','alouer':'À Louer — Immobilier','marketplace':'Marketplace','mathivick':'Mathivick','omega_conseil':'Omega Conseils'};
+  const titles={'food':'Produits Locaux/Frais','restaurant':'Restauration','clothes':'Prêt-à-porter','mathivick':'Mathivick','omega_conseil':'Omega Conseils'};
   document.getElementById("art-panel-title").textContent=titles[svc]||svc;
   document.getElementById("articles-table").innerHTML=`<div style="text-align:center;padding:30px;color:var(--light)"><div class="spinner"></div></div>`;
   try{
@@ -3337,8 +3133,7 @@ window.deleteKitArticle = async function(i) {
 
 // ════ SECTIONS ════
 window.showSection=function(id,btn){
-  ['orders','stats','articles','restaurants','kits','partenaires','mathivick','omega','bandeaux','notifications','settings','password',
-   'emp-comptable','emp-operations','emp-rh','emp-stats','gestion-employes'].forEach(s=>{
+  ['orders','stats','articles','restaurants','kits','partenaires','mathivick','omega','bandeaux','notifications','settings','password'].forEach(s=>{
     const el=document.getElementById("section-"+s); if(el)el.style.display=s===id?'block':'none';
   });
   document.querySelectorAll(".sb-item").forEach(b=>b.classList.remove("on"));
@@ -3350,7 +3145,6 @@ window.showSection=function(id,btn){
   if(id==='omega'){loadPacks('omega_conseil');}
   if(id==='bandeaux'||id==='partenaires'){loadPartners();}
   if(id==='notifications'){loadNotifHistory();}
-  if(id==='gestion-employes'){loadEmpAccounts();}
   if(window.innerWidth<769)document.getElementById("sidebar").classList.remove("open");
 };
 
@@ -3893,21 +3687,6 @@ window.deletePack = async function(svc, id) {
 // ════════════════════════════════════════
 
 const DEFAULT_BANDEAUX = [
-  { id:'delivery', emoji:'🚀', badge:'⚡ Express', promo:'LIVRAISON RAPIDE',
-    titre1:'Courses livrées', titre2:'à domicile', sub:'Partout à Lomé', cta:'Commander →',
-    bg:'linear-gradient(135deg,#1E6FBE 0%,#0d3d6e 100%)', label:'Livraison Express' },
-  { id:'restaurant', emoji:'🍽️', badge:'🍴 Restauration', promo:'PLATS & TRAITEUR',
-    titre1:'Restaurants', titre2:'partenaires', sub:'Livraison & événements', cta:'Découvrir →',
-    bg:'linear-gradient(135deg,#F5820A 0%,#8B3A00 100%)', label:'Restaurants' },
-  { id:'food', emoji:'🥘', badge:'🌿 Produits frais', promo:'MARCHÉ LOCAL',
-    titre1:'Tilapia, volailles', titre2:'& légumes', sub:'Qualité locale garantie', cta:'Commander →',
-    bg:'linear-gradient(135deg,#1a7a35 0%,#0a3d18 100%)', label:'Produits Locaux/Frais' },
-  { id:'cleaning', emoji:'✨', badge:'🧹 Nettoyage', promo:'MAISON PROPRE',
-    titre1:'Nettoyage', titre2:'professionnel', sub:'Résidentiel & bureaux', cta:'Réserver →',
-    bg:'linear-gradient(135deg,#7B1FA2 0%,#3a0a5e 100%)', label:'Nettoyage' },
-  { id:'clothes', emoji:'👗', badge:'👗 Mode', promo:'TENDANCE TOGO',
-    titre1:'Mode wax', titre2:'& accessoires', sub:'Livré chez vous', cta:'Voir →',
-    bg:'linear-gradient(135deg,#C2185B 0%,#5c0a28 100%)', label:'Prêt-à-porter' },
   { id:'kits', emoji:'🎁', badge:'📦 Kits', promo:'OFFRES GROUPÉES',
     titre1:'Kits & PACKS', titre2:'prêts à commander', sub:'Repas, Mode, Événement...', cta:'Découvrir →',
     bg:'linear-gradient(135deg,#2E7D32 0%,#1b5e20 100%)', label:'Kits & PACKS' }
@@ -4178,7 +3957,6 @@ window.loadNotifHistory = async function() {
   }
 };
 
-
 window.deleteNotif = async function(id) {
   if (!confirm('Supprimer cette notification de l\'historique ?')) return;
   try {
@@ -4187,247 +3965,6 @@ window.deleteNotif = async function(id) {
     loadNotifHistory();
   } catch(e) { toast('❌ Erreur : '+e.message, '#C62828'); }
 };
-
-// ════════════════════════════════════════
-// GESTION EMPLOYÉS — CRÉATION DE COMPTES
-// ════════════════════════════════════════
-
-// Secondary Firebase App for creating users without logging out the admin
-// Note: initApp2 est déjà importé en tête du module (alias de initializeApp) — pas de re-import
-
-const firebaseConfig2 = {
-  apiKey: "AIzaSyDtDK7-iDRy1E-kjZubjyjkPW7Th33BMyU",
-  authDomain: "omniservicetg-59df3.firebaseapp.com",
-  projectId: "omniservicetg-59df3",
-  storageBucket: "omniservicetg-59df3.firebasestorage.app",
-  messagingSenderId: "196278567761",
-  appId: "1:196278567761:web:4f6416acaab58b67bf4970"
-};
-
-let fbApp2 = null;
-let auth2  = null;
-
-function getSecondaryAuth() {
-  if (!auth2) {
-    try {
-      fbApp2 = initApp2(firebaseConfig2, 'secondary-emp');
-      auth2  = getAuthFn(fbApp2);
-    } catch(e) {
-      // App name already in use, reuse it
-      fbApp2 = initApp2(firebaseConfig2, 'secondary-emp-' + Date.now());
-      auth2  = getAuthFn(fbApp2);
-    }
-  }
-  return auth2;
-}
-
-const EMP_ROLES = {
-  comptable: { label: '💰 Comptable', defaultEmail: 'comptable@omniservicetg.com', color: '#2E7D32' },
-  ops:       { label: '⚙️ Opérations', defaultEmail: 'ops@omniservicetg.com',       color: '#E65100' },
-  rh:        { label: '👥 RH Manager',  defaultEmail: 'rh@omniservicetg.com',        color: '#7B1FA2' },
-  statisticien: { label: '📊 Statisticien', defaultEmail: 'stats@omniservicetg.com', color: '#1565C0' }
-};
-
-window.updateEmpEmailPreview = function() {
-  const role = document.getElementById('emp-role').value;
-  const hint = document.getElementById('emp-email-hint');
-  if (role && EMP_ROLES[role]) {
-    hint.innerHTML = `📧 Email suggéré : <b style="color:var(--blue)">${EMP_ROLES[role].defaultEmail}</b>`;
-    if (!document.getElementById('emp-email').value) {
-      document.getElementById('emp-email').value = EMP_ROLES[role].defaultEmail;
-    }
-  } else {
-    hint.textContent = '';
-  }
-};
-
-let _genPassword = '';
-
-window.generatePassword = function() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
-  let p = '';
-  for (let i = 0; i < 12; i++) p += chars[Math.floor(Math.random() * chars.length)];
-  _genPassword = p;
-  document.getElementById('gen-pass-display').textContent = p;
-};
-
-window.copyGenPass = function() {
-  if (!_genPassword) { toast('⚠️ Générez d\'abord un mot de passe', '#E65100'); return; }
-  navigator.clipboard.writeText(_genPassword)
-    .then(() => toast('📋 Mot de passe copié !', '#2E7D32'))
-    .catch(() => toast('Copiez : ' + _genPassword, '#E65100'));
-};
-
-window.useGenPass = function() {
-  if (!_genPassword) { toast('⚠️ Générez d\'abord un mot de passe', '#E65100'); return; }
-  document.getElementById('emp-pass').value = _genPassword;
-  const inp = document.getElementById('emp-pass');
-  inp.type = 'text';
-  setTimeout(() => inp.type = 'password', 2000);
-  toast('✅ Mot de passe appliqué', '#2E7D32');
-};
-
-window.togglePassVis = function() {
-  const inp = document.getElementById('emp-pass');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-};
-
-window.createEmployeeAccount = async function() {
-  const role  = document.getElementById('emp-role').value;
-  const nom   = document.getElementById('emp-nom').value.trim();
-  const email = document.getElementById('emp-email').value.trim();
-  const pass  = document.getElementById('emp-pass').value;
-  const msg   = document.getElementById('emp-create-msg');
-  const btn   = document.getElementById('emp-create-btn');
-
-  msg.textContent = '';
-  if (!role)  { msg.style.color='var(--red)'; msg.textContent='⚠️ Sélectionnez un poste.'; return; }
-  if (!nom)   { msg.style.color='var(--red)'; msg.textContent='⚠️ Nom obligatoire.'; return; }
-  if (!email) { msg.style.color='var(--red)'; msg.textContent='⚠️ Email obligatoire.'; return; }
-  if (pass.length < 8) { msg.style.color='var(--red)'; msg.textContent='⚠️ Mot de passe : min. 8 caractères.'; return; }
-
-  btn.disabled = true;
-  btn.textContent = '⏳ Création du compte...';
-
-  try {
-    // Créer le compte Firebase Auth via une instance secondaire
-    const sAuth = getSecondaryAuth();
-    let newUid = null;
-    let createError = null;
-
-    try {
-      const cred = await createUserWithEmailAndPassword(sAuth, email, pass);
-      newUid = cred.user.uid;
-      // Déconnexion de l'instance secondaire pour ne pas perturber l'admin
-      await sAuth.signOut();
-    } catch(authErr) {
-      createError = authErr;
-    }
-
-    if (createError) {
-      const authMsgs = {
-        'auth/email-already-in-use': '❌ Cet email est déjà utilisé.',
-        'auth/invalid-email': '❌ Email invalide.',
-        'auth/weak-password': '❌ Mot de passe trop faible (min. 6 caractères).',
-        'auth/operation-not-allowed': '❌ Création de comptes désactivée dans Firebase.',
-      };
-      throw new Error(authMsgs[createError.code] || ('❌ ' + createError.message));
-    }
-
-    // Enregistrer dans Firestore collection 'employes'
-    await setDoc(doc(db, 'employes', newUid || email), {
-      uid:       newUid,
-      nom,
-      email,
-      role,
-      roleLabel: EMP_ROLES[role]?.label || role,
-      actif:     true,
-      createdAt: serverTimestamp(),
-      createdBy: auth.currentUser?.email || 'admin'
-    });
-
-    // Afficher la modale de succès
-    const roleInfo = EMP_ROLES[role];
-    document.getElementById('emp-success-info').innerHTML = `
-      <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--light);font-weight:600">Poste</span>
-        <span style="font-weight:700">${roleInfo?.label || role}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--light);font-weight:600">Nom</span>
-        <span style="font-weight:700">${nom}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
-        <span style="color:var(--light);font-weight:600">Email</span>
-        <span style="font-weight:700;font-family:monospace;font-size:11px">${email}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;padding:7px 0">
-        <span style="color:var(--light);font-weight:600">Mot de passe</span>
-        <span style="font-weight:900;font-family:monospace;font-size:14px;color:var(--red);letter-spacing:1px">${pass}</span>
-      </div>`;
-    document.getElementById('emp-success-modal').classList.add('show');
-
-    // Reset form
-    document.getElementById('emp-role').value  = '';
-    document.getElementById('emp-nom').value   = '';
-    document.getElementById('emp-email').value = '';
-    document.getElementById('emp-pass').value  = '';
-    document.getElementById('emp-email-hint').textContent = '';
-    document.getElementById('gen-pass-display').textContent = '—';
-    _genPassword = '';
-
-    toast('✅ Compte créé avec succès !', '#2E7D32');
-    loadEmpAccounts();
-
-  } catch(e) {
-    msg.style.color = 'var(--red)';
-    msg.textContent = e.message || '❌ Erreur lors de la création.';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '✅ Créer le compte';
-  }
-};
-
-window.loadEmpAccounts = async function() {
-  const container = document.getElementById('emp-accounts-list');
-  if (!container) return;
-  container.innerHTML = `<div style="text-align:center;padding:24px"><div class="spinner"></div></div>`;
-  try {
-    const snap = await getDocs(collection(db, 'employes'));
-    const emps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    if (!emps.length) {
-      container.innerHTML = `<div style="text-align:center;padding:24px;color:var(--light);font-size:12px">Aucun compte employé enregistré.<br/>Créez le premier compte avec le formulaire.</div>`;
-      return;
-    }
-
-    container.innerHTML = emps.map(e => {
-      const roleInfo = EMP_ROLES[e.role] || { label: e.role, color: '#1A1A2E' };
-      const dateStr = e.createdAt ? new Date(e.createdAt.seconds * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-      return `
-      <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)">
-        <div style="width:38px;height:38px;border-radius:10px;background:${roleInfo.color}20;border:1.5px solid ${roleInfo.color}40;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${roleInfo.label.split(' ')[0]}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:700;color:var(--dark)">${e.nom || '—'}</div>
-          <div style="font-size:11px;color:var(--mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.email || '—'}</div>
-          <div style="display:flex;gap:6px;margin-top:3px;align-items:center;flex-wrap:wrap">
-            <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;background:${roleInfo.color}18;color:${roleInfo.color}">${roleInfo.label}</span>
-            <span style="font-size:9px;color:var(--light)">📅 ${dateStr}</span>
-            ${e.actif === false ? '<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFEBEE;color:#C62828">Désactivé</span>' : '<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F5E9;color:#2E7D32">Actif</span>'}
-          </div>
-        </div>
-        <div style="display:flex;gap:5px">
-          <button onclick="toggleEmpAccount('${e.id}',${e.actif !== false})" style="background:${e.actif !== false ? '#FFF3E0' : '#E8F5E9'};color:${e.actif !== false ? '#E65100' : '#2E7D32'};border:none;border-radius:7px;padding:5px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif">${e.actif !== false ? 'Désactiver' : 'Activer'}</button>
-          <button onclick="deleteEmpAccount('${e.id}','${e.nom || ''}')" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px;padding:5px 8px;font-size:12px;cursor:pointer">🗑</button>
-        </div>
-      </div>`;
-    }).join('');
-
-  } catch(e) {
-    container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--red);font-size:12px">❌ Erreur : ${e.message}</div>`;
-  }
-};
-
-window.toggleEmpAccount = async function(id, isActif) {
-  if (!confirm(isActif ? 'Désactiver ce compte ?' : 'Réactiver ce compte ?')) return;
-  try {
-    await updateDoc(doc(db, 'employes', id), { actif: !isActif, updatedAt: serverTimestamp() });
-    toast(isActif ? '❌ Compte désactivé' : '✅ Compte réactivé', isActif ? '#C62828' : '#2E7D32');
-    loadEmpAccounts();
-  } catch(e) { toast('❌ Erreur : ' + e.message, '#C62828'); }
-};
-
-window.deleteEmpAccount = async function(id, nom) {
-  if (!confirm(`Supprimer le compte de "${nom}" ?\n⚠️ Cela supprime l'enregistrement Firestore. Le compte Firebase Auth reste actif — supprimez-le manuellement si nécessaire.`)) return;
-  try {
-    await deleteDoc(doc(db, 'employes', id));
-    toast('🗑 Enregistrement supprimé', '#C62828');
-    loadEmpAccounts();
-  } catch(e) { toast('❌ Erreur : ' + e.message, '#C62828'); }
-};
-
-// Initialiser un mot de passe généré au chargement
-window.generatePassword();
 
 </script>
 </body>
