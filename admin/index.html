@@ -328,45 +328,39 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
 .partner-desc{font-size:11px;color:var(--light);margin-bottom:8px}
 .partner-actions{display:flex;gap:7px}
 /* ── PREVIEW ADCARD (aperçu fidèle au style client) ── */
-/* ── Aperçu bandeau — fidèle au rendu client (image plein fond) ── */
 .prev-adcard{
-  position:relative;
-  height:190px;border-radius:18px;overflow:hidden;
-  box-shadow:0 6px 24px rgba(0,0,0,.22);
+  display:flex;align-items:stretch;
+  height:160px;border-radius:20px;overflow:hidden;
+  box-shadow:0 6px 24px rgba(0,0,0,.18);
   margin-bottom:4px;
+}
+.prev-adcard-img{
+  width:45%;flex-shrink:0;position:relative;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:linear-gradient(135deg,#1E6FBE,#0d3d6e);
   transition:background .3s;
 }
-.prev-adcard-img{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;overflow:hidden;
-}
 .prev-adcard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
-.prev-adcard-gradient{
-  position:absolute;inset:0;z-index:1;
-  background:linear-gradient(to bottom,rgba(0,0,0,.04) 0%,rgba(0,0,0,.28) 50%,rgba(0,0,0,.72) 100%);
-}
-.prev-adcard-emoji{font-size:110px;opacity:.18;position:absolute;right:-10px;top:50%;transform:translateY(-50%);z-index:0;user-select:none}
+.prev-adcard-gradient{position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,rgba(0,0,0,.35) 100%);z-index:1}
+.prev-adcard-emoji{font-size:62px;opacity:.55;position:relative;z-index:0;user-select:none}
 .prev-adcard-badge{
-  position:absolute;top:12px;left:12px;z-index:10;
+  position:absolute;top:10px;left:10px;z-index:10;
   background:rgba(255,255,255,.92);color:var(--blue);
-  font-size:9px;font-weight:800;padding:4px 11px;border-radius:999px;
-  box-shadow:0 2px 8px rgba(0,0,0,.18);letter-spacing:.2px;
-  max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:9px;font-weight:800;padding:4px 10px;border-radius:999px;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);letter-spacing:.2px;
+  max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .prev-adcard-body{
-  position:absolute;bottom:0;left:0;right:0;z-index:5;
-  padding:10px 14px 14px;
-  display:flex;flex-direction:column;gap:2px;
+  flex:1;background:#fff;padding:14px 14px 14px 12px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
 }
-.prev-adcard-promo{font-size:8px;font-weight:800;letter-spacing:1.2px;color:rgba(255,255,255,.7);text-transform:uppercase}
-.prev-adcard-title{font-family:'Nunito',sans-serif;font-size:17px;font-weight:900;color:#fff;line-height:1.2;text-shadow:0 1px 4px rgba(0,0,0,.4)}
-.prev-adcard-sub{font-size:11px;color:rgba(255,255,255,.82);line-height:1.35}
+.prev-adcard-promo{font-size:8.5px;font-weight:800;letter-spacing:1.2px;color:var(--ora);text-transform:uppercase}
+.prev-adcard-title{font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;color:var(--dark);line-height:1.25}
+.prev-adcard-sub{font-size:10.5px;color:var(--light);margin-top:1px;line-height:1.4}
 .prev-adcard-cta{
-  margin-top:7px;display:none;align-items:center;align-self:flex-start;
-  background:#F5820A;color:#fff;border-radius:999px;
-  padding:6px 16px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;
-  box-shadow:0 2px 8px rgba(245,130,10,.4);
+  margin-top:8px;display:none;align-items:center;align-self:flex-start;
+  background:var(--blue);color:#fff;border-radius:999px;
+  padding:6px 14px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;
 }
 .prev-adcard-cta.show{display:inline-flex}
 /* ── MODAL ── */
@@ -634,8 +628,8 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
             <button class="svc-tab on" onclick="loadArticles('food',this)">🥘 Produits Locaux/Frais</button>
             <button class="svc-tab" onclick="loadArticles('clothes',this)">👗 Prêt-à-porter</button>
             <button class="svc-tab" onclick="loadArticles('omni_drink',this)">🍾 Omni Drink TG</button>
-            <button class="svc-tab" onclick="loadImmoArticles('avendre',this)">🏡 À Vendre</button>
-            <button class="svc-tab" onclick="loadImmoArticles('alouer',this)">🔑 À Louer</button>
+            <button class="svc-tab" onclick="loadArticles('avendre',this)">🏷️ À vendre</button>
+            <button class="svc-tab" onclick="loadArticles('alouer',this)">🔑 À Louer</button>
             <button class="svc-tab" onclick="loadArticles('marketplace',this)">🛍️ Marketplace</button>
           </div>
           <div class="panel-hdr" style="margin-top:0;border-top:1px solid var(--border)">
@@ -970,38 +964,10 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
               <span style="font-size:18px">➕</span> Créer un compte employé
             </div>
 
-            <!-- Conditions de création d'un compte agent -->
-            <div style="background:linear-gradient(135deg,#E8F5E9,#E3F2FD);border-radius:11px;padding:14px 16px;margin-bottom:18px;font-size:11px;color:#1A237E;line-height:1.9;border:1px solid rgba(30,111,190,.18)">
-              <div style="font-size:12px;font-weight:800;color:#1A237E;margin-bottom:8px">📋 Conditions pour créer un compte agent</div>
-              <div style="display:flex;flex-direction:column;gap:5px">
-                <div style="display:flex;align-items:flex-start;gap:8px">
-                  <span style="color:#2E7D32;font-weight:900;flex-shrink:0">✅</span>
-                  <span><b>Email professionnel</b> : utiliser un email <code style="background:rgba(30,111,190,.1);padding:1px 5px;border-radius:4px">@omniservicetg.com</code> ou un email valide existant</span>
-                </div>
-                <div style="display:flex;align-items:flex-start;gap:8px">
-                  <span style="color:#2E7D32;font-weight:900;flex-shrink:0">✅</span>
-                  <span><b>Mot de passe</b> : minimum 8 caractères, utilisez le générateur pour un mot de passe sécurisé</span>
-                </div>
-                <div style="display:flex;align-items:flex-start;gap:8px">
-                  <span style="color:#2E7D32;font-weight:900;flex-shrink:0">✅</span>
-                  <span><b>Poste attribué</b> : choisir parmi les 4 rôles disponibles (Comptable, Opérations, RH, Statisticien)</span>
-                </div>
-                <div style="display:flex;align-items:flex-start;gap:8px">
-                  <span style="color:#2E7D32;font-weight:900;flex-shrink:0">✅</span>
-                  <span><b>Accès immédiat</b> : le compte est actif dès création — communiquez l'email et le mot de passe à l'agent en mains propres</span>
-                </div>
-                <div style="display:flex;align-items:flex-start;gap:8px">
-                  <span style="color:#E65100;font-weight:900;flex-shrink:0">⚠️</span>
-                  <span><b>Chaque poste dispose de son interface dédiée</b> — l'agent se connecte avec son email sur l'interface correspondant à son rôle</span>
-                </div>
-              </div>
-            </div>
-            <div style="background:#FFF8E1;border-radius:10px;padding:11px 14px;margin-bottom:18px;font-size:11px;color:#E65100;line-height:1.8;border:1px solid rgba(245,130,10,.2)">
-              <b>🔑 Postes & interfaces :</b><br/>
-              💰 <b>Comptable</b> → comptable@omniservicetg.com<br/>
-              ⚙️ <b>Opérations</b> → ops@omniservicetg.com<br/>
-              👥 <b>RH Manager</b> → rh@omniservicetg.com<br/>
-              📊 <b>Statisticien</b> → stats@omniservicetg.com
+            <div style="background:linear-gradient(135deg,#E3F2FD,#EDE7F6);border-radius:11px;padding:12px 14px;margin-bottom:18px;font-size:11px;color:#1A237E;line-height:1.8;border:1px solid rgba(30,111,190,.2)">
+              🔑 <b>Postes disponibles :</b><br/>
+              💰 Comptable · ⚙️ Chargé des Opérations<br/>
+              👥 RH Manager · 📊 Statisticien
             </div>
 
             <label class="f-label">Poste / Rôle *</label>
@@ -1044,10 +1010,10 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
 
           <!-- Comptes existants + infos -->
           <div>
-            <!-- Comptes agents existants -->
+            <!-- Comptes existants en Firestore -->
             <div class="settings-card" style="max-width:100%;margin-bottom:0">
               <div class="settings-title" style="display:flex;align-items:center;justify-content:space-between">
-                <span>👤 Comptes agents actifs</span>
+                <span>👤 Comptes employés Firebase</span>
                 <button onclick="loadEmpAccounts()" style="background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;color:var(--mid);font-family:'Poppins',sans-serif">🔄</button>
               </div>
               <div id="emp-accounts-list">
@@ -1061,19 +1027,19 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
               <div style="font-size:12px;color:var(--mid);line-height:2.2">
                 <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
                   <span>💰 <b>Comptable</b></span>
-                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e88b8785989c898a848da8878586819b8d9a9e818b8d9c8fc68b8785">[email&#160;protected]</a></span>
+                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5734383a272336353b3217383a393e243225213e343223307934383a">[email&#160;protected]</a></span>
                 </div>
                 <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
                   <span>⚙️ <b>Opérations</b></span>
-                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="96f9e6e5d6f9fbf8ffe5f3e4e0fff5f3e2f1b8f5f9fb">[email&#160;protected]</a></span>
+                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c3acb3b083acaeadaab0a6b1b5aaa0a6b7a4eda0acae">[email&#160;protected]</a></span>
                 </div>
                 <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
                   <span>👥 <b>RH Manager</b></span>
-                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="394b5179565457504a5c4b4f505a5c4d5e175a5654">[email&#160;protected]</a></span>
+                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="96e4fed6f9fbf8ffe5f3e4e0fff5f3e2f1b8f5f9fb">[email&#160;protected]</a></span>
                 </div>
                 <div style="display:flex;justify-content:space-between">
                   <span>📊 <b>Statisticien</b></span>
-                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f18285908582b19e9c9f98829483879892948596df929e9c">[email&#160;protected]</a></span>
+                  <span style="font-family:monospace;font-size:11px;background:var(--bg);padding:3px 9px;border-radius:6px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="67141306131427080a090e140215110e040213004904080a">[email&#160;protected]</a></span>
                 </div>
               </div>
               <div style="margin-top:14px;padding:12px;background:#FFF8E1;border-radius:10px;font-size:11px;color:#E65100;line-height:1.7;border:1px solid rgba(245,130,10,.2)">
@@ -1220,13 +1186,8 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
         <input type="text" class="f-inp" id="art-name" placeholder="Ex : Tilapia frais"/>
       </div>
     </div>
-    <label class="f-label">Description / Caractéristiques</label>
-    <input type="text" class="f-inp" id="art-desc" placeholder="Ex : 4 chambres, salon, cuisine équipée, clôturée"/>
-    <!-- Champ localisation — visible seulement pour immobilier -->
-    <div id="art-localisation-row" style="display:none">
-      <label class="f-label">Localisation du bien</label>
-      <input type="text" class="f-inp" id="art-localisation" placeholder="Ex : Agoè, Lomé"/>
-    </div>
+    <label class="f-label">Description</label>
+    <input type="text" class="f-inp" id="art-desc" placeholder="Ex : Par kg, pêche locale"/>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div>
         <label class="f-label">Prix (FCFA) *</label>
@@ -1234,7 +1195,7 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
       </div>
       <div>
         <label class="f-label">Unité</label>
-        <input type="text" class="f-inp" id="art-unit" id="art-unit" placeholder="kg, pièce, FCFA/mois, Sur devis…"/>
+        <input type="text" class="f-inp" id="art-unit" placeholder="kg, pièce, plat…"/>
       </div>
     </div>
     <label class="f-label">URL de l'image (optionnel)</label>
@@ -1361,13 +1322,13 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
     <!-- ── Aperçu live ── -->
     <div style="margin-bottom:18px">
       <div style="font-size:10px;font-weight:800;color:var(--light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">👁 Aperçu — tel qu'affiché chez le client</div>
-      <div class="prev-adcard" id="prev-img-zone" style="transition:background .3s">
-        <div class="prev-adcard-img">
-          <img id="prev-photo" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';document.getElementById('prev-emoji').style.opacity='.18'"/>
+      <div class="prev-adcard">
+        <div class="prev-adcard-img" id="prev-img-zone" style="transition:background .3s">
+          <div class="prev-adcard-gradient"></div>
+          <div class="prev-adcard-badge" id="prev-badge">🤝 Partenaire</div>
+          <img id="prev-photo" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('prev-emoji').style.display='block'"/>
           <span class="prev-adcard-emoji" id="prev-emoji">🤝</span>
         </div>
-        <div class="prev-adcard-gradient"></div>
-        <div class="prev-adcard-badge" id="prev-badge">🤝 Partenaire</div>
         <div class="prev-adcard-body">
           <div class="prev-adcard-promo" id="prev-promo">PARTENAIRE OFFICIEL</div>
           <div class="prev-adcard-title" id="prev-title">Titre</div>
@@ -1433,44 +1394,48 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
     <label class="f-label">URL de l'image de fond
       <small style="font-weight:400;text-transform:none;color:var(--light)">(imgur.com, postimages.org… — ou laisser vide pour couleur)</small>
     </label>
-    <input type="url" class="f-inp" id="p-img" placeholder="https://i.imgur.com/... (postimages.org, imgbb.com…)"
+    <input type="url" class="f-inp" id="p-img" placeholder="https://..."
       oninput="
         const ph=document.getElementById('prev-photo');
         const em=document.getElementById('prev-emoji');
-        if(this.value){ph.src=this.value;ph.style.display='block';em.style.opacity='0';}
-        else{ph.src='';ph.style.display='none';em.style.opacity='.18';}
+        if(this.value){ph.src=this.value;ph.style.display='block';em.style.display='none';}
+        else{ph.src='';ph.style.display='none';em.style.display='block';}
       "/>
 
     <label class="f-label">Couleur / Dégradé de fond
       <small style="font-weight:400;text-transform:none;color:var(--light)">ex : linear-gradient(135deg,#1E6FBE,#0d3d6e)</small>
     </label>
     <input type="text" class="f-inp" id="p-bg" placeholder="linear-gradient(135deg,#1E6FBE,#0d3d6e)"
-      oninput="document.getElementById('prev-img-zone').style.background=this.value||'linear-gradient(135deg,#1E6FBE,#0d3d6e)'"/>
+      oninput="document.getElementById('prev-img-zone').style.background=this.value"/>
 
-    <label class="f-label">Lien du bouton CTA
-      <small style="font-weight:400;text-transform:none;color:var(--light)">— vers quel service/page le client est redirigé ?</small>
+    <label class="f-label">Lien (optionnel)
+      <small style="font-weight:400;text-transform:none;color:var(--light)">— dirige le bouton "Découvrir / Commander"</small>
     </label>
     <div style="margin-bottom:8px">
       <div style="font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🎯 Pointer vers un service de l'app :</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
-        <button type="button" style="background:#E8F5E9;color:#2E7D32;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:food'">🧺 Produits Locaux</button>
-        <button type="button" style="background:#E3F2FD;color:#1565C0;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:restaurant'">🍽️ Restaurants</button>
-        <button type="button" style="background:#FFF3E0;color:#E65100;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:delivery'">🏍️ Livraison</button>
-        <button type="button" style="background:#E8F5E9;color:#2E7D32;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:kits'">📦 Kits/Packs</button>
-        <button type="button" style="background:#FFEBEE;color:#C62828;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:maintenance'">🔧 Dépannage</button>
-        <button type="button" style="background:#E0F7FA;color:#006064;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:cleaning'">✨ Nettoyage</button>
-        <button type="button" style="background:#FCE4EC;color:#880E4F;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:clothes'">👗 Prêt-à-porter</button>
-        <button type="button" style="background:#E8F5E9;color:#1B5E20;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:immobilier'">🏢 Immobilier</button>
-        <button type="button" style="background:#E3F2FD;color:#283593;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:security'">🛡️ Gardiennage</button>
-        <button type="button" style="background:#FFF8E1;color:#F57C00;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:traiteur'">🍾 Traiteur</button>
-        <button type="button" style="background:#E0F7FA;color:#00838F;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:omni_drink'">🥂 Omni Drink</button>
-        <button type="button" style="background:#FCE4EC;color:#AD1457;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:marketplace'">🛍️ Marketplace</button>
-        <button type="button" style="background:#EDE7F6;color:#4A148C;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer" onclick="document.getElementById('p-lien').value='openService:togo_expertise'">🏆 TOGO Expertise</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:food'">🛒 Produits Locaux</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:restaurant'">🍽️ Restaurants</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:delivery'">🏍️ Livraison</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:kits'">📦 Kits/PACKS</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:maintenance'">🔧 Dépannage</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:cleaning'">✨ Nettoyage</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:clothes'">👗 Prêt-à-porter</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:immobilier'">🏢 Immobilier</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:security'">🛡️ Gardiennage</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:traiteur'">🍽️ Traiteur</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:omni_drink'">🍾 Omni Drink</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:marketplace'">🛍️ Marketplace</button>
+        <button type="button" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif" onclick="document.getElementById('p-lien').value='openService:togo_expertise'">🏆 TOGO Expertise</button>
       </div>
     </div>
-    <input type="text" class="f-inp" id="p-lien" placeholder="openService:food  —  ou  https://..."/>
-    <div style="background:#F0F4FF;border-radius:9px;padding:9px 12px;margin-top:-8px;font-size:11px;color:#283593;line-height:1.8">
-      <b>💡</b> Bouton vert ci-dessus → remplit automatiquement le champ &nbsp;|&nbsp; <code style="background:rgba(40,53,147,.1);padding:1px 5px;border-radius:4px">https://...</code> = lien externe &nbsp;|&nbsp; Vide = pas de navigation au clic
+    <input type="text" class="f-inp" id="p-lien" placeholder="openService:kits  —  ou  https://..."/>
+    <div style="background:#F0F7FF;border-radius:9px;padding:10px 12px;margin-top:-8px;margin-bottom:13px;font-size:11px;color:#1565C0;line-height:1.8">
+      <b>💡 Guide :</b><br/>
+      • Cliquez un bouton ci-dessus → le client est redirigé vers ce service<br/>
+      • <code style="background:rgba(21,90,156,.1);padding:1px 5px;border-radius:4px">openService:kits</code> = ouvre directement la page dans l'app<br/>
+      • <code style="background:rgba(21,90,156,.1);padding:1px 5px;border-radius:4px">https://...</code> = ouvre un lien externe dans le navigateur<br/>
+      • Laisser vide = CTA affiché mais sans navigation au clic
     </div>
 
     <label class="f-label">Ordre dans le slider
@@ -1571,18 +1536,29 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
 <div class="toast" id="toast"></div>
 
 <!-- ════ SPLASH SCREEN LOGIC ════ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // Le splash se masque après 2.8s ou après que Firebase confirme l'état auth
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // hideSplash : appelé par onAuthStateChanged dès que Firebase répond
+  // Le fallback ne masque le splash QUE si Firebase a aussi répondu
   let splashHidden = false;
+  let firebaseReady = false;
   function hideSplash() {
     if (splashHidden) return;
     splashHidden = true;
     const splash = document.getElementById('splash-screen');
-    splash.classList.add('hidden');
-    setTimeout(() => splash.style.display = 'none', 500);
+    if (splash) {
+      splash.classList.add('hidden');
+      setTimeout(() => { if(splash) splash.style.display = 'none'; }, 500);
+    }
   }
-  // Fallback maximal : 3.2 secondes
-  setTimeout(hideSplash, 3200);
+  // Fallback : si Firebase met trop longtemps (> 6s), on force l'affichage login
+  setTimeout(function(){
+    if (!splashHidden) {
+      hideSplash();
+      // S'assurer que login est visible si Firebase n'a toujours pas répondu
+      var ls = document.getElementById('login-screen');
+      if (ls && ls.style.display === 'none') ls.style.display = 'flex';
+    }
+  }, 6000);
 </script>
 
 <!-- ════ FIREBASE ════ -->
@@ -1643,9 +1619,9 @@ window.doLogin = async function() {
     const code = e.code||"";
     let diagHtml = "";
     if(code==="auth/unauthorized-domain"||e.message.includes("unauthorized")) {
-      diagHtml=`<div class="diag-box diag-ora"><b>🔐 Accès refusé depuis ce domaine</b><br/>Ce domaine n'est pas encore autorisé. Contactez le responsable technique OmniService TG pour faire activer <code style="background:rgba(0,0,0,.2);padding:2px 6px;border-radius:4px">${location.hostname}</code>.</div>`;
+      diagHtml=`<div class="diag-box diag-ora"><b>🔐 Domaine non autorisé</b><br/>Allez sur <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a> → Authentication → Settings → Authorized domains → Ajoutez : <code style="background:rgba(0,0,0,.2);padding:2px 6px;border-radius:4px">${location.hostname}</code></div>`;
     } else if(code==="auth/user-not-found"||code==="auth/invalid-credential") {
-      diagHtml=`<div class="diag-box diag-blue"><b>👤 Compte introuvable</b><br/>Vérifiez l'adresse email saisie. Si votre compte n'existe pas encore, demandez à l'administrateur principal de le créer depuis la section <b>Équipe &amp; Agents</b>.</div>`;
+      diagHtml=`<div class="diag-box diag-blue"><b>👤 Compte inexistant</b><br/><a href="https://console.firebase.google.com" target="_blank">Firebase Console</a> → Authentication → Users → Add user → Email + mot de passe</div>`;
     } else {
       diagHtml=`<div class="diag-box diag-dark"><b>Code :</b> <code style="background:rgba(255,255,255,.15);padding:2px 6px;border-radius:4px">${code}</code><br/><span style="font-size:11px">${e.message}</span></div>`;
     }
@@ -1729,7 +1705,7 @@ window.loadOrders = function() {
     render(); updateStats();
     document.getElementById("last-refresh").textContent=`🟢 ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})} — ${allOrders.length} commandes`;
   }, err => {
-    document.getElementById("orders-body-desktop").innerHTML=`<div class="empty-msg">❌ Erreur de chargement : ${err.message}</div>`;
+    document.getElementById("orders-body-desktop").innerHTML=`<div class="empty-msg">❌ Erreur Firebase : ${err.message}<br/><small>Vérifiez les règles Firestore.</small></div>`;
   });
 };
 
@@ -2094,15 +2070,19 @@ const DEFAULT_ARTICLES={
     {id:'od6',name:'Pack événement boissons',         desc:'Assortiment complet pour 50 personnes',                price:45000, unit:'pack',     emoji:'🎉'},
   ],
   avendre:[
-    {id:'av1',name:'Villa 4 ch + S à Agoè',      desc:'4 chambres, salon, cuisine équipée, clôturée',              price:200000000, unit:'FCFA',     emoji:'🏡'},
-    {id:'av2',name:'Terrain 600m² (1 lot) à Bè', desc:'Titre foncier disponible, bien localisé',                  price:100000000, unit:'FCFA',     emoji:'🌍'},
+    {id:'av1',name:'Recherche personnalisée',   desc:'Recherche du bien correspondant à vos critères de vente/achat', price:0, unit:'service',  emoji:'🔍'},
+    {id:'av2',name:'Vérification administrative',desc:'Contrôle des documents, titres fonciers et conformité légale',  price:0, unit:'contrôle', emoji:'📋'},
+    {id:'av3',name:'Accompagnement juridique',  desc:'Assistance d\'un conseiller juridique pour sécuriser la transaction', price:0, unit:'assistance',emoji:'⚖️'},
+    {id:'av4',name:'Négociation encadrée',      desc:'Mediation et négociation professionnelle entre acheteur et vendeur', price:0, unit:'service',  emoji:'🤝'},
+    {id:'av5',name:'Sécurisation transaction',  desc:'Protocole sécurisé pour garantir le bon déroulement de la vente',  price:0, unit:'garantie', emoji:'🔒'},
   ],
   alouer:[
-    {id:'al1',name:'Appartement 2 Ch + S à Sagbado', desc:'2 chambres, salon, sanitaires',              price:65000,  unit:'FCFA/mois', emoji:'🏠'},
-    {id:'al2',name:'Villa 4 Ch + S à Agoè',          desc:'4 chambres, salon, cuisine, garage',         price:200000, unit:'FCFA/mois', emoji:'🏡'},
-    {id:'al3',name:'Bureau',                          desc:'Espaces bureaux professionnels disponibles', price:0,      unit:'Sur devis', emoji:'🏢'},
-    {id:'al4',name:'Espace commercial',               desc:'Boutiques et locaux commerciaux',            price:0,      unit:'Sur devis', emoji:'🏪'},
-    {id:'al5',name:'Entrepôt',                        desc:'Entrepôts de diverses capacités',            price:0,      unit:'Sur devis', emoji:'🏭'},
+    {id:'al1',name:'Appartements',             desc:'Recherche et mise en location d\'appartements vérifiés',        price:0, unit:'recherche', emoji:'🏢'},
+    {id:'al2',name:'Villas',                   desc:'Villas et maisons individuelles disponibles à la location',     price:0, unit:'recherche', emoji:'🏡'},
+    {id:'al3',name:'Bureaux',                  desc:'Espaces de travail et bureaux professionnels à louer',         price:0, unit:'recherche', emoji:'💼'},
+    {id:'al4',name:'Espaces commerciaux',      desc:'Boutiques, magasins, locaux commerciaux disponibles',          price:0, unit:'recherche', emoji:'🏪'},
+    {id:'al5',name:'Entrepôts',                desc:'Espaces de stockage et entrepôts à louer',                     price:0, unit:'recherche', emoji:'🏭'},
+    {id:'al6',name:'Biens vérifiés et sécurisés',desc:'Tous nos biens font l\'objet d\'une vérification rigoureuse',price:0, unit:'garantie', emoji:'✅'},
   ],
   marketplace:[
     {id:'mk1',name:'Articles ménagers',               desc:'Ustensiles, casseroles, vaisselle, petits électroménagers',price:5000, unit:'article',emoji:'🏠'},
@@ -2117,97 +2097,10 @@ const DEFAULT_ARTICLES={
 // ════ ARTICLES ════
 let articlesCache=[];
 
-// ════ IMMOBILIER — Biens À Vendre / À Louer ════
-// Ces biens sont définis dans IMMO_ENVELOPE de index__1_.html
-// L'admin les affiche et permet de les modifier via Firestore (collection 'immo_biens')
-window.loadImmoArticles = async function(svc, btn) {
-  currentArtSvc = svc;
-  if(btn){ document.querySelectorAll('.svc-tab').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
-  const titles = { 'avendre':'🏡 À Vendre — Biens disponibles', 'alouer':'🔑 À Louer — Biens disponibles' };
-  document.getElementById('art-panel-title').textContent = titles[svc] || svc;
-  const table = document.getElementById('articles-table');
-  table.innerHTML = `<div style="text-align:center;padding:30px;color:var(--light)"><div class="spinner"></div></div>`;
-
-  // Charger depuis Firestore collection 'immo_biens'
-  let dbBiens = [];
-  try {
-    const q = query(collection(db,'immo_biens'), where('categorie','==',svc));
-    const snap = await getDocs(q);
-    dbBiens = snap.docs.map(d=>({id:d.id, _src:'db', ...d.data()}));
-  } catch(e) { dbBiens = []; }
-
-  // Fusionner avec les biens par défaut (DEFAULT_ARTICLES[svc])
-  const defaults = (DEFAULT_ARTICLES[svc]||[]).filter(d=>!dbBiens.find(b=>b.id===d.id));
-  const all = [...dbBiens, ...defaults.map(d=>({...d, _src:'std', categorie:svc}))];
-
-  const isVendre = svc === 'avendre';
-  const head = `<div class="art-table-row art-table-head"><div></div><div>Bien immobilier</div><div>Prix</div><div>Description</div><div>Dispo</div><div>Actions</div></div>`;
-
-  if (!all.length) {
-    table.innerHTML = head + `<div style="text-align:center;padding:28px;color:var(--light);font-size:13px">Aucun bien enregistré. Ajoutez-en via le bouton ci-dessus.</div>`;
-    return;
-  }
-  articlesCache = all;
-
-  table.innerHTML = head + all.map(a => {
-    const priceStr = a.price > 0 ? Number(a.price).toLocaleString('fr-FR') + ' FCFA' : (a.unit || 'Sur devis');
-    const isStd = a._src === 'std';
-    return `<div class="art-table-row">
-      <div class="art-emoji" style="font-size:22px">${a.emoji||'🏢'}</div>
-      <div>
-        <div style="font-weight:700;font-size:12px;color:var(--dark)">${a.name||'—'}</div>
-        ${a.localisation ? `<div style="font-size:10px;color:var(--light)">📍 ${a.localisation}</div>` : ''}
-        ${isStd ? '<span class="badge-std">STD</span>' : '<span class="badge-perso">PERSO</span>'}
-      </div>
-      <div style="font-weight:800;color:var(--blue);font-size:12px">${priceStr}</div>
-      <div style="font-size:11px;color:var(--mid)">${a.desc||'—'}</div>
-      <div><span style="background:#E8F5E9;color:#2E7D32;font-size:9px;font-weight:800;padding:3px 9px;border-radius:6px">✅ Disponible</span></div>
-      <div style="display:flex;gap:5px">
-        <button onclick="openImmoArticleModal('${a.id}',${isStd})" style="background:#E3F2FD;color:#1E6FBE;border:none;border-radius:7px;padding:5px 9px;font-size:10px;font-weight:700;cursor:pointer">✏️</button>
-        ${!isStd ? `<button onclick="deleteImmoArticle('${a.id}')" style="background:#FFEBEE;color:#C62828;border:none;border-radius:7px;padding:5px 8px;font-size:12px;cursor:pointer">🗑</button>` : ''}
-      </div>
-    </div>`;
-  }).join('');
-
-  // Changer le bouton "Ajouter"
-  const addBtn = document.querySelector('#section-articles .add-btn');
-  if (addBtn) addBtn.onclick = function(){ openImmoArticleModal(null, false); };
-};
-
-window.openImmoArticleModal = function(id, isStd) {
-  const a = id ? articlesCache.find(x=>x.id===id) : null;
-  editingArtId = a ? a.id : null;
-  document.getElementById('art-modal-title').textContent = a ? 'Modifier le bien' : 'Ajouter un bien immobilier';
-  document.getElementById('art-is-std').value = isStd ? '1' : '0';
-  document.getElementById('art-std-info').style.display = isStd ? 'block' : 'none';
-  document.getElementById('art-std-info').textContent = isStd ? '📌 Bien standard — vos modifications remplaceront la version par défaut.' : '';
-  document.getElementById('art-emoji').value = a?.emoji || '';
-  document.getElementById('art-name').value  = a?.name  || '';
-  document.getElementById('art-desc').value  = a?.desc  || '';
-  document.getElementById('art-price').value = a?.price || '';
-  document.getElementById('art-unit').value  = a?.unit  || (currentArtSvc==='avendre' ? 'FCFA' : 'FCFA/mois');
-  document.getElementById('art-img').value   = a?.imageUrl || '';
-  document.getElementById('art-ordre').value = a?.ordre || 1;
-  // Afficher le champ localisation pour les biens immo
-  document.getElementById('art-localisation-row').style.display = 'block';
-  document.getElementById('art-localisation').value = a?.localisation || '';
-  // Masquer le champ disponibilité (pas pertinent pour immo)
-  document.getElementById('art-modal').classList.add('show');
-};
-
-window.deleteImmoArticle = async function(id) {
-  if (!confirm('Supprimer ce bien ? Il ne sera plus affiché chez le client.')) return;
-  try {
-    await deleteDoc(doc(db,'immo_biens',id));
-    toast('🗑 Bien supprimé', '#C62828');
-    loadImmoArticles(currentArtSvc, null);
-  } catch(e) { toast('❌ ' + e.message, '#C62828'); }
-};
-
 window.loadArticles=async function(svc,btn){
   currentArtSvc=svc;
   if(btn){document.querySelectorAll(".svc-tab").forEach(b=>b.classList.remove("on"));btn.classList.add("on");}
-  const titles={'food':'Produits Locaux/Frais','restaurant':'Restauration','clothes':'Prêt-à-porter','omni_drink':'Omni Drink TG','avendre':'🏡 À Vendre — Biens disponibles','alouer':'🔑 À Louer — Biens disponibles','marketplace':'Marketplace','mathivick':'Mathivick','omega_conseil':'Omega Conseils'};
+  const titles={'food':'Produits Locaux/Frais','restaurant':'Restauration','clothes':'Prêt-à-porter','omni_drink':'Omni Drink TG','avendre':'À Vendre — Immobilier','alouer':'À Louer — Immobilier','marketplace':'Marketplace','mathivick':'Mathivick','omega_conseil':'Omega Conseils'};
   document.getElementById("art-panel-title").textContent=titles[svc]||svc;
   document.getElementById("articles-table").innerHTML=`<div style="text-align:center;padding:30px;color:var(--light)"><div class="spinner"></div></div>`;
   try{
@@ -2289,7 +2182,6 @@ function renderArticleTable(){
 
 window.openArticleModal=function(){
   editingArtId=null;
-  document.getElementById('art-localisation-row').style.display='none';
   document.getElementById("art-modal-title").textContent="Ajouter un article";
   document.getElementById("art-is-std").value='0';
   document.getElementById("art-std-info").style.display='none';
@@ -2378,35 +2270,6 @@ window.setActif=async function(id,val){
     toast(val?"👁 Article réaffiché aux clients":"🙈 Article masqué aux clients","#1A1A2E");
   }catch(e){toast("❌ Erreur : "+e.message,"#C62828");}
 };
-
-async function _saveImmoArticle() {
-  const emoji   = document.getElementById('art-emoji').value.trim();
-  const name    = document.getElementById('art-name').value.trim();
-  const desc    = document.getElementById('art-desc').value.trim();
-  const price   = parseFloat(document.getElementById('art-price').value) || 0;
-  const unit    = document.getElementById('art-unit').value.trim() || (currentArtSvc==='avendre'?'FCFA':'FCFA/mois');
-  const imageUrl= document.getElementById('art-img').value.trim();
-  const ordre   = parseInt(document.getElementById('art-ordre').value) || 1;
-  const localisation = document.getElementById('art-localisation').value.trim();
-
-  if (!name) { toast('⚠️ Le nom du bien est obligatoire.', '#E65100'); return; }
-
-  const data = { name, desc, price, unit, emoji: emoji||'🏢', imageUrl, ordre, localisation, categorie: currentArtSvc, updatedAt: serverTimestamp() };
-  const btn = document.getElementById('art-save-btn');
-  btn.disabled = true; btn.textContent = '⏳ Enregistrement...';
-
-  try {
-    if (editingArtId) {
-      await updateDoc(doc(db,'immo_biens', editingArtId), data);
-    } else {
-      await addDoc(collection(db,'immo_biens'), data);
-    }
-    document.getElementById('art-modal').classList.remove('show');
-    toast('✅ Bien enregistré !', '#2E7D32');
-    await loadImmoArticles(currentArtSvc, null);
-  } catch(e) { toast('❌ ' + e.message, '#C62828'); }
-  btn.disabled = false; btn.textContent = '💾 Enregistrer l\'article';
-}
 
 window.saveArticle=async function(){
   const name=document.getElementById("art-name").value.trim();
@@ -2945,17 +2808,7 @@ function renderPartners(){
 }
 
 window.openPartnerModal=function(){
-  editingPartnerId=null;
-  document.getElementById("partner-modal-title").textContent="Ajouter une publication";
-  document.getElementById("p-mode").value="partner";
-  ['partner-id','p-nom','p-titre2','p-desc','p-img','p-lien','p-badge','p-emoji','p-bg','p-cta'].forEach(x=>document.getElementById(x).value='');
-  document.getElementById("p-ordre").value='1';
-  document.getElementById("p-promo").value='partenaire';
-  document.getElementById("p-promo-custom").style.display='none';
-  document.getElementById("p-promo-custom").value='';
-  // Reset preview
-  document.getElementById("prev-promo").textContent="PARTENAIRE OFFICIEL";
-  document.getElementById("prev-title").textContent="Titre";
+  editingPartnerId=n  document.getElementById("prev-title").textContent="Titre";
   document.getElementById("prev-sub").textContent="Sous-titre";
   document.getElementById("prev-badge").textContent="🤝 Partenaire";
   document.getElementById("prev-emoji").textContent="🤝";
@@ -3219,7 +3072,7 @@ function renderKitsAdmin(allKits) {
           ${arts.length>4 ? `<span style="font-size:10px;background:var(--bg);border-radius:9px;padding:3px 9px;color:var(--mid)">+${arts.length-4} autres</span>` : ''}
         </div>` : '<div style="font-size:11px;color:var(--light);font-style:italic">Aucun article — cliquez Articles pour en ajouter</div>'}
         ${isStd ? `<div style="margin-top:8px;padding:7px 10px;background:linear-gradient(135deg,#E3F2FD,#EDE7F6);border-radius:9px;font-size:10px;color:#1A237E">
-          📌 <strong>Kit standard</strong> — Cliquez <em>Modifier</em> pour personnaliser l'affichage client.
+          📌 <strong>Kit standard</strong> — Cliquez <em>Modifier</em> pour personnaliser dans Firestore.
         </div>` : ''}
       </div>
       <div style="padding:10px 14px;display:flex;justify-content:flex-end;gap:6px;border-top:1px solid var(--border);flex-wrap:wrap">
@@ -4066,21 +3919,6 @@ window.deletePack = async function(svc, id) {
 // ════════════════════════════════════════
 
 const DEFAULT_BANDEAUX = [
-  { id:'delivery', emoji:'🚀', badge:'⚡ Express', promo:'LIVRAISON RAPIDE',
-    titre1:'Courses livrées', titre2:'à domicile', sub:'Partout à Lomé', cta:'Commander →',
-    bg:'linear-gradient(135deg,#1E6FBE 0%,#0d3d6e 100%)', label:'Livraison Express' },
-  { id:'restaurant', emoji:'🍽️', badge:'🍴 Restauration', promo:'PLATS & TRAITEUR',
-    titre1:'Restaurants', titre2:'partenaires', sub:'Livraison & événements', cta:'Découvrir →',
-    bg:'linear-gradient(135deg,#F5820A 0%,#8B3A00 100%)', label:'Restaurants' },
-  { id:'food', emoji:'🥘', badge:'🌿 Produits frais', promo:'MARCHÉ LOCAL',
-    titre1:'Tilapia, volailles', titre2:'& légumes', sub:'Qualité locale garantie', cta:'Commander →',
-    bg:'linear-gradient(135deg,#1a7a35 0%,#0a3d18 100%)', label:'Produits Locaux/Frais' },
-  { id:'cleaning', emoji:'✨', badge:'🧹 Nettoyage', promo:'MAISON PROPRE',
-    titre1:'Nettoyage', titre2:'professionnel', sub:'Résidentiel & bureaux', cta:'Réserver →',
-    bg:'linear-gradient(135deg,#7B1FA2 0%,#3a0a5e 100%)', label:'Nettoyage' },
-  { id:'clothes', emoji:'👗', badge:'👗 Mode', promo:'TENDANCE TOGO',
-    titre1:'Mode wax', titre2:'& accessoires', sub:'Livré chez vous', cta:'Voir →',
-    bg:'linear-gradient(135deg,#C2185B 0%,#5c0a28 100%)', label:'Prêt-à-porter' },
   { id:'kits', emoji:'🎁', badge:'📦 Kits', promo:'OFFRES GROUPÉES',
     titre1:'Kits & PACKS', titre2:'prêts à commander', sub:'Repas, Mode, Événement...', cta:'Découvrir →',
     bg:'linear-gradient(135deg,#2E7D32 0%,#1b5e20 100%)', label:'Kits & PACKS' }
@@ -4482,7 +4320,7 @@ window.createEmployeeAccount = async function() {
         'auth/email-already-in-use': '❌ Cet email est déjà utilisé.',
         'auth/invalid-email': '❌ Email invalide.',
         'auth/weak-password': '❌ Mot de passe trop faible (min. 6 caractères).',
-        'auth/operation-not-allowed': '❌ Création de comptes désactivée. Contactez l\'administrateur système.',
+        'auth/operation-not-allowed': '❌ Création de comptes désactivée dans Firebase.',
       };
       throw new Error(authMsgs[createError.code] || ('❌ ' + createError.message));
     }
@@ -4591,31 +4429,17 @@ window.toggleEmpAccount = async function(id, isActif) {
 };
 
 window.deleteEmpAccount = async function(id, nom) {
-  if (!confirm('Supprimer le compte de ' + (nom || 'cet agent') + ' ? Cette action est irréversible.')) return;
+  if (!confirm(`Supprimer le compte de "${nom}" ?\n⚠️ Cela supprime l'enregistrement Firestore. Le compte Firebase Auth reste actif — supprimez-le manuellement si nécessaire.`)) return;
   try {
     await deleteDoc(doc(db, 'employes', id));
-    toast('🗑 Compte supprimé', '#C62828');
+    toast('🗑 Enregistrement supprimé', '#C62828');
     loadEmpAccounts();
   } catch(e) { toast('❌ Erreur : ' + e.message, '#C62828'); }
 };
 
-</script>
+// Initialiser un mot de passe généré au chargement
+window.generatePassword();
 
-<!-- ════ LOGIN BRIDGE — hors module pour que onclick="" fonctionne ════ -->
-<script>
-(function() {
-  function _tryLogin() {
-    if (typeof window.doLogin === 'function') { window.doLogin(); }
-    else { setTimeout(_tryLogin, 80); }
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    var btn  = document.getElementById('login-btn');
-    var pass = document.getElementById('l-pass');
-    if (btn)  { btn.removeAttribute('onclick'); btn.addEventListener('click', function(e){ e.preventDefault(); _tryLogin(); }); }
-    if (pass) { pass.addEventListener('keydown', function(e){ if(e.key==='Enter') _tryLogin(); }); }
-  });
-})();
 </script>
-
 </body>
 </html>
