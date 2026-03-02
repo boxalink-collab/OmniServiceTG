@@ -2901,38 +2901,6 @@ window.setPartnerActif = async function(id, actif) {
   } catch(e) { toast('❌ Erreur : '+e.message,'#C62828'); }
 };
 
-// ════════════════════════════════════════
-// KITS & PACKS ADMIN
-// ════════════════════════════════════════
-
-const DEFAULT_KITS_ADMIN = [
-  { id:'kit1', nom:'Kit Repas Semaine', emoji:'🍱', description:"Tout ce qu'il faut pour nourrir votre famille pendant 7 jours",
-    prix_total:28500, categorie:'Produits Locaux/Frais', ordre:1,
-    articles:['']},
-  { id:'kit2', nom:'Pack Fête & Événement', emoji:'🎉', description:'Pour vos cérémonies, mariages et réceptions (10-15 personnes)',
-    prix_total:75000, categorie:'Événement', ordre:2,
-    articles:[
-      {emoji:'🎊', name:'Plateau traiteur',   qty:1,  unit:'plateau',  prix:35000},
-      {emoji:'🍗', name:'Poulet yassa',       qty:15, unit:'plats',    prix:4500},
-      {emoji:'🍚', name:'Riz sauce arachide', qty:15, unit:'plats',    prix:2500},
-      {emoji:'🥤', name:'Boissons variées',   qty:1,  unit:'lot',      prix:8000},
-    ]},
-  { id:'kit3', nom:'Pack Mode Wax Complet', emoji:'👗', description:'Ensemble prêt-à-porter africain complet pour homme ou femme',
-    prix_total:26000, categorie:'Pret-a-porter', ordre:3,
-    articles:[
-      {emoji:'👘', name:'Boubou wax',         qty:1, unit:'pièce',    prix:12000},
-      {emoji:'👜', name:'Sac assorti',        qty:1, unit:'pièce',    prix:15000},
-      {emoji:'👡', name:'Sandales tressées',  qty:1, unit:'paire',    prix:7500},
-      {emoji:'✨', name:'Kit cosmétiques',    qty:1, unit:'kit',      prix:4500},
-    ]},
-  { id:'kit4', nom:'Kit Nettoyage Maison', emoji:'✨', description:'Service de nettoyage + fournitures pour votre domicile (60m²)',
-    prix_total:18000, categorie:'Nettoyage', ordre:4,
-    articles:[
-      {emoji:'🧹', name:'Nettoyage complet',  qty:1, unit:'prestation', prix:12000},
-      {emoji:'🧴', name:'Produits ménagers',  qty:1, unit:'kit',        prix:3500},
-      {emoji:'🦠', name:'Désinfection',       qty:1, unit:'prestation', prix:2500},
-    ]},
-];
 
 const KIT_CAT_COLORS = {
   'Produits Locaux/Frais':'#FFF3E0','Restauration':'#E3F2FD','Pret-a-porter':'#FFF0F5',
