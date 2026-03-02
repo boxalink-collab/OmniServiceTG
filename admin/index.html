@@ -328,47 +328,39 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
 .partner-desc{font-size:11px;color:var(--light);margin-bottom:8px}
 .partner-actions{display:flex;gap:7px}
 /* ── PREVIEW ADCARD (aperçu fidèle au style client) ── */
-/* ── Aperçu bandeau full-image ── */
 .prev-adcard{
-  position:relative;
-  height:180px;border-radius:18px;overflow:hidden;
-  box-shadow:0 6px 24px rgba(0,0,0,.22);
+  display:flex;align-items:stretch;
+  height:160px;border-radius:20px;overflow:hidden;
+  box-shadow:0 6px 24px rgba(0,0,0,.18);
   margin-bottom:4px;
-  background:linear-gradient(135deg,#1E6FBE,#0d3d6e);
 }
 .prev-adcard-img{
-  position:absolute;inset:0;
+  width:45%;flex-shrink:0;position:relative;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:linear-gradient(135deg,#1E6FBE,#0d3d6e);
   transition:background .3s;
 }
 .prev-adcard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
-/* Gradient bas pour lisibilité du texte */
-.prev-adcard-gradient{
-  position:absolute;inset:0;
-  background:linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.18) 55%, transparent 100%);
-  z-index:1;
-}
-.prev-adcard-emoji{font-size:72px;opacity:.25;position:relative;z-index:0;user-select:none}
+.prev-adcard-gradient{position:absolute;inset:0;background:linear-gradient(to right,transparent 55%,rgba(0,0,0,.35) 100%);z-index:1}
+.prev-adcard-emoji{font-size:62px;opacity:.55;position:relative;z-index:0;user-select:none}
 .prev-adcard-badge{
-  position:absolute;top:12px;left:12px;z-index:10;
+  position:absolute;top:10px;left:10px;z-index:10;
   background:rgba(255,255,255,.92);color:var(--blue);
-  font-size:9px;font-weight:800;padding:5px 12px;border-radius:999px;
-  box-shadow:0 2px 8px rgba(0,0,0,.2);letter-spacing:.3px;
-  max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:9px;font-weight:800;padding:4px 10px;border-radius:999px;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);letter-spacing:.2px;
+  max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-/* Corps du texte en overlay bas */
 .prev-adcard-body{
-  position:absolute;bottom:0;left:0;right:0;z-index:5;
-  padding:14px 16px;
-  display:flex;flex-direction:column;gap:2px;
+  flex:1;background:#fff;padding:14px 14px 14px 12px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
 }
-.prev-adcard-promo{font-size:8px;font-weight:800;letter-spacing:1.3px;color:var(--ora);text-transform:uppercase}
-.prev-adcard-title{font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;color:#fff;line-height:1.2}
-.prev-adcard-sub{font-size:10.5px;color:rgba(255,255,255,.75);margin-top:1px;line-height:1.4}
+.prev-adcard-promo{font-size:8.5px;font-weight:800;letter-spacing:1.2px;color:var(--ora);text-transform:uppercase}
+.prev-adcard-title{font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;color:var(--dark);line-height:1.25}
+.prev-adcard-sub{font-size:10.5px;color:var(--light);margin-top:1px;line-height:1.4}
 .prev-adcard-cta{
   margin-top:8px;display:none;align-items:center;align-self:flex-start;
-  background:var(--ora);color:#fff;border-radius:999px;
-  padding:7px 16px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;
+  background:var(--blue);color:#fff;border-radius:999px;
+  padding:6px 14px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;
 }
 .prev-adcard-cta.show{display:inline-flex}
 /* ── MODAL ── */
@@ -1307,73 +1299,43 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
     <input type="hidden" id="partner-id"/>
     <!-- Mode : 'partner' ou 'bandeau' -->
     <input type="hidden" id="p-mode" value="partner"/>
-    <!-- Compatibilité bandeaux -->
-    <input type="hidden" id="p-emoji" value=""/>
 
     <!-- ── Aperçu live ── -->
     <div style="margin-bottom:18px">
       <div style="font-size:10px;font-weight:800;color:var(--light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">👁 Aperçu — tel qu'affiché chez le client</div>
       <div class="prev-adcard">
-        <!-- Image de fond -->
-        <div class="prev-adcard-img" id="prev-img-zone">
+        <div class="prev-adcard-img" id="prev-img-zone" style="transition:background .3s">
+          <div class="prev-adcard-gradient"></div>
+          <div class="prev-adcard-badge" id="prev-badge">🤝 Partenaire</div>
           <img id="prev-photo" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('prev-emoji').style.display='block'"/>
-          <span class="prev-adcard-emoji" id="prev-emoji" style="display:none">🖼</span>
+          <span class="prev-adcard-emoji" id="prev-emoji">🤝</span>
         </div>
-        <!-- Gradient bas -->
-        <div class="prev-adcard-gradient"></div>
-        <!-- Badge haut gauche -->
-        <div class="prev-adcard-badge" id="prev-badge" style="display:none">Badge</div>
-        <!-- Texte overlay bas -->
         <div class="prev-adcard-body">
-          <div class="prev-adcard-promo" id="prev-promo" style="display:none">LABEL</div>
-          <div class="prev-adcard-title" id="prev-title" style="display:none">Titre</div>
-          <div class="prev-adcard-sub" id="prev-sub" style="display:none">Sous-titre</div>
+          <div class="prev-adcard-promo" id="prev-promo">PARTENAIRE OFFICIEL</div>
+          <div class="prev-adcard-title" id="prev-title">Titre</div>
+          <div class="prev-adcard-sub" id="prev-sub">Sous-titre</div>
           <div class="prev-adcard-cta" id="prev-cta">Découvrir →</div>
         </div>
       </div>
       <div style="font-size:10px;color:var(--light);text-align:center;margin-top:6px">Le bandeau défile horizontalement sur l'écran d'accueil</div>
     </div>
 
-    <!-- ── IMAGE (principale) ── -->
-    <label class="f-label">🖼 Image de fond
-      <small style="font-weight:400;text-transform:none;color:var(--light)">— URL de l'image (optionnel)</small>
-    </label>
-    <input type="url" class="f-inp" id="p-img" placeholder="https://i.imgur.com/..."
-      oninput="
-        const ph=document.getElementById('prev-photo');
-        const em=document.getElementById('prev-emoji');
-        const iz=document.getElementById('prev-img-zone');
-        if(this.value){ph.src=this.value;ph.style.display='block';em.style.display='none';}
-        else{ph.src='';ph.style.display='none';em.style.display=document.getElementById('p-bg').value?'none':'block';}
-      "/>
+    <!-- Emoji (affiché seulement quand pas d'image) -->
+    <div style="display:grid;grid-template-columns:74px 1fr;gap:10px">
+      <div>
+        <label class="f-label">Emoji</label>
+        <input type="text" class="f-inp" id="p-emoji" placeholder="🤝" maxlength="4"
+          oninput="document.getElementById('prev-emoji').textContent=this.value||'🤝'"/>
+      </div>
+      <div>
+        <label class="f-label">Badge (coin de l'image)</label>
+        <input type="text" class="f-inp" id="p-badge" placeholder="🤝 Partenaire"
+          oninput="document.getElementById('prev-badge').textContent=this.value||'Badge'"/>
+      </div>
+    </div>
 
-    <label class="f-label">🎨 Couleur / Dégradé de fond
-      <small style="font-weight:400;text-transform:none;color:var(--light)">— affiché si pas d'image (optionnel)</small>
-    </label>
-    <input type="text" class="f-inp" id="p-bg" placeholder="linear-gradient(135deg,#1E6FBE,#0d3d6e)"
-      oninput="document.getElementById('prev-img-zone').style.background=this.value||''"/>
-
-    <!-- Séparateur -->
-    <div style="border-top:1.5px dashed var(--border);margin:10px 0 14px;"></div>
-    <div style="font-size:10px;font-weight:800;color:var(--light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">📝 Texte en overlay (tout optionnel)</div>
-
-    <!-- Badge haut gauche -->
-    <label class="f-label">🏷 Badge (coin haut gauche)
-      <small style="font-weight:400;text-transform:none;color:var(--light)">— ex : ⚡ Express</small>
-    </label>
-    <input type="text" class="f-inp" id="p-badge" placeholder="Ex : ⚡ Express"
-      oninput="
-        const el=document.getElementById('prev-badge');
-        if(this.value){el.textContent=this.value;el.style.display='block';}
-        else{el.style.display='none';}
-      "/>
-
-    <!-- Label promo -->
-    <label class="f-label">📣 Label promotionnel
-      <small style="font-weight:400;text-transform:none;color:var(--light)">— petite ligne au-dessus du titre</small>
-    </label>
+    <label class="f-label">Type / Label promotionnel *</label>
     <select class="f-sel" id="p-promo" onchange="_updatePrevPromo(this.value)">
-      <option value="">— Aucun —</option>
       <option value="partenaire">🤝 Partenaire officiel</option>
       <option value="sponsor">💼 Sponsor</option>
       <option value="collaborateur">🔗 Collaborateur</option>
@@ -1388,49 +1350,47 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
       <option value="pack">📦 Offres groupées</option>
       <option value="custom">✏️ Personnalisé…</option>
     </select>
+    <!-- Champ libre si custom -->
     <input type="text" class="f-inp" id="p-promo-custom" placeholder="Texte promotionnel libre" style="display:none;margin-top:-8px"
-      oninput="
-        const el=document.getElementById('prev-promo');
-        if(this.value){el.textContent=this.value;el.style.display='block';}
-        else{el.style.display='none';}
-      "/>
+      oninput="document.getElementById('prev-promo').textContent=this.value||'LABEL'"/>
 
-    <!-- Titre ligne 1 -->
-    <label class="f-label">✏️ Titre (ligne 1)
-      <small style="font-weight:400;text-transform:none;color:var(--light)">— optionnel</small>
-    </label>
+    <label class="f-label">Titre (ligne 1) *</label>
     <input type="text" class="f-inp" id="p-nom" placeholder="Ex : Courses livrées"
       oninput="_refreshPrevTitle()"/>
 
-    <!-- Titre ligne 2 -->
-    <label class="f-label">✏️ Titre (ligne 2)
-      <small style="font-weight:400;text-transform:none;color:var(--light)">— optionnel</small>
-    </label>
+    <label class="f-label">Titre (ligne 2 — optionnel)</label>
     <input type="text" class="f-inp" id="p-titre2" placeholder="Ex : à domicile"
       oninput="_refreshPrevTitle()"/>
 
-    <!-- Sous-titre -->
-    <label class="f-label">💬 Sous-titre / Slogan
-      <small style="font-weight:400;text-transform:none;color:var(--light)">— optionnel</small>
-    </label>
+    <label class="f-label">Sous-titre / Slogan</label>
     <input type="text" class="f-inp" id="p-desc" placeholder="Ex : Partout à Lomé"
-      oninput="
-        const el=document.getElementById('prev-sub');
-        if(this.value){el.textContent=this.value;el.style.display='block';}
-        else{el.style.display='none';}
-      "/>
+      oninput="document.getElementById('prev-sub').textContent=this.value||'Sous-titre'"/>
 
-    <!-- CTA -->
-    <label class="f-label">🔘 Texte du bouton CTA
+    <label class="f-label">Texte du bouton CTA
       <small style="font-weight:400;text-transform:none;color:var(--light)">— laisser vide pour masquer</small>
     </label>
-    <input type="text" class="f-inp" id="p-cta" placeholder="Ex : Commander →"
-      oninput="const cta=document.getElementById('prev-cta');cta.textContent=this.value;cta.classList.toggle('show',!!this.value);"/>
+    <input type="text" class="f-inp" id="p-cta" placeholder="Découvrir →"
+      oninput="const cta=document.getElementById('prev-cta');cta.textContent=this.value||'Découvrir →';cta.classList.toggle('show',!!this.value);"/>
 
-    <!-- Séparateur lien -->
-    <div style="border-top:1.5px dashed var(--border);margin:10px 0 14px;"></div>
-    <label class="f-label">🔗 Lien au clic
-      <small style="font-weight:400;text-transform:none;color:var(--light)">— optionnel</small>
+    <label class="f-label">URL de l'image de fond
+      <small style="font-weight:400;text-transform:none;color:var(--light)">(imgur.com, postimages.org… — ou laisser vide pour couleur)</small>
+    </label>
+    <input type="url" class="f-inp" id="p-img" placeholder="https://..."
+      oninput="
+        const ph=document.getElementById('prev-photo');
+        const em=document.getElementById('prev-emoji');
+        if(this.value){ph.src=this.value;ph.style.display='block';em.style.display='none';}
+        else{ph.src='';ph.style.display='none';em.style.display='block';}
+      "/>
+
+    <label class="f-label">Couleur / Dégradé de fond
+      <small style="font-weight:400;text-transform:none;color:var(--light)">ex : linear-gradient(135deg,#1E6FBE,#0d3d6e)</small>
+    </label>
+    <input type="text" class="f-inp" id="p-bg" placeholder="linear-gradient(135deg,#1E6FBE,#0d3d6e)"
+      oninput="document.getElementById('prev-img-zone').style.background=this.value"/>
+
+    <label class="f-label">Lien (optionnel)
+      <small style="font-weight:400;text-transform:none;color:var(--light)">— dirige le bouton "Découvrir / Commander"</small>
     </label>
     <div style="margin-bottom:8px">
       <div style="font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🎯 Pointer vers un service de l'app :</div>
@@ -1456,10 +1416,10 @@ html,body{height:100%;font-family:'Poppins',sans-serif;background:var(--bg);colo
       • Cliquez un bouton ci-dessus → le client est redirigé vers ce service<br/>
       • <code style="background:rgba(21,90,156,.1);padding:1px 5px;border-radius:4px">openService:kits</code> = ouvre directement la page dans l'app<br/>
       • <code style="background:rgba(21,90,156,.1);padding:1px 5px;border-radius:4px">https://...</code> = ouvre un lien externe dans le navigateur<br/>
-      • Laisser vide = pas de navigation au clic
+      • Laisser vide = CTA affiché mais sans navigation au clic
     </div>
 
-    <label class="f-label">📊 Ordre dans le slider
+    <label class="f-label">Ordre dans le slider
       <small style="font-weight:400;text-transform:none;color:var(--light)">(1 = en premier)</small>
     </label>
     <input type="number" class="f-inp" id="p-ordre" placeholder="1" value="1" min="1"/>
@@ -2830,25 +2790,14 @@ function renderPartners(){
 
 window.openPartnerModal=function(){
   editingPartnerId=null;
-  document.getElementById("partner-modal-title").textContent="Ajouter une publication";
-  document.getElementById("p-mode").value="partner";
-  document.getElementById("partner-id").value='';
-  // Reset champs
-  ['p-img','p-bg','p-badge','p-promo-custom','p-nom','p-titre2','p-desc','p-cta','p-lien'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
-  });
-  document.getElementById("p-promo").value='';
-  document.getElementById("p-ordre").value='1';
-  document.getElementById("p-promo-custom").style.display='none';
-  // Reset aperçu
-  document.getElementById("prev-badge").style.display='none';
-  document.getElementById("prev-promo").style.display='none';
-  document.getElementById("prev-title").style.display='none';
-  document.getElementById("prev-sub").style.display='none';
+  document.getElementById("prev-title").textContent="Titre";
+  document.getElementById("prev-sub").textContent="Sous-titre";
+  document.getElementById("prev-badge").textContent="🤝 Partenaire";
+  document.getElementById("prev-emoji").textContent="🤝";
   document.getElementById("prev-cta").classList.remove("show");
   document.getElementById("prev-img-zone").style.background='';
   const ph=document.getElementById("prev-photo"); ph.src=''; ph.style.display='none';
-  document.getElementById("prev-emoji").style.display='none';
+  document.getElementById("prev-emoji").style.display='block';
   document.getElementById("partner-save-btn").textContent="💾 Publier";
   document.getElementById("partner-reset-btn").style.display='none';
   document.getElementById("partner-modal").classList.add("show");
@@ -2867,14 +2816,12 @@ window.editPartner=function(id){
   document.getElementById("p-lien").value=p.lien||'';
   document.getElementById("p-ordre").value=p.ordre||1;
   document.getElementById("p-badge").value=p.badge||'';
+  document.getElementById("p-emoji").value=p.emoji||'';
   document.getElementById("p-bg").value=p.bg||'';
   document.getElementById("p-cta").value=p.ctaText||'';
   // Promo
   const allPromos=['partenaire','sponsor','collaborateur','nouveaute','promotion','evenement','livraison','restaurant','alimentaire','nettoyage','mode','pack'];
-  if(!p.promo || p.promo===''){
-    document.getElementById("p-promo").value='';
-    document.getElementById("p-promo-custom").style.display='none';
-  } else if(allPromos.includes(p.promo)){
+  if(allPromos.includes(p.promo)){
     document.getElementById("p-promo").value=p.promo;
     document.getElementById("p-promo-custom").style.display='none';
   } else {
@@ -2882,25 +2829,19 @@ window.editPartner=function(id){
     document.getElementById("p-promo-custom").style.display='block';
     document.getElementById("p-promo-custom").value=p.promoCustom||p.promo||'';
   }
-  // Preview badge
-  const badgeEl=document.getElementById("prev-badge");
-  if(p.badge){badgeEl.textContent=p.badge;badgeEl.style.display='block';}else{badgeEl.style.display='none';}
-  // Preview promo
-  _updatePrevPromo(p.promo||'',p.promoCustom);
-  // Preview titre
+  // Preview
+  _updatePrevPromo(p.promo||'partenaire',p.promoCustom);
   _refreshPrevTitle();
-  // Preview sous-titre
-  const subEl=document.getElementById("prev-sub");
-  if(p.description){subEl.textContent=p.description;subEl.style.display='block';}else{subEl.style.display='none';}
-  // Preview CTA
+  document.getElementById("prev-sub").textContent=p.description||'Sous-titre';
+  document.getElementById("prev-badge").textContent=p.badge||(p.nom?'🤝 '+p.nom:'🤝 Partenaire');
+  document.getElementById("prev-emoji").textContent=p.emoji||'🤝';
   const ctaEl=document.getElementById("prev-cta");
   ctaEl.textContent=p.ctaText||'Découvrir →';
   ctaEl.classList.toggle("show",!!(p.lien||p.ctaText));
-  // Preview image/fond
   document.getElementById("prev-img-zone").style.background=p.bg||'';
   const ph=document.getElementById("prev-photo");
   if(p.imageUrl){ph.src=p.imageUrl;ph.style.display='block';document.getElementById("prev-emoji").style.display='none';}
-  else{ph.src='';ph.style.display='none';document.getElementById("prev-emoji").style.display='none';}
+  else{ph.src='';ph.style.display='none';document.getElementById("prev-emoji").style.display='block';}
   document.getElementById("partner-save-btn").textContent="💾 Enregistrer";
   document.getElementById("partner-reset-btn").style.display='none';
   document.getElementById("partner-modal").classList.add("show");
@@ -2910,10 +2851,7 @@ window.savePartner=async function(){
   // Déléguer si on est en mode bandeau
   if(document.getElementById('p-mode').value==='bandeau'){saveBandeau();return;}
   const nom=document.getElementById("p-nom").value.trim();
-  const imgUrl=document.getElementById("p-img").value.trim();
-  const bg=document.getElementById("p-bg").value.trim();
-  // Au moins une image ou un titre
-  if(!nom && !imgUrl && !bg){toast("⚠️ Ajoutez au moins une image ou un titre","#F5820A");return;}
+  if(!nom){toast("⚠️ Le titre est obligatoire","#F5820A");return;}
   const promoVal=document.getElementById("p-promo").value;
   const promoCustom=promoVal==='custom'?document.getElementById("p-promo-custom").value.trim():'';
   const btn=document.getElementById("partner-save-btn");
@@ -2925,10 +2863,10 @@ window.savePartner=async function(){
     description:document.getElementById("p-desc").value.trim(),
     lien:document.getElementById("p-lien").value.trim(),
     badge:document.getElementById("p-badge").value.trim(),
-    emoji:'',
+    emoji:document.getElementById("p-emoji").value.trim(),
     bg:document.getElementById("p-bg").value.trim(),
     ctaText:document.getElementById("p-cta").value.trim(),
-    promo:promoVal||'',
+    promo:promoVal||'partenaire',
     promoCustom,
     ordre:parseInt(document.getElementById("p-ordre").value)||1,
     updatedAt:serverTimestamp()
@@ -2970,13 +2908,7 @@ window.setPartnerActif = async function(id, actif) {
 const DEFAULT_KITS_ADMIN = [
   { id:'kit1', nom:'Kit Repas Semaine', emoji:'🍱', description:"Tout ce qu'il faut pour nourrir votre famille pendant 7 jours",
     prix_total:28500, categorie:'Produits Locaux/Frais', ordre:1,
-    articles:[
-      {emoji:'🐟', name:'Tilapia frais',      qty:2, unit:'kg',        prix:3500},
-      {emoji:'🐔', name:'Poulet fermier',      qty:2, unit:'pièces',    prix:5500},
-      {emoji:'🥬', name:'Légumes assortis',    qty:3, unit:'paniers',   prix:1500},
-      {emoji:'🍶', name:'Vin de palme',        qty:1, unit:'bidon',     prix:4000},
-      {emoji:'🫘', name:'Néré (soumbara)',     qty:2, unit:'sachets',   prix:1000},
-    ]},
+    articles:['']},
   { id:'kit2', nom:'Pack Fête & Événement', emoji:'🎉', description:'Pour vos cérémonies, mariages et réceptions (10-15 personnes)',
     prix_total:75000, categorie:'Événement', ordre:2,
     articles:[
@@ -4073,33 +4005,20 @@ window._updatePrevPromo = function(val, customText) {
   };
   const el = document.getElementById('prev-promo');
   if(!el) return;
-  if(!val || val==='') {
-    el.style.display='none';
-    document.getElementById('p-promo-custom').style.display='none';
-    return;
-  }
   if(val==='custom'){
-    const txt = customText || document.getElementById('p-promo-custom').value || '';
-    if(txt){el.textContent=txt;el.style.display='block';}else{el.style.display='none';}
+    el.textContent = customText || document.getElementById('p-promo-custom').value || 'LABEL';
     document.getElementById('p-promo-custom').style.display='block';
   } else {
     el.textContent = LABELS[val] || val.toUpperCase();
-    el.style.display='block';
     document.getElementById('p-promo-custom').style.display='none';
   }
 };
 
 window._refreshPrevTitle = function() {
-  const t1 = document.getElementById('p-nom').value;
+  const t1 = document.getElementById('p-nom').value || 'Titre';
   const t2 = document.getElementById('p-titre2').value;
   const el = document.getElementById('prev-title');
-  if(!el) return;
-  if(t1||t2){
-    el.style.display='block';
-    el.innerHTML = (t1||'')+(t2?`${t1?'<br/>':''}<span style="color:#fff;opacity:.85">${t2}</span>`:'');
-  } else {
-    el.style.display='none';
-  }
+  if(el) el.innerHTML = t1+(t2?`<br/><span style="color:#1E6FBE">${t2}</span>`:'');
 };
 window._refreshBandeauTitle = window._refreshPrevTitle; // alias legacy
 
